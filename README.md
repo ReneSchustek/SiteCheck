@@ -18,6 +18,20 @@ Admins sind. Die üblichen Prüfungen sind passiv: gewöhnliche Anfragen und DNS
 nichts angegriffen und nichts verschickt. Nur der Stresstest belastet aktiv — und erst, nachdem
 bestätigt wurde, dass die Seite dir gehört und selbst gehostet ist.
 
+## Herunterladen
+
+Fertige Pakete für Windows (x64) liegen unter
+[Releases](https://github.com/ReneSchustek/SiteCheck/releases/latest): der Installer oder das
+portable ZIP, beide self-contained (keine Runtime nötig).
+
+Die Dateien sind nicht mit einem Zertifikat signiert, deshalb warnt Windows SmartScreen beim ersten
+Start („Der Computer wurde geschützt" → **Weitere Informationen** → **Trotzdem ausführen**). Zur
+Sicherheit steht im Release die **SHA-256-Prüfsumme** jeder Datei; so lässt sich der Download prüfen:
+
+```powershell
+Get-FileHash .\SiteCheck-Setup-v0.1.0.exe -Algorithm SHA256
+```
+
 ## Was er prüft
 
 **Web**
