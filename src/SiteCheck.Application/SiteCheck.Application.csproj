@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Die Abläufe: einen Prüflauf zusammenstellen, die Prüfungen der Reihe nach ausführen,
+    Fortschritt melden, abbrechen. Kennt den Core, aber keine Oberfläche und keinen
+    konkreten Netz-/DNS-Zugriff; die liegen hinter den Core-Abstraktionen.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SiteCheck.Core\SiteCheck.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SiteCheck.Application.Tests" />
+  </ItemGroup>
+
+</Project>

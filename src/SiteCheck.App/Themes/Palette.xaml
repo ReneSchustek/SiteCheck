@@ -1,0 +1,118 @@
+<!--
+    Die Farben der Gestaltungslinie ruhrcoder, hell und dunkel. Die Werte sind aus
+    design-system.md übernommen, nicht erfunden. WinUI wählt anhand des Erscheinungsbilds des
+    Systems das passende Wörterbuch; eigene semantische Brushes und die nötigen WinUI-Schlüssel
+    (Akzent, Navigationsleiste) stehen in beiden Belegungen mit demselben Schlüsselsatz, damit
+    keine Fläche in einer der beiden Belegungen ohne Farbe dasteht.
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.ThemeDictionaries>
+
+        <ResourceDictionary x:Key="Light">
+            <!-- Marken- und Flächenfarben -->
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#F5F5F5" />
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="SurfaceRaisedBrush" Color="#EBEBEB" />
+            <SolidColorBrush x:Key="PrimaryBrush" Color="#2F4858" />
+            <SolidColorBrush x:Key="PrimaryHoverBrush" Color="#26708F" />
+            <SolidColorBrush x:Key="OnPrimaryBrush" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1A1A1A" />
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#5A5A5A" />
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#5A5A5A" />
+            <SolidColorBrush x:Key="HairlineBrush" Color="#D2D2D2" />
+
+            <!-- WinUI-Schlüssel, damit Standardsteuerelemente der Linie folgen. Der Pane ist eine
+                 dunkle Petrolfläche; ohne helle Menü-Textfarben erbten die Einträge die dunkle
+                 Standardfarbe des Rahmenwerks und stünden dunkel auf dunkel (die Falle aus der
+                 Gestaltungslinie). Darum hier die hellen Werte, in beiden Belegungen gleich. -->
+            <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#2F4858" />
+            <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="#2F4858" />
+            <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#C2D4DE" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundPressed" Color="#DCE9F1" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPressed" Color="#DCE9F1" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#5F7685" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedDisabled" Color="#5F7685" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForeground" Color="#C2D4DE" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundPointerOver" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundPressed" Color="#DCE9F1" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundSelected" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundSelectedPointerOver" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundSelectedPressed" Color="#DCE9F1" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundDisabled" Color="#5F7685" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundSelectedDisabled" Color="#5F7685" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="#3C5A6C" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#243B49" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#3C5A6C" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPointerOver" Color="#496A7D" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPressed" Color="#243B49" />
+            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#4A9CC5" />
+            <SolidColorBrush x:Key="NavigationViewButtonForegroundPointerOver" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewButtonForegroundPressed" Color="#DCE9F1" />
+            <Color x:Key="SystemAccentColor">#26708F</Color>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0F1923" />
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#152030" />
+            <SolidColorBrush x:Key="SurfaceRaisedBrush" Color="#1A2535" />
+            <SolidColorBrush x:Key="PrimaryBrush" Color="#C5D0D6" />
+            <SolidColorBrush x:Key="PrimaryHoverBrush" Color="#DDE5E9" />
+            <SolidColorBrush x:Key="OnPrimaryBrush" Color="#0F1923" />
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E4EDF2" />
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#8AA3B0" />
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#8AA3B0" />
+            <SolidColorBrush x:Key="HairlineBrush" Color="#2A3645" />
+
+            <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#152030" />
+            <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="#152030" />
+            <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#C2D4DE" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundPressed" Color="#DCE9F1" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPointerOver" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedPressed" Color="#DCE9F1" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#5F7685" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundSelectedDisabled" Color="#5F7685" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForeground" Color="#C2D4DE" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundPointerOver" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundPressed" Color="#DCE9F1" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundSelected" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundSelectedPointerOver" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundSelectedPressed" Color="#DCE9F1" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundDisabled" Color="#5F7685" />
+            <SolidColorBrush x:Key="NavigationViewItemIconForegroundSelectedDisabled" Color="#5F7685" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="#243445" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#1B2a3a" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#243445" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPointerOver" Color="#2C3E50" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPressed" Color="#1B2a3a" />
+            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#4A9CC5" />
+            <SolidColorBrush x:Key="NavigationViewButtonForegroundPointerOver" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewButtonForegroundPressed" Color="#DCE9F1" />
+            <Color x:Key="SystemAccentColor">#94A3AB</Color>
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+
+    <!-- Statusfarben als feste, theme-unabhängige Werte. Sie sitzen als schmaler Streifen oder
+         als Wort-Plakette auf der Karte und müssen in beiden Erscheinungsbildern erkennbar sein;
+         ein mittlerer Ton trägt auf heller wie dunkler Fläche. Aus dem Code heraus (ViewModel)
+         sind nur solche Schlüssel der obersten Ebene verlässlich auflösbar, nicht die
+         theme-abhängigen. Die Bedeutung hängt nie allein an der Farbe, immer am Wort daneben. -->
+    <SolidColorBrush x:Key="StatusOkBrush" Color="#2E9E5B" />
+    <SolidColorBrush x:Key="StatusInfoBrush" Color="#2E86B8" />
+    <SolidColorBrush x:Key="StatusWarningBrush" Color="#C77A00" />
+    <SolidColorBrush x:Key="StatusCriticalBrush" Color="#D13A30" />
+
+    <!-- Schrift gehört zur Marke und wechselt nicht mit dem Erscheinungsbild. Roboto Flex mit
+         Rückfallkette; auf Windows ohne installierte Schrift greift Segoe UI Variable. -->
+    <FontFamily x:Key="ThemeFontFamily">Roboto Flex, Segoe UI Variable, Segoe UI</FontFamily>
+    <FontFamily x:Key="ThemeMonoFontFamily">Roboto Mono, Cascadia Mono, Consolas</FontFamily>
+
+</ResourceDictionary>

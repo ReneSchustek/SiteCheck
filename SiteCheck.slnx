@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SiteCheck.Core/SiteCheck.Core.csproj" />
+    <Project Path="src/SiteCheck.Application/SiteCheck.Application.csproj" />
+    <Project Path="src/SiteCheck.Data/SiteCheck.Data.csproj" />
+    <Project Path="src/SiteCheck.Cli/SiteCheck.Cli.csproj" />
+    <Project Path="src/SiteCheck.App/SiteCheck.App.csproj">
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SiteCheck.Core.Tests/SiteCheck.Core.Tests.csproj" />
+    <Project Path="tests/SiteCheck.Application.Tests/SiteCheck.Application.Tests.csproj" />
+    <Project Path="tests/SiteCheck.Data.Tests/SiteCheck.Data.Tests.csproj" />
+    <Project Path="tests/SiteCheck.App.Tests/SiteCheck.App.Tests.csproj">
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+</Solution>

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Die Domäne: Befund-Modell, Stufen, Prüfregeln und die Verträge für Netz-, DNS- und
+    Dateizugriff. Kennt weder WinUI noch die Konsole und hat keine Paketabhängigkeit;
+    ein Architekturtest in SiteCheck.Core.Tests hält das fest.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SiteCheck.Core.Tests" />
+  </ItemGroup>
+
+</Project>

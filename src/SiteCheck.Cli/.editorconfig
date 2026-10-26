@@ -1,0 +1,6 @@
+# Konsolen-Einstiegspunkt: Die Ausgabe läuft bewusst synchron über Console, und ein
+# Synchronisationskontext, den ConfigureAwait beeinflussen könnte, existiert hier nicht.
+# Beide Regeln sind für einen einfachen CLI-Lauf ohne Gegenwert.
+[*.cs]
+dotnet_diagnostic.CA1849.severity = none
+dotnet_diagnostic.CA2007.severity = none

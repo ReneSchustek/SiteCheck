@@ -1,0 +1,3 @@
+# App-Projekt: kein ConfigureAwait nötig, die Oberfläche läuft auf dem UI-Thread.
+[*.cs]
+dotnet_diagnostic.CA2007.severity = none

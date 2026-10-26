@@ -1,0 +1,123 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Die WinUI-3-Oberfläche. Unpackaged (portabel) als Default, wie die Schwesterprogramme
+    ausgeliefert werden; ein MSIX-Paket ist optional möglich. Bindet Core, Application und
+    Data über die Composition Root (App.xaml.cs) zusammen.
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>SiteCheck.App</RootNamespace>
+    <AssemblyName>SiteCheck</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Icon der EXE (Explorer, Taskleiste, Alt+Tab) im unpackaged-Betrieb. -->
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
+    <UseWinUI>true</UseWinUI>
+    <WinUISDKReferences>false</WinUISDKReferences>
+    <Nullable>enable</Nullable>
+    <!-- Unpackaged als Default: F5/Run und die portable Variante laufen ohne MSIX-Deploy.
+         Self-contained (das Windows App SDK mitliefern) wird erst im Publish-Profil gesetzt,
+         nicht hier: Im csproj gälte es auch für den gewöhnlichen Build und verlangte dort eine
+         feste Architektur, was den Bau über eine Projektreferenz (Tests) brechen würde. -->
+    <WindowsPackageType Condition="'$(WindowsPackageType)' == ''">None</WindowsPackageType>
+    <EnableMsixTooling Condition="'$(WindowsPackageType)' != 'None'">true</EnableMsixTooling>
+  </PropertyGroup>
+
+  <!-- Der self-contained-Publish zieht die generierte Datei UndockedRegFreeWinRT-AutoInitializer.cs
+       aus dem WindowsAppSDK-Paket herein, die CA5392 verletzt. Fremd-/Generat-Code außerhalb
+       unserer .editorconfig; daher CA5392 ausschließlich in diesem Modus unterdrücken. -->
+  <PropertyGroup Condition="'$(WindowsAppSDKSelfContained)' == 'true'">
+    <NoWarn>$(NoWarn);CA5392</NoWarn>
+  </PropertyGroup>
+
+  <!-- Die WinUI-3-Resource-Indizes werden beim Build erzeugt, aber von 'dotnet publish'
+       (unpackaged) nicht mitgenommen. Ohne sie scheitert zur Laufzeit das Laden von XAML/
+       ms-appx-Assets. Beide unter ihrem jeweiligen Namen in den Publish-Output aufnehmen. -->
+  <Target Name="IncludeProjectPriInPublish" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <ResolvedFileToPublish Include="$(OutDir)$(AssemblyName).pri" Condition="Exists('$(OutDir)$(AssemblyName).pri')">
+        <RelativePath>$(AssemblyName).pri</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+      <ResolvedFileToPublish Include="$(OutDir)$(AssemblyName).pri"
+                             Condition="'$(WindowsPackageType)' == 'None' and Exists('$(OutDir)$(AssemblyName).pri')">
+        <RelativePath>resources.pri</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+
+  <!-- Themes und Assets liegen im unpackaged-Publish sonst nur in der PRI und fehlen als lose
+       Dateien; App.xaml lädt die Paletten per Source="Themes/…", und der Splash braucht das Logo. -->
+  <Target Name="CopyLooseContentToPublish" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <_LooseAsset Include="$(MSBuildProjectDirectory)\Assets\**\*" />
+      <ResolvedFileToPublish Include="@(_LooseAsset)">
+        <RelativePath>Assets\%(RecursiveDir)%(Filename)%(Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+      <_LooseTheme Include="$(MSBuildProjectDirectory)\Themes\*.xaml" />
+      <ResolvedFileToPublish Include="@(_LooseTheme)">
+        <RelativePath>Themes\%(Filename)%(Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <!-- Theme-Wörterbücher sind reine ResourceDictionaries; Page Remove hält den XAML-Compiler
+         davon ab, sie als Seiten zu behandeln, Content Include liefert sie ins Ausgabeverzeichnis. -->
+    <Page Remove="Themes\*.xaml" />
+    <Content Include="Themes\*.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\logo.png" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Fenster-Icon zur Laufzeit (AppWindow.SetIcon braucht die lose Datei). -->
+    <Content Include="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" />
+    <!-- MSIX-Kacheln und -Logos; vom Package.appxmanifest referenziert. -->
+    <Content Include="Assets\Square44x44Logo.scale-100.png" />
+    <Content Include="Assets\Square44x44Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Content Include="Assets\Square150x150Logo.scale-100.png" />
+    <Content Include="Assets\Square150x150Logo.scale-200.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-100.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="Assets\StoreLogo.png" />
+    <Content Include="Assets\SplashScreen.scale-100.png" />
+    <Content Include="Assets\SplashScreen.scale-200.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SiteCheck.Core\SiteCheck.Core.csproj" />
+    <ProjectReference Include="..\SiteCheck.Application\SiteCheck.Application.csproj" />
+    <ProjectReference Include="..\SiteCheck.Data\SiteCheck.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SiteCheck.App.Tests" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Windows-TFM, weil SiteCheck.App diesen als einzigen führt. Kein WinUI-Host: getestet
+         werden die UI-freien ViewModels und ein Gestaltungslinien-Wächter über die XAML-Dateien. -->
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <UseWinUI>false</UseWinUI>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- SiteCheck.App wird im Solution-Build mit RID und damit self-contained gebaut; ein
+         nicht self-contained gebautes Testprojekt dürfte es nicht referenzieren (NETSDK1151).
+         Darum hier ebenfalls self-contained. -->
+    <SelfContained>true</SelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SiteCheck.App\SiteCheck.App.csproj" />
+    <ProjectReference Include="..\..\src\SiteCheck.Core\SiteCheck.Core.csproj" />
+    <ProjectReference Include="..\..\src\SiteCheck.Application\SiteCheck.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

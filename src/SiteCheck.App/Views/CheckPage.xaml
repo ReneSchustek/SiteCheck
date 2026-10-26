@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SiteCheck.App.Views.CheckPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="using:SiteCheck.App.Converters"
+    xmlns:vm="using:SiteCheck.App.ViewModels"
+    Background="{ThemeResource AppBackgroundBrush}">
+
+    <Page.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+
+        <!-- Befund-Karte: linker Farbstreifen nach Stufe, Wort-Plakette, Titel, Detail, Rat. -->
+        <DataTemplate x:Key="FindingTemplate" x:DataType="vm:FindingViewModel">
+            <Border
+                Background="{ThemeResource SurfaceBrush}"
+                BorderBrush="{ThemeResource HairlineBrush}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource SurfaceCornerRadius}"
+                Margin="0,0,0,8"
+                Padding="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Rectangle Grid.Column="0" Fill="{x:Bind AccentBrush}" RadiusX="2" RadiusY="2" />
+                    <StackPanel Grid.Column="1" Spacing="4" Padding="14,10">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Border
+                                Background="{x:Bind AccentBrush}"
+                                CornerRadius="4"
+                                Padding="6,1"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    Text="{x:Bind SeverityWord}"
+                                    Foreground="White"
+                                    FontSize="11"
+                                    FontWeight="SemiBold" />
+                            </Border>
+                            <TextBlock
+                                Text="{x:Bind Title}"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource TextPrimaryBrush}"
+                                VerticalAlignment="Center"
+                                TextWrapping="Wrap" />
+                            <TextBlock
+                                Text="aus Sicht von außen"
+                                FontSize="11"
+                                FontStyle="Italic"
+                                VerticalAlignment="Center"
+                                Foreground="{ThemeResource TextSecondaryBrush}"
+                                Visibility="{x:Bind IsInferred, Converter={StaticResource BoolToVisibility}}" />
+                            <Border
+                                Background="{ThemeResource SurfaceRaisedBrush}"
+                                CornerRadius="4"
+                                Padding="6,1"
+                                VerticalAlignment="Center"
+                                Visibility="{x:Bind HasChangeLabel, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock
+                                    Text="{x:Bind ChangeLabel}"
+                                    FontSize="11"
+                                    FontWeight="SemiBold"
+                                    Foreground="{ThemeResource TextSecondaryBrush}" />
+                            </Border>
+                        </StackPanel>
+                        <TextBlock
+                            Text="{x:Bind Detail}"
+                            Visibility="{x:Bind HasDetail, Converter={StaticResource BoolToVisibility}}"
+                            Foreground="{ThemeResource TextSecondaryBrush}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Visibility="{x:Bind HasAdvice, Converter={StaticResource BoolToVisibility}}"
+                            Foreground="{ThemeResource TextPrimaryBrush}"
+                            TextWrapping="Wrap">
+                            <Run Text="Empfehlung:" FontWeight="SemiBold" />
+                            <Run Text="{x:Bind Advice}" />
+                        </TextBlock>
+                        <Border
+                            Visibility="{x:Bind HasExample, Converter={StaticResource BoolToVisibility}}"
+                            Background="{ThemeResource AppBackgroundBrush}"
+                            BorderBrush="{ThemeResource HairlineBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="8,6">
+                            <TextBlock
+                                Text="{x:Bind Example}"
+                                FontFamily="{ThemeResource ThemeMonoFontFamily}"
+                                FontSize="12"
+                                IsTextSelectionEnabled="True"
+                                Foreground="{ThemeResource TextSecondaryBrush}"
+                                TextWrapping="Wrap" />
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid Padding="{StaticResource PagePadding}" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Kopf -->
+        <StackPanel Grid.Row="0" Spacing="2">
+            <TextBlock Text="Prüfen" Style="{StaticResource PageTitleTextStyle}" />
+            <TextBlock
+                Text="Adresse der eigenen Seite eingeben und prüfen. Es wird nur von außen geschaut, nichts verändert."
+                Style="{StaticResource PageSubtitleTextStyle}" />
+        </StackPanel>
+
+        <!-- Adressfeld und Aktionen -->
+        <StackPanel Grid.Row="1" Spacing="8">
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox
+                    x:Name="AddressBox"
+                    Grid.Column="0"
+                    Text="{x:Bind ViewModel.AddressInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    PlaceholderText="z. B. meine-seite.de"
+                    KeyDown="OnAddressKeyDown"
+                    VerticalAlignment="Center" />
+                <Button
+                    Grid.Column="1"
+                    Content="Prüfen"
+                    Style="{StaticResource PrimaryActionButtonStyle}"
+                    Command="{x:Bind ViewModel.RunCommand}"
+                    Visibility="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource InverseBoolToVisibility}}" />
+                <Button
+                    Grid.Column="2"
+                    Content="Abbrechen"
+                    MinHeight="40"
+                    Command="{x:Bind ViewModel.CancelCommand}"
+                    Visibility="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
+            </Grid>
+
+            <InfoBar
+                IsOpen="{x:Bind ViewModel.HasValidationMessage, Mode=OneWay}"
+                Severity="Warning"
+                IsClosable="False"
+                Message="{x:Bind ViewModel.ValidationMessage, Mode=OneWay}" />
+
+            <ProgressBar
+                Maximum="1"
+                Value="{x:Bind ViewModel.Progress, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
+        </StackPanel>
+
+        <!-- Zusammenzählung und Weitergabe -->
+        <Grid Grid.Row="2" ColumnSpacing="8" Visibility="{x:Bind ViewModel.HasResult, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Grid.Column="0"
+                Text="{x:Bind ViewModel.StatusText, Mode=OneWay}"
+                Style="{StaticResource BodyTextStyle}"
+                VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="Kopieren" Command="{x:Bind ViewModel.CopyCommand}" />
+            <Button Grid.Column="2" Content="Als Datei speichern" Command="{x:Bind ViewModel.SaveCommand}" />
+            <Button Grid.Column="3" Content="Verlauf leeren" Command="{x:Bind ViewModel.ClearHistoryCommand}" />
+        </Grid>
+
+        <!-- Ergebnisse -->
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="8">
+                <TextBlock
+                    Text="WEB"
+                    Style="{StaticResource SectionHeaderTextStyle}"
+                    Visibility="{x:Bind ViewModel.HasResult, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
+                <ItemsControl ItemsSource="{x:Bind ViewModel.WebFindings}" ItemTemplate="{StaticResource FindingTemplate}" />
+                <TextBlock
+                    Text="MAIL-EINRICHTUNG"
+                    Style="{StaticResource SectionHeaderTextStyle}"
+                    Margin="0,8,0,0"
+                    Visibility="{x:Bind ViewModel.HasResult, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
+                <ItemsControl ItemsSource="{x:Bind ViewModel.MailFindings}" ItemTemplate="{StaticResource FindingTemplate}" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

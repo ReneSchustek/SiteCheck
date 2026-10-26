@@ -1,0 +1,45 @@
+<Project>
+  <!--
+    Zentrale Build-Konfiguration für alle Projekte dieser Solution.
+    Einzelne .csproj-Dateien setzen nur, was nur für sie gilt.
+  -->
+  <PropertyGroup>
+    <!-- Die Versionsnummer steht einmal in VERSION; Programm, Über-Seite und Bericht lesen sie
+         aus der Assembly. Eine zweite Angabe hier liefe früher oder später auseinander. -->
+    <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)VERSION').Trim())</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>All</AnalysisMode>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Company>Ruhrcoder</Company>
+    <Product>SiteCheck</Product>
+    <Copyright>© Ruhrcoder (René Schustek)</Copyright>
+  </PropertyGroup>
+
+  <!-- Reproduzierbare Builds: gleicher Quelltext ergibt gleiche Bytes, und im CI bleiben
+       rechnerspezifische Pfade aus den Symboldateien heraus. -->
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true' or '$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- Testprojekte: Unterstriche im Testnamen sind Konvention, XML-Doku entfällt. Die
+       Laufzeit-Grenzen aus tests.runsettings gelten in jedem Lauf (Timeout-Netz gegen Hänger). -->
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+    <NoWarn>$(NoWarn);CA1707</NoWarn>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <IsPackable>false</IsPackable>
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)tests.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+</Project>

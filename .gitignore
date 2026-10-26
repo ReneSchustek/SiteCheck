@@ -1,0 +1,34 @@
+# Build-Artefakte
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+.vs/
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Test-Ergebnisse und Abdeckung
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.cobertura.xml
+coverage/
+
+# Auslieferung
+[Pp]ublish/
+dist/
+AppPackages/
+BundleArtifacts/
+
+# Zertifikate
+*.pfx
+*.p12
+
+# Die globale Ignorierliste dieses Rechners schließt "docs/" aus; hier soll die
+# Projekt-Doku (z. B. die Abdeckungs-Begründung) mit ins Repository.
+!docs/
+!docs/**

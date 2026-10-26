@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="SiteCheck.App.SplashWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="SiteCheck">
+
+    <!-- Feste Farben: Der Splash erscheint, bevor die Paletten verlässlich geladen sind. -->
+    <Grid Background="#2F4858">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+            <Image x:Name="LogoImage" Width="96" Height="96" HorizontalAlignment="Center" Stretch="Uniform" />
+            <TextBlock
+                Text="SiteCheck"
+                FontSize="30"
+                FontWeight="Bold"
+                Foreground="#FFFFFF"
+                HorizontalAlignment="Center" />
+            <TextBlock
+                Text="Prüft die eigenen Seiten — ehrlich und passiv."
+                FontSize="13"
+                Foreground="#C5D0D6"
+                HorizontalAlignment="Center" />
+            <ProgressBar IsIndeterminate="True" Width="200" Margin="0,8,0,0" />
+        </StackPanel>
+    </Grid>
+
+</Window>

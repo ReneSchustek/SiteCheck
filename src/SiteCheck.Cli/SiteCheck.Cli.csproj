@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Der schmale Konsolen-Zugang: dieselbe Prüflogik wie die Oberfläche, nur ohne sie. Führt
+    einen einzelnen Lauf aus und gibt die Befunde farbig aus. Praktisch für einen geplanten
+    Lauf; Rückgabewert 1, sobald ein kritischer Befund dabei ist.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>SiteCheck.Cli</RootNamespace>
+    <AssemblyName>sitecheck</AssemblyName>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SiteCheck.Application\SiteCheck.Application.csproj" />
+    <ProjectReference Include="..\SiteCheck.Core\SiteCheck.Core.csproj" />
+    <ProjectReference Include="..\SiteCheck.Data\SiteCheck.Data.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SiteCheck.App.Views.SitesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="using:SiteCheck.App.Converters"
+    xmlns:vm="using:SiteCheck.App.ViewModels"
+    Background="{ThemeResource AppBackgroundBrush}">
+
+    <Page.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+
+        <DataTemplate x:Key="SiteTemplate" x:DataType="vm:SiteRowViewModel">
+            <Border
+                Background="{ThemeResource SurfaceBrush}"
+                BorderBrush="{ThemeResource HairlineBrush}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource SurfaceCornerRadius}"
+                Margin="0,0,0,8"
+                Padding="14,10">
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Ampel: Punkt plus Wort, nie nur Farbe -->
+                    <Ellipse Grid.Column="0" Width="14" Height="14" VerticalAlignment="Center" Fill="{x:Bind AmpelBrush, Mode=OneWay}" />
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" Foreground="{ThemeResource TextPrimaryBrush}" />
+                        <TextBlock Text="{x:Bind Address}" Foreground="{ThemeResource TextSecondaryBrush}" FontSize="12" />
+                        <TextBlock Text="{x:Bind LastRunText, Mode=OneWay}" Foreground="{ThemeResource TextSecondaryBrush}" FontSize="11" />
+                    </StackPanel>
+
+                    <TextBlock
+                        Grid.Column="2"
+                        Text="{x:Bind AmpelWord, Mode=OneWay}"
+                        Foreground="{ThemeResource TextSecondaryBrush}"
+                        VerticalAlignment="Center" />
+
+                    <Button
+                        Grid.Column="3"
+                        Content="Prüfen"
+                        Command="{Binding DataContext.CheckCommand, ElementName=Root}"
+                        CommandParameter="{x:Bind}" />
+                    <Button
+                        Grid.Column="4"
+                        Content="Entfernen"
+                        Command="{Binding DataContext.RemoveCommand, ElementName=Root}"
+                        CommandParameter="{x:Bind}" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid x:Name="Root" Padding="{StaticResource PagePadding}" RowSpacing="16" DataContext="{x:Bind ViewModel}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Spacing="2">
+                <TextBlock Text="Meine Seiten" Style="{StaticResource PageTitleTextStyle}" />
+                <TextBlock
+                    Text="Seiten, die du öfter prüfst. Prüfen kannst du jede Adresse auch direkt unter „Prüfen“."
+                    Style="{StaticResource PageSubtitleTextStyle}" />
+            </StackPanel>
+            <Button
+                Grid.Column="1"
+                Content="Alle prüfen"
+                Style="{StaticResource PrimaryActionButtonStyle}"
+                VerticalAlignment="Center"
+                Command="{x:Bind ViewModel.CheckAllCommand}"
+                Visibility="{x:Bind ViewModel.IsCheckingAll, Mode=OneWay, Converter={StaticResource InverseBoolToVisibility}}" />
+            <Button
+                Grid.Column="2"
+                Content="Abbrechen"
+                MinHeight="40"
+                VerticalAlignment="Center"
+                Command="{x:Bind ViewModel.CancelAllCommand}"
+                Visibility="{x:Bind ViewModel.IsCheckingAll, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
+        </Grid>
+
+        <StackPanel Grid.Row="1" Spacing="8">
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" PlaceholderText="Name (optional)" Text="{x:Bind ViewModel.NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Column="1" PlaceholderText="Adresse, z. B. meine-seite.de" Text="{x:Bind ViewModel.NewAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Grid.Column="2" Content="Hinzufügen" Command="{x:Bind ViewModel.AddCommand}" />
+            </Grid>
+            <InfoBar
+                IsOpen="{x:Bind ViewModel.HasValidationMessage, Mode=OneWay}"
+                Severity="Warning"
+                IsClosable="False"
+                Message="{x:Bind ViewModel.ValidationMessage, Mode=OneWay}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Spacing="4" Visibility="{x:Bind ViewModel.IsCheckingAll, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+            <ProgressBar IsIndeterminate="True" />
+            <TextBlock Text="{x:Bind ViewModel.CheckAllStatus, Mode=OneWay}" Style="{StaticResource MutedTextStyle}" />
+        </StackPanel>
+
+        <Grid Grid.Row="3">
+            <TextBlock
+                Text="Noch keine Seite gespeichert. Oben eine Adresse hinzufügen."
+                Style="{StaticResource MutedTextStyle}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{x:Bind ViewModel.Sites}" ItemTemplate="{StaticResource SiteTemplate}" />
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Page>

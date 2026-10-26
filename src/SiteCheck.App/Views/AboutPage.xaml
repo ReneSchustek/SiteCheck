@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SiteCheck.App.Views.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{ThemeResource AppBackgroundBrush}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="12" HorizontalAlignment="Center" MaxWidth="440" Margin="24,40,24,40">
+
+            <Image Source="ms-appx:///Assets/logo.png" Width="88" Height="88" HorizontalAlignment="Center" />
+
+            <TextBlock Text="SiteCheck" Style="{StaticResource PageTitleTextStyle}" HorizontalAlignment="Center" />
+            <TextBlock x:Name="VersionText" Style="{StaticResource MutedTextStyle}" HorizontalAlignment="Center" TextAlignment="Center" />
+
+            <Border Style="{StaticResource CardBorderStyle}">
+                <TextBlock
+                    Style="{StaticResource BodyTextStyle}"
+                    TextAlignment="Center"
+                    Text="SiteCheck prüft die eigenen Seiten von außen: Verschlüsselung, Schutz-Kopfzeilen, Cookies, offene Dateien und die Mail-Einrichtung (MX, SPF, DKIM, DMARC, Rückwärtsauflösung). Alles passiv — gewöhnliche Anfragen und DNS-Abfragen, nichts wird angegriffen. Nur der Stresstest belastet aktiv und nur nach Bestätigung, dass die Seite dir gehört." />
+            </Border>
+
+            <TextBlock Text="Ruhrcoder (René Schustek)" Style="{StaticResource BodyTextStyle}" HorizontalAlignment="Center" />
+            <TextBlock Text="ruhrcoder.de" Style="{StaticResource MutedTextStyle}" HorizontalAlignment="Center" />
+
+            <StackPanel x:Name="SupportPanel" Spacing="8" Visibility="Collapsed" Margin="0,8,0,0">
+                <TextBlock
+                    Style="{StaticResource MutedTextStyle}"
+                    TextAlignment="Center"
+                    Text="SiteCheck ist kostenlos. Wenn es dir hilft, kannst du freiwillig einen Kaffee spendieren." />
+                <Button Content="☕ Kaffee spendieren" HorizontalAlignment="Center" Click="OnSupportClick" />
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>
