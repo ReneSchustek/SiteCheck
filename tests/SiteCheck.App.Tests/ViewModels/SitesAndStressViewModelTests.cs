@@ -23,12 +23,12 @@ public sealed class SitesAndStressViewModelTests
         SitesViewModel vm = BuildSites(store);
         await vm.LoadAsync(TestContext.Current.CancellationToken);
         vm.NewName = "Musik";
-        vm.NewAddress = "music.vreka-music.com";
+        vm.NewAddress = "music.example.com";
 
         await vm.AddCommand.ExecuteAsync(null);
 
         _ = Assert.Single(vm.Sites);
-        Assert.Equal("https://music.vreka-music.com/", vm.Sites[0].Address);
+        Assert.Equal("https://music.example.com/", vm.Sites[0].Address);
         Assert.False(vm.IsEmpty);
 
         // Neu laden aus dem Speicher bestätigt, dass gespeichert wurde.

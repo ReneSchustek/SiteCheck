@@ -2,7 +2,7 @@ namespace SiteCheck.Core.Models;
 
 /// <summary>
 /// Leitet aus einem Rechnernamen die Domain ab, unter der Mail-Einträge (MX, SPF, DMARC)
-/// gesucht werden: aus <c>music.vreka-music.com</c> wird <c>vreka-music.com</c>.
+/// gesucht werden: aus <c>music.example.com</c> wird <c>example.com</c>.
 /// <para>
 /// Die vollständige Public Suffix List wäre genauer, bräuchte aber ein Paket oder eine
 /// gepflegte Datei mit rund 10.000 Einträgen. Für eigene Seiten genügen die letzten zwei

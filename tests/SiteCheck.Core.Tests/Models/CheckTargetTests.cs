@@ -36,18 +36,18 @@ public sealed class CheckTargetTests
     [Fact]
     public void MailDomain_ForSubdomain_StripsToRegistrableDomain()
     {
-        Assert.True(CheckTarget.TryParse("music.vreka-music.com", out CheckTarget? target, out _));
+        Assert.True(CheckTarget.TryParse("music.example.com", out CheckTarget? target, out _));
 
-        Assert.Equal("vreka-music.com", target!.MailDomain);
+        Assert.Equal("example.com", target!.MailDomain);
         Assert.True(target.IsSubdomain);
     }
 
     [Fact]
     public void MailDomain_ForApexDomain_IsNotSubdomain()
     {
-        Assert.True(CheckTarget.TryParse("vreka-music.com", out CheckTarget? target, out _));
+        Assert.True(CheckTarget.TryParse("example.com", out CheckTarget? target, out _));
 
-        Assert.Equal("vreka-music.com", target!.MailDomain);
+        Assert.Equal("example.com", target!.MailDomain);
         Assert.False(target.IsSubdomain);
     }
 

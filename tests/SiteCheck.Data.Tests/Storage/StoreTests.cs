@@ -62,8 +62,8 @@ public sealed class StoreTests : IDisposable
         SiteStore store = new(_paths);
         IReadOnlyList<Site> sites =
         [
-            new Site("Musik", "https://music.vreka-music.com/"),
-            new Site("Haupt", "https://vreka-music.com/"),
+            new Site("Musik", "https://music.example.com/"),
+            new Site("Haupt", "https://example.com/"),
         ];
 
         await store.SaveAsync(sites, TestContext.Current.CancellationToken);

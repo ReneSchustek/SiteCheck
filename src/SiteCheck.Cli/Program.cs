@@ -8,14 +8,14 @@ using SiteCheck.Data.Probes;
 // von außen ab und gibt die Befunde aus. Alles passiv; der Lasttest ist der Oberfläche
 // vorbehalten, weil er eine ausdrückliche Bestätigung verlangt.
 //
-// Aufruf:  sitecheck https://music.vreka-music.com
+// Aufruf:  sitecheck https://music.example.com
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 if (args.Length == 0 || args[0] is "-h" or "--help")
 {
     Console.WriteLine("Aufruf: sitecheck <adresse>");
-    Console.WriteLine("Beispiel: sitecheck https://music.vreka-music.com");
+    Console.WriteLine("Beispiel: sitecheck https://music.example.com");
     return 0;
 }
 

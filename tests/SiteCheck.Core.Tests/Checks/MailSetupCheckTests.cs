@@ -18,10 +18,10 @@ public sealed class MailSetupCheckTests
         // Fehlender MX ist nach echter Erfahrung ein Warnung-wert Mangel (häufiger
         // Grund für ausbleibende Mails), aber von außen nicht als Ursache beweisbar → nie „Kritisch“.
         FakeDnsProbe dns = new FakeDnsProbe()
-            .SetTxt("vreka-music.com", "v=spf1 include:secureserver.net -all");
+            .SetTxt("example.com", "v=spf1 include:secureserver.net -all");
         MailSetupCheck check = new(dns);
 
-        IReadOnlyList<Finding> findings = await check.RunAsync(Target("https://music.vreka-music.com"), TestContext.Current.CancellationToken);
+        IReadOnlyList<Finding> findings = await check.RunAsync(Target("https://music.example.com"), TestContext.Current.CancellationToken);
 
         Finding mx = findings.Single(finding => finding.Key == "mail.setup.mx.missing");
         Assert.Equal(Severity.Warning, mx.Severity);

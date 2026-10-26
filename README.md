@@ -1,4 +1,16 @@
+<div align="center">
+
+<img src="src/SiteCheck.App/Assets/logo.png" alt="SiteCheck" width="120" />
+
 # SiteCheck
+
+**Prüft die eigenen Websites von außen auf Sicherheit und Mail-Einrichtung.**
+
+[![CI](https://github.com/ReneSchustek/SiteCheck/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ReneSchustek/SiteCheck/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/ReneSchustek/SiteCheck?sort=semver)](https://github.com/ReneSchustek/SiteCheck/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+</div>
 
 Ein kleiner Prüfer für die **eigenen** Seiten. Er klopft eine Adresse von außen ab und sagt
 in klarer Sprache, was gut eingestellt ist und was fehlt — gedacht auch für Leute, die keine
@@ -68,7 +80,7 @@ dotnet test tests/SiteCheck.App.Tests/SiteCheck.App.Tests.csproj -c Release
 **Konsole:**
 
 ```bash
-dotnet run --project src/SiteCheck.Cli -- https://music.vreka-music.com
+dotnet run --project src/SiteCheck.Cli -- https://example.com
 ```
 
 Rückgabewert der Konsole ist `1`, sobald ein kritischer Punkt dabei ist, sonst `0` — praktisch
@@ -95,4 +107,4 @@ werten schon viele schnelle Anfragen als Angriff und sperren die Adresse vorübe
 
 ## Lizenz
 
-Proprietär — alle Rechte vorbehalten.
+MIT — siehe [LICENSE](LICENSE).
