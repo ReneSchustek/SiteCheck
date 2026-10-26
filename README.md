@@ -41,17 +41,40 @@ Get-FileHash .\SiteCheck-Setup-v0.1.0.exe -Algorithm SHA256
 - Ist das Sitzungs-Cookie sauber (Secure, HttpOnly, SameSite)?
 - Verrät der Server seine Version (Server, X-Powered-By)?
 - Sind heikle Dateien offen lesbar (`.git`, `.env`, `composer.json`, `.htaccess` …)?
+- Zeigt der Server an gängigen Pfaden eine offene Verzeichnis-Auflistung?
+- Gibt es eine `/.well-known/security.txt` (RFC 9116) mit Kontakt für Sicherheitsmeldungen?
+
+**DNS-Härtung**
+- Ist die Domain mit DNSSEC signiert?
+- Legt ein CAA-Eintrag fest, welche Zertifizierungsstellen ausstellen dürfen?
+- Gibt es für den Mailserver TLSA-Einträge (DANE)?
 
 **Mail-Einrichtung** (der häufigste Grund für nicht ankommende Bestätigungsmails)
 - MX-Eintrag vorhanden?
-- SPF, DKIM und DMARC gesetzt?
-- Passt die Rückwärtsauflösung (PTR) der Server-Adresse zur Domain?
+- SPF gesetzt, und wie streng endet er (`~all` oder `-all`)?
+- DKIM gesetzt, und ist der Schlüssel lang genug?
+- DMARC gesetzt: Richtlinie, Berichtsadresse (`rua`) und Anteil (`pct`)?
+- MTA-STS (samt der Richtlinie über HTTPS), TLS-RPT und BIMI.
+- Passt die Rückwärtsauflösung (PTR) der eigenen Versand-Adressen? Geprüft werden nur einzelne
+  Adressen aus dem SPF, keine Netzbereiche; läuft der Versand über einen Anbieter, wird das benannt.
 - Hinweis, wenn die Seite auf einer Subdomain läuft, SPF/DKIM aber nur auf der Hauptdomain liegen.
+
+**Ehrlich eingeordnet**
+- Jeder Befund steht als gesichert oder als Vermutung „aus Sicht von außen“ da.
+- War die Seite nicht erreichbar, heißt es „nicht geprüft“ statt „in Ordnung“. Bekommt der eigene
+  Rechner gar keine Verbindung, weist der Bericht darauf hin, dass oft das eigene Netz die Ursache ist
+  (ein Virenschutz, der HTTPS aufbricht, oder eine zeitweise IP-Sperre des Hosters).
 
 **Stresstest** (optional, aktiv)
 - Hält für kurze Zeit viele gleichzeitige Anfragen offen und misst Antwortzeiten und Fehlerquote.
 - Obergrenzen fest verdrahtet (höchstens 20 gleichzeitige Anfragen, höchstens 60 Sekunden).
 - Läuft nur nach ausdrücklicher Bestätigung vor **jedem** Lauf, dass die Seite dir gehört.
+
+## Eigene Seiten und Verlauf
+
+Die eigenen Seiten lassen sich speichern und auf einen Schlag prüfen; jede bekommt eine Ampel aus
+ihrem schlimmsten Befund. Ein neuer Lauf zeigt, was seit dem vorigen dazugekommen, geblieben oder
+behoben ist. Der Verlauf lässt sich leeren.
 
 ## Der Bericht
 
