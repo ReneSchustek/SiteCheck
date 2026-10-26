@@ -1,6 +1,6 @@
 # Testabdeckung
 
-Gemessen am 27.10.2026 mit `tools/coverage-snapshot.ps1` (Microsoft Testing Platform,
+Gemessen am 26.10.2026 mit `tools/coverage-snapshot.ps1` (Microsoft Testing Platform,
 Cobertura). Gemessen wird in der **Debug**-Konfiguration: Der Release-Build setzt
 `DebugType=none` und liefert keine PDBs, ohne die keine Instrumentierung möglich ist.
 
