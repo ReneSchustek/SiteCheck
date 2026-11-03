@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using SiteCheck.Core.Abstractions;
 using SiteCheck.Core.Models;
 using SiteCheck.Core.Models.Stress;
@@ -14,10 +16,16 @@ namespace SiteCheck.Application;
 /// Parallelität und Dauer kommen fest aus <see cref="StressTestOptions.Clamp"/> und lassen
 /// sich hier nicht umgehen.
 /// </para>
+/// <para>
+/// Viele gleichzeitige Anfragen sind genau das, was eine Abwehr im geteilten Hosting sperrt. Deshalb
+/// endet der Test bei der ersten Abweisung, und danach ruht der Host für eine Abkühlzeit.
+/// </para>
 /// </summary>
-public sealed class StressTestCoordinator(ILoadProbe loadProbe)
+public sealed class StressTestCoordinator(ILoadProbe loadProbe, HostRequestGuard guard, ILogger? logger = null)
 {
     private readonly ILoadProbe _loadProbe = loadProbe;
+    private readonly HostRequestGuard _guard = guard;
+    private readonly ILogger _logger = logger ?? NullLogger.Instance;
 
     /// <summary>
     /// Führt den Lasttest aus.
@@ -29,6 +37,7 @@ public sealed class StressTestCoordinator(ILoadProbe loadProbe)
     /// <param name="cancellationToken">Bricht den Test ab; bereits laufende Anfragen werden beendet.</param>
     /// <returns>Die Zusammenfassung des Laufs.</returns>
     /// <exception cref="InvalidOperationException">Wenn die Eigentums-Bestätigung fehlt.</exception>
+    /// <exception cref="RequestsHaltedException">Wenn der Host gerade gesperrt ist; dann geht nichts hinaus.</exception>
     public async Task<StressTestResult> RunAsync(
         CheckTarget target,
         StressTestOptions options,
@@ -45,13 +54,19 @@ public sealed class StressTestCoordinator(ILoadProbe loadProbe)
                 "Ein Lasttest läuft nur nach ausdrücklicher Bestätigung, dass die Seite dem Nutzer gehört.");
         }
 
+        await _guard.ThrowIfBlockedAsync(target.Host, cancellationToken).ConfigureAwait(false);
+
         StressTestOptions effective = options.Clamp();
+        double seconds = effective.Duration.TotalSeconds;
+        string address = target.ToString();
+        _logger.StressStarted(address, effective.Concurrency, seconds);
         List<RequestOutcome> outcomes = [];
         object outcomesLock = new();
 
         using CancellationTokenSource durationLimit = new(effective.Duration);
+        using CancellationTokenSource rejected = new();
         using CancellationTokenSource linked =
-            CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, durationLimit.Token);
+            CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, durationLimit.Token, rejected.Token);
 
         Stopwatch stopwatch = Stopwatch.StartNew();
         using Timer progressTimer = StartProgressTimer(progress, outcomes, outcomesLock, stopwatch, effective.Duration);
@@ -62,11 +77,14 @@ public sealed class StressTestCoordinator(ILoadProbe loadProbe)
         Task[] workers = new Task[effective.Concurrency];
         for (int worker = 0; worker < workers.Length; worker++)
         {
-            workers[worker] = RunWorkerAsync(target.Address, outcomes, outcomesLock, linked.Token);
+            workers[worker] = RunWorkerAsync(target.Address, outcomes, outcomesLock, rejected.Cancel, linked.Token);
         }
 
         await Task.WhenAll(workers).ConfigureAwait(false);
         stopwatch.Stop();
+
+        // Auch nach einem Abbruch durch den Nutzer: Die Last hat der Server bereits gesehen.
+        await _guard.StartCooldownAsync(target.Host, CancellationToken.None).ConfigureAwait(false);
 
         // Ein Abbruch durch den Nutzer wird zum Ergebnis, nicht zur Ausnahme: Das bereits
         // Gemessene ist aussagekräftig, und der Lauf endet ohnehin. Nur ein Abbruch, der nicht
@@ -76,12 +94,21 @@ public sealed class StressTestCoordinator(ILoadProbe loadProbe)
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        StressTestResult result = StressTestResult.From(outcomes, stopwatch.Elapsed);
+        StressTestResult result = StressTestResult.From(outcomes, stopwatch.Elapsed) with
+        {
+            StoppedByRejection = rejected.IsCancellationRequested,
+        };
+        _logger.StressFinished(address, result.TotalRequests, result.StoppedByRejection);
         progress?.Report(new StressTestProgress(result.TotalRequests, stopwatch.Elapsed, effective.Duration));
         return result;
     }
 
-    private async Task RunWorkerAsync(Uri address, List<RequestOutcome> outcomes, object outcomesLock, CancellationToken token)
+    private async Task RunWorkerAsync(
+        Uri address,
+        List<RequestOutcome> outcomes,
+        object outcomesLock,
+        Action stopAllWorkers,
+        CancellationToken token)
     {
         while (!token.IsCancellationRequested)
         {
@@ -100,8 +127,25 @@ public sealed class StressTestCoordinator(ILoadProbe loadProbe)
             {
                 outcomes.Add(outcome);
             }
+
+            try
+            {
+                await ObserveAsync(address, outcome).ConfigureAwait(false);
+            }
+            catch (RequestsHaltedException)
+            {
+                // Sofort alle Arbeiter anhalten; bereits offene Anfragen werden mit abgebrochen.
+                stopAllWorkers();
+                break;
+            }
         }
     }
+
+    // Ohne Abbruch-Token: Eine erkannte Abweisung muss auch dann vermerkt werden, wenn die Zeit gerade abläuft.
+    private Task ObserveAsync(Uri address, RequestOutcome outcome) =>
+        outcome.StatusCode is int statusCode
+            ? _guard.ObserveResponseAsync(address, statusCode, CancellationToken.None)
+            : _guard.ObserveNoAnswerAsync(address.Host, CancellationToken.None);
 
     private static Timer StartProgressTimer(
         IProgress<StressTestProgress>? progress,

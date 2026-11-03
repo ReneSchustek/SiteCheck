@@ -1,10 +1,5 @@
 name: CI
 
-# Hinweis: In den Ruhrcoder-Repositories laufen seit der Entscheidung vom 08.09.2026
-# („ich zahle nicht") in der Regel keine GitHub-Actions. Der maßgebliche Nachweis ist das
-# lokale Quality-Gate (Build ohne Warnung, alle Tests grün, CVE 0). Dieser Workflow hält den
-# gleichen Ablauf fest, damit er auf einem Läufer reproduzierbar ist, sobald welche laufen.
-
 on:
   push:
     branches: [main]
@@ -61,9 +56,89 @@ jobs:
             'tests/SiteCheck.App.Tests/SiteCheck.App.Tests.csproj'
           )
           foreach ($p in $projects) {
-            dotnet test $p --configuration Release --no-build
+            # Die Solution baut die App-Tests für x64; ohne diese Angabe sucht der Lauf im AnyCPU-Pfad
+            # und findet dort nichts Startbares.
+            dotnet test $p --configuration Release --no-build -p:Platform=x64
             if ($LASTEXITCODE -ne 0) { throw "Tests fehlgeschlagen: $p" }
           }
 
       - name: CVE-Scan (inkl. transitiver Pakete)
         run: dotnet list ${{ env.SOLUTION_FILE }} package --vulnerable --include-transitive
+
+  release:
+    name: Release-Artefakte (Tag-Push)
+    needs: build-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+
+    steps:
+      - name: Quellcode auschecken
+        uses: actions/checkout@v5
+
+      - name: .NET ${{ env.DOTNET_VERSION }} einrichten
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Workloads wiederherstellen (Windows App SDK)
+        run: dotnet workload restore ${{ env.SOLUTION_FILE }}
+
+      - name: Versionsnummer aus dem Tag ableiten
+        id: version
+        shell: pwsh
+        run: echo "value=$($env:GITHUB_REF_NAME.TrimStart('v'))" >> $env:GITHUB_OUTPUT
+
+      - name: Portables Paket erstellen
+        shell: pwsh
+        run: ./tools/publish-portable.ps1 -Version ${{ steps.version.outputs.value }}
+
+      - name: Installer erstellen
+        shell: pwsh
+        run: ./tools/publish-setup.ps1 -Version ${{ steps.version.outputs.value }}
+
+      # Nur das ZIP: Der Updater greift die erste .sig im Release, eine zweite Signatur läse er womöglich
+      # als die des Pakets. Ohne Secret bleibt das Paket unsigniert, und der Updater weist es ab.
+      - name: Portables Paket signieren, falls ein Schlüssel hinterlegt ist
+        shell: pwsh
+        env:
+          SIGNING_KEY: ${{ secrets.SITECHECK_SIGNING_KEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:SIGNING_KEY)) {
+            Write-Host 'Kein Signaturschlüssel hinterlegt, das Paket bleibt unsigniert.'
+            exit 0
+          }
+          $keyPath = Join-Path $env:RUNNER_TEMP 'sitecheck-signing-key.pem'
+          Set-Content -LiteralPath $keyPath -Value $env:SIGNING_KEY -NoNewline
+          try {
+            ./tools/sign-release.ps1 -PackagePath "dist/SiteCheck-Portable-v${{ steps.version.outputs.value }}.zip" -KeyPath $keyPath
+          }
+          finally {
+            Remove-Item -LiteralPath $keyPath -Force -ErrorAction SilentlyContinue
+          }
+
+      # Ohne Code-Signing-Zertifikat ist der Hash die Kontrolle, die ein Nutzer in der Hand hat.
+      - name: SHA-256 der Pakete ermitteln
+        id: hashes
+        shell: pwsh
+        run: |
+          $version = '${{ steps.version.outputs.value }}'
+          "setup=$((Get-FileHash "dist/SiteCheck-Setup-v$version.exe" -Algorithm SHA256).Hash.ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          "portable=$((Get-FileHash "dist/SiteCheck-Portable-v$version.zip" -Algorithm SHA256).Hash.ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+
+      - name: Release veröffentlichen
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            dist/SiteCheck-Portable-v${{ steps.version.outputs.value }}.zip*
+            dist/SiteCheck-Setup-v${{ steps.version.outputs.value }}.exe
+          generate_release_notes: true
+          body: |
+            ## Integritätsprüfung (SHA-256)
+
+            - `SiteCheck-Setup-v${{ steps.version.outputs.value }}.exe`: `${{ steps.hashes.outputs.setup }}`
+            - `SiteCheck-Portable-v${{ steps.version.outputs.value }}.zip`: `${{ steps.hashes.outputs.portable }}`
+
+            Die Dateien sind nicht mit einem Zertifikat signiert, deshalb warnt Windows SmartScreen beim ersten Start.

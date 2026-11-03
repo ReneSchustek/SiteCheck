@@ -1,6 +1,7 @@
 using SiteCheck.Core.Abstractions;
-using SiteCheck.Core.Models;
+using SiteCheck.Core.Localization;
 using SiteCheck.Core.Models.Probes;
+using SiteCheck.Core.Models;
 
 namespace SiteCheck.Core.Checks;
 
@@ -26,7 +27,7 @@ public sealed class DirectoryListingCheck(IHttpProbe http) : ICheck
         // Ist die Startseite nicht erreichbar, die Pfad-Anfragen überspringen (Cache-Treffer).
         if (await http.FetchAsync(target.Address, cancellationToken).ConfigureAwait(false) is null)
         {
-            return [new Finding(Id + ".skipped", Category, Severity.Info, "Nicht geprüft — die Seite war nicht erreichbar")];
+            return [new Finding(Id + ".skipped", Category, Severity.Info, DomainText.Get("Nicht geprüft — die Seite war nicht erreichbar"))];
         }
 
         List<string> open = [];
@@ -43,17 +44,17 @@ public sealed class DirectoryListingCheck(IHttpProbe http) : ICheck
         }
 
         return open.Count == 0
-            ? [new Finding(Id + ".ok", Category, Severity.Ok, "Keine offene Verzeichnis-Auflistung an den geprüften Pfaden")]
+            ? [new Finding(Id + ".ok", Category, Severity.Ok, DomainText.Get("Keine offene Verzeichnis-Auflistung an den geprüften Pfaden"))]
             :
             [
                 new Finding(
                     Id + ".open",
                     Category,
                     Severity.Warning,
-                    $"Offene Verzeichnis-Auflistung an {open.Count} Pfad(en)",
+                    DomainText.Format($"Offene Verzeichnis-Auflistung an {open.Count} Pfad(en)"),
                     string.Join("\n", open.Select(path => "- " + path)),
                     new Recommendation(
-                        "Die Verzeichnis-Auflistung im Webserver abschalten.",
+                        DomainText.Get("Die Verzeichnis-Auflistung im Webserver abschalten."),
                         "Options -Indexes")),
             ];
     }

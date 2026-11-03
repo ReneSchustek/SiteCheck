@@ -30,6 +30,7 @@ public static class ReportComparison
     /// <returns>
     /// Die aktuellen Befunde mit Veränderung, gefolgt von den behobenen Problemen des vorigen
     /// Laufs. Nur Probleme gelten als „behoben“ — ein weggefallener Ok-Befund ist keine Meldung wert.
+    /// Was diesmal nicht geprüft wurde, gilt nie als behoben.
     /// </returns>
     public static IReadOnlyList<ComparedFinding> Compare(IReadOnlyList<Finding> current, IReadOnlyList<Finding> previous)
     {
@@ -38,6 +39,10 @@ public static class ReportComparison
 
         HashSet<string> previousKeys = previous.Select(finding => finding.Key).ToHashSet(StringComparer.Ordinal);
         HashSet<string> currentKeys = current.Select(finding => finding.Key).ToHashSet(StringComparer.Ordinal);
+        string[] notChecked = current
+            .Where(finding => finding.Key.EndsWith(CheckReport.NotCheckedKeySuffix, StringComparison.Ordinal))
+            .Select(finding => finding.Key[..^CheckReport.NotCheckedKeySuffix.Length])
+            .ToArray();
 
         List<ComparedFinding> result = current
             .Select(finding => new ComparedFinding(
@@ -46,9 +51,12 @@ public static class ReportComparison
             .ToList();
 
         result.AddRange(previous
-            .Where(finding => finding.IsProblem && !currentKeys.Contains(finding.Key))
+            .Where(finding => finding.IsProblem && !currentKeys.Contains(finding.Key) && !IsFromAny(finding, notChecked))
             .Select(finding => new ComparedFinding(finding, FindingChange.Resolved)));
 
         return result;
     }
+
+    private static bool IsFromAny(Finding finding, string[] checkIds) =>
+        checkIds.Any(id => finding.Key == id || finding.Key.StartsWith(id + ".", StringComparison.Ordinal));
 }

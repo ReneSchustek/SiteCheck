@@ -1,6 +1,7 @@
 using SiteCheck.Core.Abstractions;
-using SiteCheck.Core.Models;
+using SiteCheck.Core.Localization;
 using SiteCheck.Core.Models.Probes;
+using SiteCheck.Core.Models;
 
 namespace SiteCheck.Core.Checks;
 
@@ -16,24 +17,24 @@ public sealed class SecurityHeadersCheck(IHttpProbe http) : ICheck
     private static readonly SecurityHeader[] BaselineHeaders =
     [
         new("Content-Security-Policy",
-            "begrenzt, welche Skripte und Quellen laden dürfen (Schutz gegen eingeschleuste Skripte)",
-            "Mit einer eng gefassten Richtlinie beginnen und schrittweise öffnen.",
+            DomainText.Get("begrenzt, welche Skripte und Quellen laden dürfen (Schutz gegen eingeschleuste Skripte)"),
+            DomainText.Get("Mit einer eng gefassten Richtlinie beginnen und schrittweise öffnen."),
             "Content-Security-Policy: default-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"),
         new("Strict-Transport-Security",
-            "erzwingt https auch beim nächsten Besuch (HSTS)",
-            "HSTS erst setzen, wenn https dauerhaft steht; der Browser merkt es sich lange.",
+            DomainText.Get("erzwingt https auch beim nächsten Besuch (HSTS)"),
+            DomainText.Get("HSTS erst setzen, wenn https dauerhaft steht; der Browser merkt es sich lange."),
             "Strict-Transport-Security: max-age=31536000; includeSubDomains"),
         new("X-Frame-Options",
-            "verhindert das Einbetten der Seite in fremde Rahmen (Clickjacking)",
-            "Auf SAMEORIGIN setzen, wenn die Seite nicht fremd eingebettet werden soll.",
+            DomainText.Get("verhindert das Einbetten der Seite in fremde Rahmen (Clickjacking)"),
+            DomainText.Get("Auf SAMEORIGIN setzen, wenn die Seite nicht fremd eingebettet werden soll."),
             "X-Frame-Options: SAMEORIGIN"),
         new("X-Content-Type-Options",
-            "verbietet dem Browser das Raten von Dateitypen (nosniff)",
-            "Ohne Ausnahme auf nosniff setzen.",
+            DomainText.Get("verbietet dem Browser das Raten von Dateitypen (nosniff)"),
+            DomainText.Get("Ohne Ausnahme auf nosniff setzen."),
             "X-Content-Type-Options: nosniff"),
         new("Referrer-Policy",
-            "steuert, wie viel Herkunft an fremde Seiten weitergegeben wird",
-            "Eine zurückhaltende Richtlinie wählen.",
+            DomainText.Get("steuert, wie viel Herkunft an fremde Seiten weitergegeben wird"),
+            DomainText.Get("Eine zurückhaltende Richtlinie wählen."),
             "Referrer-Policy: strict-origin-when-cross-origin"),
     ];
 
@@ -41,16 +42,16 @@ public sealed class SecurityHeadersCheck(IHttpProbe http) : ICheck
     private static readonly SecurityHeader[] MaturityHeaders =
     [
         new("Permissions-Policy",
-            "schaltet Browser-Funktionen ab, die die Seite nicht braucht (Kamera, Mikrofon, Ortung)",
-            "Nicht genutzte Funktionen leeren.",
+            DomainText.Get("schaltet Browser-Funktionen ab, die die Seite nicht braucht (Kamera, Mikrofon, Ortung)"),
+            DomainText.Get("Nicht genutzte Funktionen leeren."),
             "Permissions-Policy: camera=(), microphone=(), geolocation=()"),
         new("Cross-Origin-Opener-Policy",
-            "trennt das Browser-Fenster von fremden Seiten ab",
-            "Auf same-origin setzen, wenn keine fremde Einbettung nötig ist.",
+            DomainText.Get("trennt das Browser-Fenster von fremden Seiten ab"),
+            DomainText.Get("Auf same-origin setzen, wenn keine fremde Einbettung nötig ist."),
             "Cross-Origin-Opener-Policy: same-origin"),
         new("Cross-Origin-Resource-Policy",
-            "begrenzt, wer die Ressourcen der Seite einbinden darf",
-            "Auf same-origin oder same-site setzen.",
+            DomainText.Get("begrenzt, wer die Ressourcen der Seite einbinden darf"),
+            DomainText.Get("Auf same-origin oder same-site setzen."),
             "Cross-Origin-Resource-Policy: same-origin"),
     ];
 
@@ -74,8 +75,8 @@ public sealed class SecurityHeadersCheck(IHttpProbe http) : ICheck
                     Id + ".unreachable",
                     Category,
                     Severity.Critical,
-                    "Seite nicht erreichbar",
-                    $"{target.Address} hat auf eine gewöhnliche Anfrage nicht geantwortet."),
+                    DomainText.Get("Seite nicht erreichbar"),
+                    DomainText.Format($"{target.Address} hat auf eine gewöhnliche Anfrage nicht geantwortet.")),
             ];
         }
 
@@ -103,12 +104,12 @@ public sealed class SecurityHeadersCheck(IHttpProbe http) : ICheck
     {
         bool present = response.GetHeader(header.Name) is not null;
         return present
-            ? new Finding($"{Id}.{header.Name}", Category, Severity.Ok, $"Schutz-Kopfzeile gesetzt: {header.Name}")
+            ? new Finding($"{Id}.{header.Name}", Category, Severity.Ok, DomainText.Format($"Schutz-Kopfzeile gesetzt: {header.Name}"))
             : new Finding(
                 $"{Id}.missing.{header.Name}",
                 Category,
                 missingSeverity,
-                $"Schutz-Kopfzeile fehlt: {header.Name}",
+                DomainText.Format($"Schutz-Kopfzeile fehlt: {header.Name}"),
                 header.Purpose,
                 new Recommendation(header.Advice, header.Example));
     }
@@ -135,9 +136,9 @@ public sealed class SecurityHeadersCheck(IHttpProbe http) : ICheck
                 $"{Id}.hsts.maxage",
                 Category,
                 Severity.Info,
-                $"HSTS ist kurz gesetzt (max-age={maxAge})",
-                "Unter einem Jahr wirkt HSTS nur schwach; ein neuer Besucher ist kaum geschützt.",
-                new Recommendation("max-age auf mindestens ein Jahr setzen und includeSubDomains ergänzen.",
+                DomainText.Format($"HSTS ist kurz gesetzt (max-age={maxAge})"),
+                DomainText.Get("Unter einem Jahr wirkt HSTS nur schwach; ein neuer Besucher ist kaum geschützt."),
+                new Recommendation(DomainText.Get("max-age auf mindestens ein Jahr setzen und includeSubDomains ergänzen."),
                     "Strict-Transport-Security: max-age=31536000; includeSubDomains"));
         }
 
@@ -146,8 +147,8 @@ public sealed class SecurityHeadersCheck(IHttpProbe http) : ICheck
             Category,
             Severity.Ok,
             includeSubDomains
-                ? "HSTS ausreichend lang und inklusive Subdomains"
-                : "HSTS ausreichend lang (ohne includeSubDomains)");
+                ? DomainText.Get("HSTS ausreichend lang und inklusive Subdomains")
+                : DomainText.Get("HSTS ausreichend lang (ohne includeSubDomains)"));
     }
 
     private sealed record SecurityHeader(string Name, string Purpose, string Advice, string Example);

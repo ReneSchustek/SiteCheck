@@ -32,3 +32,6 @@ BundleArtifacts/
 # Projekt-Doku (z. B. die Abdeckungs-Begründung) mit ins Repository.
 !docs/
 !docs/**
+
+# Fremdprogramm für den lokalen Geheimnis-Scan; gehört nicht in die Historie.
+tools/gitleaks.exe

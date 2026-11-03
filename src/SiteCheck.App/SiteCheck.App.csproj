@@ -20,6 +20,8 @@
     <UseWinUI>true</UseWinUI>
     <WinUISDKReferences>false</WinUISDKReferences>
     <Nullable>enable</Nullable>
+    <!-- Deutsch trägt den vollständigen Textbestand und fängt jede Sprache ohne eigene Datei auf. -->
+    <DefaultLanguage>de</DefaultLanguage>
     <!-- Unpackaged als Default: F5/Run und die portable Variante laufen ohne MSIX-Deploy.
          Self-contained (das Windows App SDK mitliefern) wird erst im Publish-Profil gesetzt,
          nicht hier: Im csproj gälte es auch für den gewöhnlichen Build und verlangte dort eine

@@ -1,7 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using SiteCheck.App.Services;
 using SiteCheck.App.ViewModels;
 
 namespace SiteCheck.App.Views;
@@ -40,7 +42,7 @@ public sealed partial class SitesPage : Page
             {
                 // Ausnahme aus einem async-void-Handler bleibt sonst unbeobachtet und beendet die App.
                 // Die Liste bleibt dann leer, statt dass das Öffnen der Seite abstürzt.
-                System.Diagnostics.Debug.WriteLine("Laden der Seitenliste fehlgeschlagen: " + ex);
+                App.Services.GetRequiredService<ILogger<SitesPage>>().SiteListLoadFailed(ex);
             }
         }
     }

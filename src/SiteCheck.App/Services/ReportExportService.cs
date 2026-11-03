@@ -12,8 +12,10 @@ namespace SiteCheck.App.Services;
 /// Dateiauswahl. Im unpackaged-Betrieb muss die Dateiauswahl mit dem Fensterhandle verbunden
 /// werden (<c>InitializeWithWindow</c>), sonst öffnet sie sich nicht.
 /// </summary>
-public sealed class ReportExportService : IReportExportService
+public sealed class ReportExportService(IStringResources strings) : IReportExportService
 {
+    private readonly IStringResources _strings = strings;
+
     /// <inheritdoc/>
     public void CopyTextToClipboard(CheckReport report)
     {
@@ -40,7 +42,7 @@ public sealed class ReportExportService : IReportExportService
             SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
             SuggestedFileName = SuggestFileName(report),
         };
-        picker.FileTypeChoices.Add("HTML-Bericht", [".html"]);
+        picker.FileTypeChoices.Add(_strings.GetString("Export_HtmlFileType"), [".html"]);
 
         nint handle = WinRT.Interop.WindowNative.GetWindowHandle(window);
         WinRT.Interop.InitializeWithWindow.Initialize(picker, handle);

@@ -1,6 +1,7 @@
 using SiteCheck.Core.Abstractions;
-using SiteCheck.Core.Models;
+using SiteCheck.Core.Localization;
 using SiteCheck.Core.Models.Probes;
+using SiteCheck.Core.Models;
 
 namespace SiteCheck.Core.Checks;
 
@@ -46,15 +47,15 @@ public sealed class VersionLeakCheck(IHttpProbe http) : ICheck
                     $"{Id}.{headerName}",
                     Category,
                     Severity.Warning,
-                    $"{headerName} verrät die Version: {value}",
-                    "Ein Angreifer sieht sofort, welche Fassung er sich vornehmen kann.",
-                    new Recommendation($"Die Versionsangabe aus der {headerName}-Kopfzeile entfernen oder kürzen.")));
+                    DomainText.Format($"{headerName} verrät die Version: {value}"),
+                    DomainText.Get("Ein Angreifer sieht sofort, welche Fassung er sich vornehmen kann."),
+                    new Recommendation(DomainText.Format($"Die Versionsangabe aus der {headerName}-Kopfzeile entfernen oder kürzen."))));
             }
         }
 
         if (findings.Count == 0)
         {
-            findings.Add(new Finding(Id + ".ok", Category, Severity.Ok, "Der Server nennt keine genaue Version"));
+            findings.Add(new Finding(Id + ".ok", Category, Severity.Ok, DomainText.Get("Der Server nennt keine genaue Version")));
         }
 
         return findings;

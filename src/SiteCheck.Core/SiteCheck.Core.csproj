@@ -13,4 +13,8 @@
     <InternalsVisibleTo Include="SiteCheck.Core.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\domain-texts-english.json" LogicalName="SiteCheck.Core.Localization.domain-texts-english.json" />
+  </ItemGroup>
+
 </Project>

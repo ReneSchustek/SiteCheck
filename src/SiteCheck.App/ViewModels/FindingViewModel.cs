@@ -1,6 +1,7 @@
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
+using SiteCheck.App.Services;
 using SiteCheck.Core.Models;
 
 namespace SiteCheck.App.ViewModels;
@@ -9,9 +10,10 @@ namespace SiteCheck.App.ViewModels;
 /// Stellt einen Befund für die Anzeige dar: Titel, Detail und Empfehlung, dazu ein Wort und
 /// eine Farbe je Stufe. Die Farbe steht nie allein — das Wort trägt die Bedeutung auch ohne sie.
 /// </summary>
-public sealed class FindingViewModel(Finding finding, FindingChange change = FindingChange.Unchanged)
+public sealed class FindingViewModel(Finding finding, IStringResources strings, FindingChange change = FindingChange.Unchanged)
 {
     private readonly Finding _finding = finding;
+    private readonly IStringResources _strings = strings;
 
     /// <summary>Wie der Befund gegenüber dem letzten Lauf dasteht (neu, behoben, unverändert).</summary>
     public FindingChange Change { get; } = change;
@@ -19,8 +21,8 @@ public sealed class FindingViewModel(Finding finding, FindingChange change = Fin
     /// <summary>Kurzes Wort zur Veränderung; leer, wenn unverändert.</summary>
     public string ChangeLabel => Change switch
     {
-        FindingChange.New => "neu",
-        FindingChange.Resolved => "behoben",
+        FindingChange.New => _strings.GetString("Finding_Change_New"),
+        FindingChange.Resolved => _strings.GetString("Finding_Change_Resolved"),
         _ => string.Empty,
     };
 
@@ -34,14 +36,14 @@ public sealed class FindingViewModel(Finding finding, FindingChange change = Fin
     public bool IsInferred => _finding.Confidence == Confidence.Inferred;
 
     /// <summary>Das Wort zur Stufe, z. B. „Kritisch“.</summary>
-    public string SeverityWord => _finding.Severity switch
+    public string SeverityWord => _strings.GetString(_finding.Severity switch
     {
-        Severity.Ok => "In Ordnung",
-        Severity.Info => "Hinweis",
-        Severity.Warning => "Zu verbessern",
-        Severity.Critical => "Kritisch",
-        _ => "Unbekannt",
-    };
+        Severity.Ok => "Severity_Ok",
+        Severity.Info => "Severity_Info",
+        Severity.Warning => "Severity_Warning",
+        Severity.Critical => "Severity_Critical",
+        _ => "Severity_Unknown",
+    });
 
     /// <summary>Begründung oder gefundene Werte; leer, wenn es nichts zu ergänzen gibt.</summary>
     public string Detail => _finding.Detail ?? string.Empty;

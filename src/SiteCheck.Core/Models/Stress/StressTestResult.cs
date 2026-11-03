@@ -20,6 +20,9 @@ public sealed record StressTestResult(
     double MedianMilliseconds,
     double Percentile95Milliseconds)
 {
+    /// <summary>Ob der Test vorzeitig endete, weil der Server abgewiesen oder nicht mehr geantwortet hat.</summary>
+    public bool StoppedByRejection { get; init; }
+
     /// <summary>Anfragen pro Sekunde über den ganzen Lauf gerechnet.</summary>
     public double RequestsPerSecond => Elapsed.TotalSeconds > 0 ? TotalRequests / Elapsed.TotalSeconds : 0;
 

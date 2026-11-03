@@ -4,6 +4,7 @@ namespace SiteCheck.Application;
 public interface ICheckRunnerFactory
 {
     /// <summary>Erzeugt einen Prüflauf mit frischem Antwort-Cache.</summary>
+    /// <param name="options">Was der Lauf umfasst.</param>
     /// <returns>Der einsatzbereite Runner für genau einen Lauf.</returns>
-    CheckRunner Create();
+    CheckRunner Create(CheckRunOptions options);
 }

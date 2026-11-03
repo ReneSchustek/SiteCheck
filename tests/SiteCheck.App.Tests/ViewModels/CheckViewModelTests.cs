@@ -15,7 +15,7 @@ public sealed class CheckViewModelTests
             ? [new StubCheck(CheckCategory.Web, [new Finding("web.ok", CheckCategory.Web, Severity.Ok, "Alles gut")])]
             : checks;
         FakeCheckRunnerFactory factory = new(effective);
-        return new CheckViewModel(factory, new FakeTimeProvider(), history ?? new FakeHistoryStore(), new FakeReportExportService());
+        return new CheckViewModel(factory, new FakeTimeProvider(), history ?? new FakeHistoryStore(), new FakeReportExportService(), TestGuards.Create(), new FakeConfirmationService(confirms: true), new FakeStringResources());
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public sealed class CheckViewModelTests
         Assert.Equal("https://beispiel.de/", vm.AddressInput);
         _ = Assert.Single(vm.WebFindings);
         _ = Assert.Single(vm.MailFindings);
-        Assert.Contains("1 kritisch", vm.StatusText, StringComparison.Ordinal);
+        Assert.Equal("Status_Check_Summary|1|0|1", vm.StatusText);
         _ = Assert.Single(history.Appended);
     }
 
@@ -100,7 +100,7 @@ public sealed class CheckViewModelTests
     {
         FakeReportExportService export = new();
         FakeCheckRunnerFactory factory = new(new StubCheck(CheckCategory.Web, [new Finding("web.ok", CheckCategory.Web, Severity.Ok, "ok")]));
-        CheckViewModel vm = new(factory, new FakeTimeProvider(), new FakeHistoryStore(), export);
+        CheckViewModel vm = new(factory, new FakeTimeProvider(), new FakeHistoryStore(), export, TestGuards.Create(), new FakeConfirmationService(confirms: true), new FakeStringResources());
         vm.AddressInput = "beispiel.de";
         await vm.RunCommand.ExecuteAsync(null);
 
@@ -108,5 +108,112 @@ public sealed class CheckViewModelTests
         vm.CopyCommand.Execute(null);
 
         Assert.Equal(1, export.CopyCount);
+    }
+
+    private static CheckViewModel BuildGuarded(FakeCheckRunnerFactory factory, FakeConfirmationService confirmation, HostRequestGuard guard, FakeHistoryStore? history = null) =>
+        new(factory, new FakeTimeProvider(), history ?? new FakeHistoryStore(), new FakeReportExportService(), guard, confirmation, new FakeStringResources());
+
+    private static FakeCheckRunnerFactory OkFactory() =>
+        new(new StubCheck(CheckCategory.Web, [new Finding("w", CheckCategory.Web, Severity.Ok, "ok")]));
+
+    [Fact]
+    public async Task Run_FirstTime_AsksOnceForEachHost()
+    {
+        FakeConfirmationService confirmation = new(confirms: true);
+        CheckViewModel vm = BuildGuarded(OkFactory(), confirmation, TestGuards.Create());
+        vm.AddressInput = "beispiel.de";
+
+        await vm.RunCommand.ExecuteAsync(null);
+        await vm.RunCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, confirmation.NoticeCount);
+        Assert.Equal(CheckRunState.Completed, vm.State);
+    }
+
+    [Fact]
+    public async Task Run_WithoutNoticeConfirmation_SendsNothing()
+    {
+        HaltingCheck check = new();
+        CheckViewModel vm = BuildGuarded(new FakeCheckRunnerFactory(check), new FakeConfirmationService(confirms: false), TestGuards.Create());
+        vm.AddressInput = "beispiel.de";
+
+        await vm.RunCommand.ExecuteAsync(null);
+
+        Assert.Equal(0, check.Calls);
+        Assert.Equal(CheckRunState.Idle, vm.State);
+    }
+
+    [Fact]
+    public async Task Run_ByDefault_UsesStandardRunWithoutAskingForPaths()
+    {
+        FakeCheckRunnerFactory factory = OkFactory();
+        FakeConfirmationService confirmation = new(confirms: true);
+        CheckViewModel vm = BuildGuarded(factory, confirmation, TestGuards.Create());
+        vm.AddressInput = "beispiel.de";
+
+        await vm.RunCommand.ExecuteAsync(null);
+
+        Assert.Equal(CheckRunOptions.Standard, factory.LastOptions);
+        Assert.Equal(0, confirmation.SensitivePathsCount);
+    }
+
+    [Fact]
+    public async Task Run_WithSensitivePaths_ConfirmsEachRunAndResetsTheChoice()
+    {
+        FakeCheckRunnerFactory factory = OkFactory();
+        FakeConfirmationService confirmation = new(confirms: true);
+        CheckViewModel vm = BuildGuarded(factory, confirmation, TestGuards.Create());
+        vm.AddressInput = "beispiel.de";
+        vm.IncludeSensitivePaths = true;
+
+        await vm.RunCommand.ExecuteAsync(null);
+
+        Assert.Equal(CheckRunOptions.WithSensitivePaths, factory.LastOptions);
+        Assert.Equal(1, confirmation.SensitivePathsCount);
+        Assert.False(vm.IncludeSensitivePaths);
+    }
+
+    [Fact]
+    public async Task Run_WhenHalted_ShowsItAndKeepsNoHistory()
+    {
+        FakeHistoryStore history = new();
+        CheckViewModel vm = BuildGuarded(new FakeCheckRunnerFactory(new HaltingCheck()), new FakeConfirmationService(confirms: true), TestGuards.Create(), history);
+        vm.AddressInput = "beispiel.de";
+
+        await vm.RunCommand.ExecuteAsync(null);
+
+        Assert.True(vm.WasHalted);
+        Assert.Empty(history.Appended);
+    }
+
+    [Fact]
+    public async Task Run_DuringHalt_WithoutConfirmation_SendsNothingAndKeepsHalt()
+    {
+        HostRequestGuard guard = TestGuards.Create();
+        await guard.StartCooldownAsync("beispiel.de", TestContext.Current.CancellationToken);
+        HaltingCheck check = new();
+        FakeConfirmationService confirmation = new(confirms: false);
+        CheckViewModel vm = BuildGuarded(new FakeCheckRunnerFactory(check), confirmation, guard);
+        vm.AddressInput = "beispiel.de";
+
+        await vm.RunCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, confirmation.RetryCount);
+        Assert.Equal(0, check.Calls);
+        Assert.True((await guard.GetStatusAsync("beispiel.de", TestContext.Current.CancellationToken)).IsBlocked);
+    }
+
+    [Fact]
+    public async Task Run_DuringHalt_WithConfirmation_LiftsHalt()
+    {
+        HostRequestGuard guard = TestGuards.Create();
+        await guard.StartCooldownAsync("beispiel.de", TestContext.Current.CancellationToken);
+        CheckViewModel vm = BuildGuarded(OkFactory(), new FakeConfirmationService(confirms: true), guard);
+        vm.AddressInput = "beispiel.de";
+
+        await vm.RunCommand.ExecuteAsync(null);
+
+        Assert.False((await guard.GetStatusAsync("beispiel.de", TestContext.Current.CancellationToken)).IsBlocked);
+        Assert.Equal(CheckRunState.Completed, vm.State);
     }
 }

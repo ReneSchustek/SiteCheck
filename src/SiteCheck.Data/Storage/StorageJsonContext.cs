@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using SiteCheck.Core.Models;
+using SiteCheck.Core.Models.Guard;
 
 namespace SiteCheck.Data.Storage;
 
@@ -16,15 +17,49 @@ namespace SiteCheck.Data.Storage;
 [JsonSerializable(typeof(StoredSettings))]
 [JsonSerializable(typeof(List<StoredSite>))]
 [JsonSerializable(typeof(List<StoredHistoryEntry>))]
+[JsonSerializable(typeof(Dictionary<string, StoredHostGuard>))]
 internal sealed partial class StorageJsonContext : JsonSerializerContext;
 
 /// <summary>Gespeicherte Fassung der Einstellungen. Eigener Typ, damit das Dateiformat nicht am Domänenmodell klebt.</summary>
-internal sealed record StoredSettings(int? WindowWidth, int? WindowHeight, bool ScopeNoticeAcknowledged)
+internal sealed record StoredSettings(
+    int? WindowWidth,
+    int? WindowHeight,
+    bool ScopeNoticeAcknowledged,
+    bool AutoUpdateEnabled = true,
+    DateTimeOffset? LastUpdateCheck = null,
+    string? PendingUpdateVersion = null,
+    string? PendingUpdateSha256 = null)
 {
-    public static StoredSettings From(AppSettings settings) =>
-        new(settings.WindowWidth, settings.WindowHeight, settings.ScopeNoticeAcknowledged);
+    public static StoredSettings From(AppSettings settings) => new(
+        settings.WindowWidth,
+        settings.WindowHeight,
+        settings.ScopeNoticeAcknowledged,
+        settings.AutoUpdateEnabled,
+        settings.LastUpdateCheck,
+        settings.PendingUpdateVersion,
+        settings.PendingUpdateSha256);
 
-    public AppSettings ToModel() => new(WindowWidth, WindowHeight, ScopeNoticeAcknowledged);
+    public AppSettings ToModel() => new(
+        WindowWidth,
+        WindowHeight,
+        ScopeNoticeAcknowledged,
+        AutoUpdateEnabled,
+        LastUpdateCheck,
+        PendingUpdateVersion,
+        PendingUpdateSha256);
+}
+
+/// <summary>Gespeicherter Stand der Sperrwache für einen Host.</summary>
+internal sealed record StoredHostGuard(
+    List<DateTimeOffset> RecentRequests,
+    DateTimeOffset? BlockedUntil,
+    RequestHaltReason? BlockReason,
+    bool NoticeAcknowledged)
+{
+    public static StoredHostGuard From(HostGuardEntry entry) =>
+        new([.. entry.RecentRequests], entry.BlockedUntil, entry.BlockReason, entry.NoticeAcknowledged);
+
+    public HostGuardEntry ToModel() => new(RecentRequests, BlockedUntil, BlockReason, NoticeAcknowledged);
 }
 
 /// <summary>Gespeicherte Fassung einer Seite.</summary>

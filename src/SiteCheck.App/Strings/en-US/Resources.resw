@@ -1,0 +1,399 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AboutPage_AutoUpdate.Header" xml:space="preserve">
+    <value>Automatic updates</value>
+  </data>
+  <data name="AboutPage_AutoUpdate.OffContent" xml:space="preserve">
+    <value>Only on request</value>
+  </data>
+  <data name="AboutPage_AutoUpdate.OnContent" xml:space="preserve">
+    <value>Look once a day and install on next start</value>
+  </data>
+  <data name="AboutPage_CheckUpdateButton.Content" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="AboutPage_Description.Text" xml:space="preserve">
+    <value>SiteCheck checks your own sites from the outside: encryption, security headers, cookies, exposed files and the mail setup (MX, SPF, DKIM, DMARC, reverse DNS). The standard run makes a few ordinary requests and DNS lookups, slowly, and stops at the first rejection. Sensitive paths and the stress test only run after you confirm, because a hosting provider can block your connection for them.</value>
+  </data>
+  <data name="AboutPage_InstallUpdateButton.Content" xml:space="preserve">
+    <value>Update now</value>
+  </data>
+  <data name="AboutPage_SupportButton.Content" xml:space="preserve">
+    <value>☕ Buy me a coffee</value>
+  </data>
+  <data name="AboutPage_SupportText.Text" xml:space="preserve">
+    <value>SiteCheck is free. If it helps you, you are welcome to buy me a coffee, entirely voluntarily.</value>
+  </data>
+  <data name="AboutPage_UpdateNote.Text" xml:space="preserve">
+    <value>The request goes to GitHub, never to a checked site. Only a package with a valid signature is installed.</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="Action_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CheckPage_AddressBox.PlaceholderText" xml:space="preserve">
+    <value>e.g. my-site.com</value>
+  </data>
+  <data name="CheckPage_Advice.Text" xml:space="preserve">
+    <value>Recommendation:</value>
+  </data>
+  <data name="CheckPage_CancelButton.Content" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CheckPage_ClearHistoryButton.Content" xml:space="preserve">
+    <value>Clear history</value>
+  </data>
+  <data name="CheckPage_CopyButton.Content" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="CheckPage_FromOutside.Text" xml:space="preserve">
+    <value>as seen from outside</value>
+  </data>
+  <data name="CheckPage_MailHeader.Text" xml:space="preserve">
+    <value>MAIL SETUP</value>
+  </data>
+  <data name="CheckPage_RunButton.Content" xml:space="preserve">
+    <value>Check</value>
+  </data>
+  <data name="CheckPage_SaveButton.Content" xml:space="preserve">
+    <value>Save as file</value>
+  </data>
+  <data name="CheckPage_SensitivePaths.Content" xml:space="preserve">
+    <value>Also request sensitive files and directories (.git, .env, /backup/ and others). This can get your connection blocked.</value>
+  </data>
+  <data name="CheckPage_Subtitle.Text" xml:space="preserve">
+    <value>Enter the address of your own site and check it. SiteCheck only looks from the outside, slowly, and stops at the first rejection.</value>
+  </data>
+  <data name="CheckPage_Title.Text" xml:space="preserve">
+    <value>Check</value>
+  </data>
+  <data name="CheckPage_WebHeader.Text" xml:space="preserve">
+    <value>WEB</value>
+  </data>
+  <data name="Dialog_HostNotice_Advice" xml:space="preserve">
+    <value>That is why SiteCheck requests slowly and stops at the first rejection. A block cannot be ruled out entirely from the outside. It is safer to have your own address allowlisted by your hosting provider, if they offer that.</value>
+  </data>
+  <data name="Dialog_HostNotice_First" xml:space="preserve">
+    <value>First check of {0}.</value>
+  </data>
+  <data name="Dialog_HostNotice_Primary" xml:space="preserve">
+    <value>Understood, check</value>
+  </data>
+  <data name="Dialog_HostNotice_Risk" xml:space="preserve">
+    <value>A hosting provider can treat even slow checks as an attack and block your connection. You would then reach neither the website nor the mailboxes on that server, possibly for days.</value>
+  </data>
+  <data name="Dialog_HostNotice_Title" xml:space="preserve">
+    <value>Could your connection get blocked?</value>
+  </data>
+  <data name="Dialog_Retry_Primary" xml:space="preserve">
+    <value>Yes, check again</value>
+  </data>
+  <data name="Dialog_Retry_Risk" xml:space="preserve">
+    <value>If your connection is blocked, every further request to {0} extends the block. First use another connection to see whether the site is up.</value>
+  </data>
+  <data name="Dialog_Retry_Title" xml:space="preserve">
+    <value>Check again anyway?</value>
+  </data>
+  <data name="Dialog_ScopeNotice_Close" xml:space="preserve">
+    <value>Understood</value>
+  </data>
+  <data name="Dialog_ScopeNotice_Text" xml:space="preserve">
+    <value>SiteCheck checks sites from the outside: ordinary requests and DNS lookups, slowly, stopping at the first rejection. Only use it for sites you own or have explicit permission to check. Many providers still treat checks as an attack and temporarily block your address.</value>
+  </data>
+  <data name="Dialog_ScopeNotice_Title" xml:space="preserve">
+    <value>Your own sites only, from the outside only</value>
+  </data>
+  <data name="Dialog_SensitivePaths_Primary" xml:space="preserve">
+    <value>Yes, for this run</value>
+  </data>
+  <data name="Dialog_SensitivePaths_Risk" xml:space="preserve">
+    <value>This is exactly what attackers look for, and many providers' defenses block the connection after only a few such requests. It is the biggest risk of this check.</value>
+  </data>
+  <data name="Dialog_SensitivePaths_Scope" xml:space="preserve">
+    <value>This run requests paths such as .git, .env, config.php and /backup/ on {0}.</value>
+  </data>
+  <data name="Dialog_SensitivePaths_Title" xml:space="preserve">
+    <value>Really request sensitive files?</value>
+  </data>
+  <data name="Dialog_StressOwner_Load" xml:space="preserve">
+    <value>The stress test briefly sends many simultaneous requests to {0}. Unlike the other checks, this puts active load on the site.</value>
+  </data>
+  <data name="Dialog_StressOwner_Lockout" xml:space="preserve">
+    <value>A hosting provider will block your entire connection for this, possibly for days. You would then reach neither the website nor the mailboxes on that server. The test ends at the first rejection, and the site then rests for a quarter of an hour.</value>
+  </data>
+  <data name="Dialog_StressOwner_Only" xml:space="preserve">
+    <value>Only confirm if this site is yours and you host it yourself. Putting this kind of load on someone else's server or on rented hosting can count as an attack.</value>
+  </data>
+  <data name="Dialog_StressOwner_Primary" xml:space="preserve">
+    <value>Yes, this is my site</value>
+  </data>
+  <data name="Dialog_StressOwner_Title" xml:space="preserve">
+    <value>Is this your site?</value>
+  </data>
+  <data name="Export_HtmlFileType" xml:space="preserve">
+    <value>HTML report</value>
+  </data>
+  <data name="Finding_Change_New" xml:space="preserve">
+    <value>new</value>
+  </data>
+  <data name="Finding_Change_Resolved" xml:space="preserve">
+    <value>resolved</value>
+  </data>
+  <data name="LogPage_FilterAll.Content" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="LogPage_FilterErrors.Content" xml:space="preserve">
+    <value>Errors only</value>
+  </data>
+  <data name="LogPage_FilterWarnings.Content" xml:space="preserve">
+    <value>Warnings and errors</value>
+  </data>
+  <data name="LogPage_ReloadButton.Content" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="LogPage_Search.PlaceholderText" xml:space="preserve">
+    <value>Search message and area</value>
+  </data>
+  <data name="LogPage_Subtitle.Text" xml:space="preserve">
+    <value>What SiteCheck has done over the last 14 days, such as when and why a run was stopped. No content from other sites is stored here.</value>
+  </data>
+  <data name="LogPage_Title.Text" xml:space="preserve">
+    <value>Log</value>
+  </data>
+  <data name="Log_Empty_NoMatch" xml:space="preserve">
+    <value>Nothing found. Change the search or filter.</value>
+  </data>
+  <data name="Log_Empty_None" xml:space="preserve">
+    <value>No entries yet. They appear as soon as something is checked.</value>
+  </data>
+  <data name="MainWindow_NavAbout.Content" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="MainWindow_NavCheck.Content" xml:space="preserve">
+    <value>Check</value>
+  </data>
+  <data name="MainWindow_NavLog.Content" xml:space="preserve">
+    <value>Log</value>
+  </data>
+  <data name="MainWindow_NavSites.Content" xml:space="preserve">
+    <value>My sites</value>
+  </data>
+  <data name="MainWindow_NavStress.Content" xml:space="preserve">
+    <value>Stress test</value>
+  </data>
+  <data name="Severity_Critical" xml:space="preserve">
+    <value>Critical</value>
+  </data>
+  <data name="Severity_Info" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="Severity_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Severity_Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="Severity_Warning" xml:space="preserve">
+    <value>Needs work</value>
+  </data>
+  <data name="SitesPage_AddButton.Content" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="SitesPage_AddressBox.PlaceholderText" xml:space="preserve">
+    <value>Address, e.g. my-site.com</value>
+  </data>
+  <data name="SitesPage_CancelAllButton.Content" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="SitesPage_CheckAllButton.Content" xml:space="preserve">
+    <value>Check all</value>
+  </data>
+  <data name="SitesPage_Empty.Text" xml:space="preserve">
+    <value>No sites saved yet. Add an address above.</value>
+  </data>
+  <data name="SitesPage_NameBox.PlaceholderText" xml:space="preserve">
+    <value>Name (optional)</value>
+  </data>
+  <data name="SitesPage_RemoveButton.Content" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="SitesPage_RowCheckButton.Content" xml:space="preserve">
+    <value>Check</value>
+  </data>
+  <data name="SitesPage_Subtitle.Text" xml:space="preserve">
+    <value>Sites you check often. You can also check any address directly under “Check”.</value>
+  </data>
+  <data name="SitesPage_Title.Text" xml:space="preserve">
+    <value>My sites</value>
+  </data>
+  <data name="Sites_NeverChecked" xml:space="preserve">
+    <value>Not checked yet</value>
+  </data>
+  <data name="Sites_RanAt" xml:space="preserve">
+    <value>Checked on {0}</value>
+  </data>
+  <data name="SplashWindow_Tagline.Text" xml:space="preserve">
+    <value>Checks your own sites from the outside, honestly and carefully.</value>
+  </data>
+  <data name="Status_Check_Cancelled" xml:space="preserve">
+    <value>Check cancelled.</value>
+  </data>
+  <data name="Status_Check_Copied" xml:space="preserve">
+    <value>Report copied to the clipboard.</value>
+  </data>
+  <data name="Status_Check_Failed" xml:space="preserve">
+    <value>The check failed unexpectedly: {0}</value>
+  </data>
+  <data name="Status_Check_Halted" xml:space="preserve">
+    <value>Check stopped to protect your connection. The report is incomplete.</value>
+  </data>
+  <data name="Status_Check_HistoryClearFailed" xml:space="preserve">
+    <value>The history could not be cleared: {0}</value>
+  </data>
+  <data name="Status_Check_HistoryCleared" xml:space="preserve">
+    <value>History of this site cleared.</value>
+  </data>
+  <data name="Status_Check_HistoryNotSaved" xml:space="preserve">
+    <value>{0} (The history could not be saved.)</value>
+  </data>
+  <data name="Status_Check_Running" xml:space="preserve">
+    <value>Check running … There are pauses between requests so the hosting provider does not block you.</value>
+  </data>
+  <data name="Status_Check_Saved" xml:space="preserve">
+    <value>Report saved: {0}</value>
+  </data>
+  <data name="Status_Check_Summary" xml:space="preserve">
+    <value>Result: {0} OK, {1} need work, {2} critical.</value>
+  </data>
+  <data name="Status_NothingSent" xml:space="preserve">
+    <value>Cancelled. Nothing was sent.</value>
+  </data>
+  <data name="Status_Sites_AllChecked" xml:space="preserve">
+    <value>All sites checked.</value>
+  </data>
+  <data name="Status_Sites_Cancelled" xml:space="preserve">
+    <value>Batch run cancelled.</value>
+  </data>
+  <data name="Status_Sites_Checking" xml:space="preserve">
+    <value>Checking {0} of {1}: {2}</value>
+  </data>
+  <data name="Status_Sites_Halted" xml:space="preserve">
+    <value>Batch run stopped at {0} to protect your connection. See the Check view for details.</value>
+  </data>
+  <data name="Status_Stress_Cancelled" xml:space="preserve">
+    <value>Stress test cancelled.</value>
+  </data>
+  <data name="Status_Stress_Completed" xml:space="preserve">
+    <value>Stress test finished. The site now rests for a quarter of an hour.</value>
+  </data>
+  <data name="Status_Stress_Failed" xml:space="preserve">
+    <value>The stress test failed: {0}</value>
+  </data>
+  <data name="Status_Stress_NotConfirmed" xml:space="preserve">
+    <value>Cancelled. No stress test without confirmation.</value>
+  </data>
+  <data name="Status_Stress_Progress" xml:space="preserve">
+    <value>Stress test running … {0} requests</value>
+  </data>
+  <data name="Status_Stress_Rejected" xml:space="preserve">
+    <value>Stress test ended: the server rejected requests. Please do not request anything else from here for now.</value>
+  </data>
+  <data name="Status_Stress_Result" xml:space="preserve">
+    <value>{0} requests in {1:0.#} seconds&#10;{2:0.#} requests per second&#10;Succeeded: {3}, failed: {4} ({5:P0})&#10;Average response time: {6:0} ms&#10;Median: {7:0} ms, slowest end (95%): {8:0} ms</value>
+  </data>
+  <data name="Status_Stress_Running" xml:space="preserve">
+    <value>Stress test running …</value>
+  </data>
+  <data name="Status_Update_Available" xml:space="preserve">
+    <value>Version {0} is available.</value>
+  </data>
+  <data name="Status_Update_Checking" xml:space="preserve">
+    <value>Checking for updates …</value>
+  </data>
+  <data name="Status_Update_InstallFailed" xml:space="preserve">
+    <value>The update could not be installed. Opening the release page.</value>
+  </data>
+  <data name="Status_Update_Installing" xml:space="preserve">
+    <value>Downloading and verifying the update …</value>
+  </data>
+  <data name="Status_Update_None" xml:space="preserve">
+    <value>No newer version found.</value>
+  </data>
+  <data name="Status_Update_SaveFailed" xml:space="preserve">
+    <value>The setting could not be saved: {0}</value>
+  </data>
+  <data name="StressPage_AddressBox.Header" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="StressPage_AddressBox.PlaceholderText" xml:space="preserve">
+    <value>e.g. my-site.com</value>
+  </data>
+  <data name="StressPage_CancelButton.Content" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="StressPage_Concurrency.Text" xml:space="preserve">
+    <value>Simultaneous requests: </value>
+  </data>
+  <data name="StressPage_Duration.Text" xml:space="preserve">
+    <value>Duration (seconds): </value>
+  </data>
+  <data name="StressPage_ResultHeader.Text" xml:space="preserve">
+    <value>RESULT</value>
+  </data>
+  <data name="StressPage_StartButton.Content" xml:space="preserve">
+    <value>Start stress test</value>
+  </data>
+  <data name="StressPage_Subtitle.Text" xml:space="preserve">
+    <value>Briefly loads the site with many simultaneous requests and measures response times. A hosting provider can block your connection for this; the test ends at the first rejection.</value>
+  </data>
+  <data name="StressPage_Title.Text" xml:space="preserve">
+    <value>Stress test</value>
+  </data>
+  <data name="StressPage_Warning.Message" xml:space="preserve">
+    <value>This puts active load on the site. Before every run you are asked whether the site is yours. Putting this kind of load on someone else's server or on rented hosting can count as an attack.</value>
+  </data>
+  <data name="StressPage_Warning.Title" xml:space="preserve">
+    <value>Only for your own, self-hosted sites</value>
+  </data>
+  <data name="Valid_ContainsCredentials" xml:space="preserve">
+    <value>Please enter the address without a user name and password.</value>
+  </data>
+  <data name="Valid_Empty" xml:space="preserve">
+    <value>Please enter an address first, e.g. my-site.com.</value>
+  </data>
+  <data name="Valid_Invalid" xml:space="preserve">
+    <value>That does not look like a valid web address. Example: my-site.com</value>
+  </data>
+  <data name="Valid_Sites_Duplicate" xml:space="preserve">
+    <value>This address is already on the list.</value>
+  </data>
+  <data name="Valid_Sites_Invalid" xml:space="preserve">
+    <value>Please enter a valid address, e.g. my-site.com.</value>
+  </data>
+  <data name="Valid_Sites_SaveFailed" xml:space="preserve">
+    <value>The list could not be saved: {0}</value>
+  </data>
+  <data name="Valid_Stress_Empty" xml:space="preserve">
+    <value>Please enter the address of your site first.</value>
+  </data>
+  <data name="Valid_Stress_UnsupportedScheme" xml:space="preserve">
+    <value>Only http and https addresses can be tested.</value>
+  </data>
+  <data name="Valid_UnsupportedScheme" xml:space="preserve">
+    <value>Only http and https addresses can be checked.</value>
+  </data>
+</root>

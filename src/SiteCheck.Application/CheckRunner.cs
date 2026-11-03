@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using SiteCheck.Core.Abstractions;
 using SiteCheck.Core.Models;
 
@@ -7,11 +9,12 @@ namespace SiteCheck.Application;
 /// Führt die Prüfungen eines Laufs der Reihe nach aus, meldet den Fortschritt und bricht auf
 /// Wunsch ab. Die Reihenfolge der übergebenen Prüfungen bleibt die Reihenfolge der Befunde.
 /// </summary>
-public sealed class CheckRunner(IEnumerable<ICheck> checks)
+public sealed class CheckRunner(IEnumerable<ICheck> checks, ILogger? logger = null)
 {
     // Einmal aufzählen und festhalten: Die Reihenfolge ist Teil des Vertrags (Web vor Mail),
     // und die Gesamtzahl steht für die Fortschrittsmeldung von Anfang an fest.
     private readonly IReadOnlyList<ICheck> _checks = [.. checks];
+    private readonly ILogger _logger = logger ?? NullLogger.Instance;
 
     /// <summary>
     /// Führt alle Prüfungen für ein Ziel aus.
@@ -30,8 +33,11 @@ public sealed class CheckRunner(IEnumerable<ICheck> checks)
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(clock);
 
+        string address = target.ToString();
+        _logger.RunStarted(address);
         DateTimeOffset startedAt = clock.GetUtcNow();
         List<Finding> findings = [];
+        RequestsHaltedException? halt = null;
 
         for (int index = 0; index < _checks.Count; index++)
         {
@@ -39,11 +45,27 @@ public sealed class CheckRunner(IEnumerable<ICheck> checks)
             ICheck check = _checks[index];
             progress?.Report(check.Id, index, _checks.Count);
 
-            findings.AddRange(await RunSingleAsync(check, target, cancellationToken).ConfigureAwait(false));
+            try
+            {
+                findings.AddRange(await RunSingleAsync(check, target, cancellationToken).ConfigureAwait(false));
+            }
+            catch (RequestsHaltedException ex)
+            {
+                // Weiterlaufen statt abbrechen: Prüfungen mit Anfragen an den Server scheitern nun
+                // sofort an der Sperrwache, ohne etwas zu senden; die DNS-Prüfungen belasten ihn nicht.
+                halt ??= ex;
+                findings.Add(HaltedFindings.ForCheck(check));
+            }
+        }
+
+        if (halt is not null)
+        {
+            findings.Insert(0, HaltedFindings.ForRun(halt));
         }
 
         progress?.Report(string.Empty, _checks.Count, _checks.Count);
-        return new CheckReport(target.ToString(), startedAt, clock.GetUtcNow(), findings);
+        _logger.RunFinished(address, findings.Count, halt is not null);
+        return new CheckReport(address, startedAt, clock.GetUtcNow(), findings);
     }
 
     private static async Task<IReadOnlyList<Finding>> RunSingleAsync(
@@ -58,6 +80,11 @@ public sealed class CheckRunner(IEnumerable<ICheck> checks)
         catch (OperationCanceledException)
         {
             // Abbruch ist kein Prüfergebnis, sondern Nutzerwille; nach oben durchreichen.
+            throw;
+        }
+        catch (RequestsHaltedException)
+        {
+            // Der Halt ist Sache des ganzen Laufs, kein Fehler dieser einen Prüfung.
             throw;
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)

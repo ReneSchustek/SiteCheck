@@ -1,7 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using SiteCheck.App.Services;
 using SiteCheck.App.ViewModels;
 using SiteCheck.App.Views;
 
@@ -44,7 +46,7 @@ public sealed partial class MainWindow : Window
             // Eine Ausnahme aus einem async-void-Handler bleibt unbeobachtet und beendet die App.
             // Der Erststart-Hinweis ist eine Beigabe (gesperrte Einstellungsdatei, bereits offener
             // Dialog): scheitert er, läuft die App trotzdem weiter.
-            System.Diagnostics.Debug.WriteLine("Erststart-Hinweis fehlgeschlagen: " + ex);
+            App.Services.GetRequiredService<ILogger<MainWindow>>().FirstRunNoticeFailed(ex);
         }
     }
 
@@ -60,6 +62,7 @@ public sealed partial class MainWindow : Window
             "Check" => typeof(CheckPage),
             "Sites" => typeof(SitesPage),
             "Stress" => typeof(StressTestPage),
+            "Log" => typeof(LogPage),
             "About" => typeof(AboutPage),
             _ => typeof(CheckPage),
         };

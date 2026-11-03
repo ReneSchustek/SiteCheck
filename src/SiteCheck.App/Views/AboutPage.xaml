@@ -17,18 +17,29 @@
                 <TextBlock
                     Style="{StaticResource BodyTextStyle}"
                     TextAlignment="Center"
-                    Text="SiteCheck prüft die eigenen Seiten von außen: Verschlüsselung, Schutz-Kopfzeilen, Cookies, offene Dateien und die Mail-Einrichtung (MX, SPF, DKIM, DMARC, Rückwärtsauflösung). Alles passiv — gewöhnliche Anfragen und DNS-Abfragen, nichts wird angegriffen. Nur der Stresstest belastet aktiv und nur nach Bestätigung, dass die Seite dir gehört." />
+                    x:Uid="AboutPage_Description" />
             </Border>
 
             <TextBlock Text="Ruhrcoder (René Schustek)" Style="{StaticResource BodyTextStyle}" HorizontalAlignment="Center" />
             <TextBlock Text="ruhrcoder.de" Style="{StaticResource MutedTextStyle}" HorizontalAlignment="Center" />
 
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Spacing="8">
+                    <ToggleSwitch x:Uid="AboutPage_AutoUpdate" IsOn="{x:Bind Updates.AutoUpdateEnabled, Mode=TwoWay}" />
+                    <TextBlock x:Uid="AboutPage_UpdateNote" Style="{StaticResource MutedTextStyle}" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Uid="AboutPage_CheckUpdateButton" Command="{x:Bind Updates.CheckCommand}" />
+                        <Button x:Uid="AboutPage_InstallUpdateButton" Command="{x:Bind Updates.InstallCommand}" />
+                    </StackPanel>
+                    <TextBlock Text="{x:Bind Updates.StatusText, Mode=OneWay}" Style="{StaticResource BodyTextStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
             <StackPanel x:Name="SupportPanel" Spacing="8" Visibility="Collapsed" Margin="0,8,0,0">
                 <TextBlock
                     Style="{StaticResource MutedTextStyle}"
                     TextAlignment="Center"
-                    Text="SiteCheck ist kostenlos. Wenn es dir hilft, kannst du freiwillig einen Kaffee spendieren." />
-                <Button Content="☕ Kaffee spendieren" HorizontalAlignment="Center" Click="OnSupportClick" />
+                    x:Uid="AboutPage_SupportText" />
+                <Button x:Uid="AboutPage_SupportButton" HorizontalAlignment="Center" Click="OnSupportClick" />
             </StackPanel>
 
         </StackPanel>

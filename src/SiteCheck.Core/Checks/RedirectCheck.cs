@@ -1,6 +1,7 @@
 using SiteCheck.Core.Abstractions;
-using SiteCheck.Core.Models;
+using SiteCheck.Core.Localization;
 using SiteCheck.Core.Models.Probes;
+using SiteCheck.Core.Models;
 
 namespace SiteCheck.Core.Checks;
 
@@ -33,8 +34,8 @@ public sealed class RedirectCheck(IHttpProbe http) : ICheck
                     Id + ".unreachable",
                     Category,
                     Severity.Info,
-                    "http-Adresse nicht erreichbar",
-                    "Die Seite antwortet nur über https. Das ist in Ordnung, nur ließ sich die Umleitung nicht nachstellen."),
+                    DomainText.Get("http-Adresse nicht erreichbar"),
+                    DomainText.Get("Die Seite antwortet nur über https. Das ist in Ordnung, nur ließ sich die Umleitung nicht nachstellen.")),
             ];
         }
 
@@ -55,14 +56,14 @@ public sealed class RedirectCheck(IHttpProbe http) : ICheck
                     Category,
                     isPermanent ? Severity.Ok : Severity.Info,
                     isPermanent
-                        ? $"http leitet fest auf https um ({response.StatusCode})"
-                        : $"http leitet auf https um, aber nicht dauerhaft ({response.StatusCode})",
+                        ? DomainText.Format($"http leitet fest auf https um ({response.StatusCode})")
+                        : DomainText.Format($"http leitet auf https um, aber nicht dauerhaft ({response.StatusCode})"),
                     isPermanent
                         ? null
-                        : "Eine 301 (oder 308) sagt dem Browser, dass es dauerhaft https ist; er merkt es sich.",
+                        : DomainText.Get("Eine 301 (oder 308) sagt dem Browser, dass es dauerhaft https ist; er merkt es sich."),
                     isPermanent
                         ? null
-                        : new Recommendation("Die Umleitung auf eine feste (301) umstellen.")),
+                        : new Recommendation(DomainText.Get("Die Umleitung auf eine feste (301) umstellen."))),
             ];
         }
 
@@ -72,10 +73,10 @@ public sealed class RedirectCheck(IHttpProbe http) : ICheck
                 Id + ".missing",
                 Category,
                 Severity.Warning,
-                "http leitet nicht sauber auf https um",
-                $"Die http-Adresse antwortet mit {response.StatusCode}. Eine feste Umleitung (301) auf https fehlt.",
+                DomainText.Get("http leitet nicht sauber auf https um"),
+                DomainText.Format($"Die http-Adresse antwortet mit {response.StatusCode}. Eine feste Umleitung (301) auf https fehlt."),
                 new Recommendation(
-                    "Alle http-Aufrufe serverseitig fest auf https umleiten.",
+                    DomainText.Get("Alle http-Aufrufe serverseitig fest auf https umleiten."),
                     "RewriteEngine On\nRewriteCond %{HTTPS} off\nRewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]")),
         ];
     }
