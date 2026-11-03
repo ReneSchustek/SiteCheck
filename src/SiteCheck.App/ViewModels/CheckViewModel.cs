@@ -113,7 +113,7 @@ public sealed partial class CheckViewModel(
             return;
         }
 
-        _dispatcher ??= DispatcherQueue.GetForCurrentThread();
+        _dispatcher ??= UiDispatcher.TryGetCurrent();
         WebFindings.Clear();
         MailFindings.Clear();
         Progress = 0;
