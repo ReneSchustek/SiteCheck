@@ -10,6 +10,8 @@
 [![Release](https://img.shields.io/github/v/release/ReneSchustek/SiteCheck?sort=semver)](https://github.com/ReneSchustek/SiteCheck/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
+**Deutsch** · [English](README.en.md)
+
 </div>
 
 Ein kleiner Prüfer für die **eigenen** Seiten. Er klopft eine Adresse von außen ab und sagt
@@ -31,6 +33,14 @@ Sicherheit steht im Release die **SHA-256-Prüfsumme** jeder Datei; so lässt si
 ```powershell
 Get-FileHash .\SiteCheck-Setup-v0.1.0.exe -Algorithm SHA256
 ```
+
+## Updates
+
+Die portable Fassung aktualisiert sich selbst: Einmal am Tag sieht sie auf GitHub nach einer neuen Version,
+lädt sie im Hintergrund und spielt sie beim nächsten Start ein. Eingespielt wird nur ein Paket mit gültiger
+Signatur, ohne sie wird das Update abgewiesen. Eine Installation im schreibgeschützten Ordner „Programme“
+öffnet stattdessen die Release-Seite. Abschalten lässt sich das unter „Über“. Die Abfrage geht an GitHub, nie
+an eine geprüfte Seite.
 
 ## Schutz vor der eigenen Sperre
 
@@ -119,9 +129,9 @@ Saubere Schichtung, Abhängigkeiten nur nach innen:
 ```
 SiteCheck.App          WinUI-3-Oberfläche (Ansichten, ViewModels, Composition Root)
 SiteCheck.Cli          schmaler Konsolen-Zugang auf derselben Prüflogik
-SiteCheck.Application   Abläufe: Prüflauf, Lasttest, Berichtsbau
+SiteCheck.Application   Abläufe: Prüflauf, Lasttest, Berichtsbau, Sperrwache
 SiteCheck.Core          Domäne: Befund-Modell, Stufen, Prüfungen, Verträge (ohne Framework)
-SiteCheck.Data          konkrete Zugriffe: HTTP, TLS, DNS, Speicher (JSON)
+SiteCheck.Data          konkrete Zugriffe: HTTP, TLS, DNS, Speicher (JSON), Update, Protokolldatei
 ```
 
 ## Entwicklung
@@ -134,6 +144,11 @@ dotnet test tests/SiteCheck.Application.Tests/SiteCheck.Application.Tests.csproj
 dotnet test tests/SiteCheck.Data.Tests/SiteCheck.Data.Tests.csproj -c Release
 dotnet test tests/SiteCheck.App.Tests/SiteCheck.App.Tests.csproj -c Release --no-build -p:Platform=x64
 ```
+
+Update-Pakete werden mit `tools/sign-release.ps1` signiert; der Release-Job erledigt das, wenn das
+Repository-Secret `SITECHECK_SIGNING_KEY` gesetzt ist. Der private Schlüssel bleibt außerhalb des Repositorys.
+`tools/new-signing-key.ps1` erzeugt ein neues Paar. Nach einem Wechsel vertrauen bestehende Installationen nur
+dem alten Schlüssel und müssen die neue Fassung einmal von Hand einspielen.
 
 ## Benutzen
 

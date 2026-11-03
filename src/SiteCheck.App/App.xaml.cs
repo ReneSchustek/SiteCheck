@@ -1,9 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using SiteCheck.App.Composition;
 using SiteCheck.App.Services;
 using SiteCheck.Core.Abstractions;
+using SiteCheck.Core.Models.Update;
 
 namespace SiteCheck.App;
 
@@ -37,8 +39,38 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     /// <summary>Wird beim Start aufgerufen.</summary>
     /// <param name="args">Startparameter.</param>
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
+        try
+        {
+            await StartAsync();
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
+        {
+            // Eine Ausnahme aus einem async-void-Handler bliebe sonst unbeobachtet; das Protokoll hält sie fest.
+            Services.GetRequiredService<ILogger<App>>().StartFailed(ex);
+            throw;
+        }
+    }
+
+    private async Task StartAsync()
+    {
+        UpdateOrchestrator updates = Services.GetRequiredService<UpdateOrchestrator>();
+
+        // Aus dem Staging-Ordner gestartet: nur die Dateien tauschen, kein Fenster öffnen.
+        if (UpdateApplyArgs.TryParse(Environment.GetCommandLineArgs(), out UpdateApplyArgs helper))
+        {
+            await updates.RunHelperApplyAsync(helper);
+            return;
+        }
+
+        // Ein vorbereitetes Update kommt vor dem ersten Fenster, sonst sperrt dieser Prozess die Dateien.
+        if (await updates.TryApplyPendingUpdateOnStartupAsync())
+        {
+            Exit();
+            return;
+        }
+
         _splash = new SplashWindow();
         _splash.Activate();
 
@@ -47,6 +79,22 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         _splash.Close();
         _splash = null;
+
+        // Der Blick auf neue Versionen darf das Öffnen des Fensters nicht aufhalten.
+        _ = CheckForUpdatesAsync(updates);
+    }
+
+    private static async Task CheckForUpdatesAsync(UpdateOrchestrator updates)
+    {
+        try
+        {
+            await updates.CheckAtStartupAsync(CancellationToken.None);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
+        {
+            // Ein Fehler beim Nachsehen ist kein Grund, das laufende Programm zu stören.
+            Services.GetRequiredService<ILogger<App>>().UpdateCheckFailed(ex);
+        }
     }
 
     /// <summary>Löst den Erststart-Hinweis aus, sobald das Fenster bereit ist.</summary>
