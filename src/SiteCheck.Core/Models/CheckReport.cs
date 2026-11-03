@@ -11,6 +11,15 @@ public sealed record CheckReport(
     DateTimeOffset FinishedAt,
     IReadOnlyList<Finding> Findings)
 {
+    /// <summary>Kennung des Befunds, der erklärt, warum ein Lauf angehalten wurde.</summary>
+    public const string HaltedFindingKey = "run.halted";
+
+    /// <summary>Endung der Kennung eines Befunds, dessen Prüfung nicht lief.</summary>
+    public const string NotCheckedKeySuffix = ".notchecked";
+
+    /// <summary>Ob der Lauf angehalten wurde und der Bericht deshalb unvollständig ist.</summary>
+    public bool WasHalted => Findings.Any(finding => finding.Key == HaltedFindingKey);
+
     /// <summary>Zusammenzählung der Befunde je Stufe.</summary>
     public FindingSummary Summary => FindingSummary.From(Findings);
 }

@@ -17,7 +17,7 @@
                 <TextBlock
                     Style="{StaticResource BodyTextStyle}"
                     TextAlignment="Center"
-                    Text="SiteCheck prüft die eigenen Seiten von außen: Verschlüsselung, Schutz-Kopfzeilen, Cookies, offene Dateien und die Mail-Einrichtung (MX, SPF, DKIM, DMARC, Rückwärtsauflösung). Alles passiv — gewöhnliche Anfragen und DNS-Abfragen, nichts wird angegriffen. Nur der Stresstest belastet aktiv und nur nach Bestätigung, dass die Seite dir gehört." />
+                    x:Uid="AboutPage_Description" />
             </Border>
 
             <TextBlock Text="Ruhrcoder (René Schustek)" Style="{StaticResource BodyTextStyle}" HorizontalAlignment="Center" />
@@ -27,8 +27,8 @@
                 <TextBlock
                     Style="{StaticResource MutedTextStyle}"
                     TextAlignment="Center"
-                    Text="SiteCheck ist kostenlos. Wenn es dir hilft, kannst du freiwillig einen Kaffee spendieren." />
-                <Button Content="☕ Kaffee spendieren" HorizontalAlignment="Center" Click="OnSupportClick" />
+                    x:Uid="AboutPage_SupportText" />
+                <Button x:Uid="AboutPage_SupportButton" HorizontalAlignment="Center" Click="OnSupportClick" />
             </StackPanel>
 
         </StackPanel>

@@ -32,6 +32,7 @@ public sealed class CheckRunner(IEnumerable<ICheck> checks)
 
         DateTimeOffset startedAt = clock.GetUtcNow();
         List<Finding> findings = [];
+        RequestsHaltedException? halt = null;
 
         for (int index = 0; index < _checks.Count; index++)
         {
@@ -39,7 +40,22 @@ public sealed class CheckRunner(IEnumerable<ICheck> checks)
             ICheck check = _checks[index];
             progress?.Report(check.Id, index, _checks.Count);
 
-            findings.AddRange(await RunSingleAsync(check, target, cancellationToken).ConfigureAwait(false));
+            try
+            {
+                findings.AddRange(await RunSingleAsync(check, target, cancellationToken).ConfigureAwait(false));
+            }
+            catch (RequestsHaltedException ex)
+            {
+                // Weiterlaufen statt abbrechen: Prüfungen mit Anfragen an den Server scheitern nun
+                // sofort an der Sperrwache, ohne etwas zu senden; die DNS-Prüfungen belasten ihn nicht.
+                halt ??= ex;
+                findings.Add(HaltedFindings.ForCheck(check));
+            }
+        }
+
+        if (halt is not null)
+        {
+            findings.Insert(0, HaltedFindings.ForRun(halt));
         }
 
         progress?.Report(string.Empty, _checks.Count, _checks.Count);
@@ -58,6 +74,11 @@ public sealed class CheckRunner(IEnumerable<ICheck> checks)
         catch (OperationCanceledException)
         {
             // Abbruch ist kein Prüfergebnis, sondern Nutzerwille; nach oben durchreichen.
+            throw;
+        }
+        catch (RequestsHaltedException)
+        {
+            // Der Halt ist Sache des ganzen Laufs, kein Fehler dieser einen Prüfung.
             throw;
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)

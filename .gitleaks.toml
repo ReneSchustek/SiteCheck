@@ -1,0 +1,15 @@
+# Regeln für den Geheimnis-Scan: die Vorgaben von gitleaks, ohne Build-Ausgaben.
+# SiteCheck speichert keine Zugangsdaten, eine eigene Regel gibt es deshalb nicht.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Erzeugte Dateien, die nicht aus diesem Repository stammen"
+paths = [
+    '''(?i)(^|/)bin/''',
+    '''(?i)(^|/)obj/''',
+    '''(?i)(^|/)\.vs/''',
+    '''(?i)(^|/)dist/''',
+    '''(?i)(^|/)TestResults/''',
+]

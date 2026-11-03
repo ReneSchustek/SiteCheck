@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SiteCheck.App.Services;
 using SiteCheck.App.ViewModels;
 using SiteCheck.Application;
@@ -37,8 +38,18 @@ public static class ServiceRegistration
             provider.GetRequiredService<IHttpProbe>(),
             provider.GetRequiredService<ITlsProbe>(),
             provider.GetRequiredService<IDnsProbe>(),
-            provider.GetRequiredService<TimeProvider>()));
-        _ = services.AddSingleton(provider => new StressTestCoordinator(provider.GetRequiredService<ILoadProbe>()));
+            provider.GetRequiredService<TimeProvider>(),
+            provider.GetRequiredService<HostRequestGuard>()));
+        _ = services.AddSingleton(provider => new StressTestCoordinator(
+            provider.GetRequiredService<ILoadProbe>(),
+            provider.GetRequiredService<HostRequestGuard>()));
+
+        // Genau eine Sperrwache im Prozess: Prüflauf, Sammellauf und Lasttest teilen sich ihre Grenzen.
+        _ = services.AddSingleton<IRequestGuardStore, RequestGuardStore>();
+        _ = services.AddSingleton(provider => new HostRequestGuard(
+            provider.GetRequiredService<TimeProvider>(),
+            provider.GetRequiredService<IRequestGuardStore>(),
+            provider.GetRequiredService<IDnsProbe>()));
 
         // Speicher im Anwendungsdatenordner.
         _ = services.AddSingleton<AppPaths>();
@@ -46,7 +57,11 @@ public static class ServiceRegistration
         _ = services.AddSingleton<ISiteStore, SiteStore>();
         _ = services.AddSingleton<IHistoryStore, HistoryStore>();
 
+        // Das Protokoll liegt neben den übrigen Daten und bleibt lesbar, wenn das Programm nicht startet.
+        _ = services.AddLogging(logging => logging.AddProvider(new FileLoggerProvider(new AppPaths().LogDirectory, TimeProvider.System)));
+
         // App-Dienste für die Oberfläche.
+        _ = services.AddSingleton<IStringResources, ReswStringResources>();
         _ = services.AddSingleton<IConfirmationService, ConfirmationService>();
         _ = services.AddSingleton<IReportExportService, ReportExportService>();
 

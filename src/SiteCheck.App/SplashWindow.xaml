@@ -16,7 +16,7 @@
                 Foreground="#FFFFFF"
                 HorizontalAlignment="Center" />
             <TextBlock
-                Text="Prüft die eigenen Seiten — ehrlich und passiv."
+                x:Uid="SplashWindow_Tagline"
                 FontSize="13"
                 Foreground="#C5D0D6"
                 HorizontalAlignment="Center" />

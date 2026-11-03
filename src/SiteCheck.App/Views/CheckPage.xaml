@@ -46,7 +46,7 @@
                                 VerticalAlignment="Center"
                                 TextWrapping="Wrap" />
                             <TextBlock
-                                Text="aus Sicht von außen"
+                                x:Uid="CheckPage_FromOutside"
                                 FontSize="11"
                                 FontStyle="Italic"
                                 VerticalAlignment="Center"
@@ -74,7 +74,7 @@
                             Visibility="{x:Bind HasAdvice, Converter={StaticResource BoolToVisibility}}"
                             Foreground="{ThemeResource TextPrimaryBrush}"
                             TextWrapping="Wrap">
-                            <Run Text="Empfehlung:" FontWeight="SemiBold" />
+                            <Run x:Uid="CheckPage_Advice" FontWeight="SemiBold" />
                             <Run Text="{x:Bind Advice}" />
                         </TextBlock>
                         <Border
@@ -108,9 +108,9 @@
 
         <!-- Kopf -->
         <StackPanel Grid.Row="0" Spacing="2">
-            <TextBlock Text="Prüfen" Style="{StaticResource PageTitleTextStyle}" />
+            <TextBlock x:Uid="CheckPage_Title" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock
-                Text="Adresse der eigenen Seite eingeben und prüfen. Es wird nur von außen geschaut, nichts verändert."
+                x:Uid="CheckPage_Subtitle"
                 Style="{StaticResource PageSubtitleTextStyle}" />
         </StackPanel>
 
@@ -126,22 +126,32 @@
                     x:Name="AddressBox"
                     Grid.Column="0"
                     Text="{x:Bind ViewModel.AddressInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    PlaceholderText="z. B. meine-seite.de"
+                    x:Uid="CheckPage_AddressBox"
                     KeyDown="OnAddressKeyDown"
                     VerticalAlignment="Center" />
                 <Button
                     Grid.Column="1"
-                    Content="Prüfen"
+                    x:Uid="CheckPage_RunButton"
                     Style="{StaticResource PrimaryActionButtonStyle}"
                     Command="{x:Bind ViewModel.RunCommand}"
                     Visibility="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource InverseBoolToVisibility}}" />
                 <Button
                     Grid.Column="2"
-                    Content="Abbrechen"
+                    x:Uid="CheckPage_CancelButton"
                     MinHeight="40"
                     Command="{x:Bind ViewModel.CancelCommand}"
                     Visibility="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
             </Grid>
+
+            <CheckBox
+                x:Uid="CheckPage_SensitivePaths"
+                IsChecked="{x:Bind ViewModel.IncludeSensitivePaths, Mode=TwoWay}" />
+
+            <InfoBar
+                IsOpen="{x:Bind ViewModel.WasHalted, Mode=OneWay}"
+                Severity="Warning"
+                IsClosable="False"
+                Message="{x:Bind ViewModel.StatusText, Mode=OneWay}" />
 
             <InfoBar
                 IsOpen="{x:Bind ViewModel.HasValidationMessage, Mode=OneWay}"
@@ -168,21 +178,21 @@
                 Text="{x:Bind ViewModel.StatusText, Mode=OneWay}"
                 Style="{StaticResource BodyTextStyle}"
                 VerticalAlignment="Center" />
-            <Button Grid.Column="1" Content="Kopieren" Command="{x:Bind ViewModel.CopyCommand}" />
-            <Button Grid.Column="2" Content="Als Datei speichern" Command="{x:Bind ViewModel.SaveCommand}" />
-            <Button Grid.Column="3" Content="Verlauf leeren" Command="{x:Bind ViewModel.ClearHistoryCommand}" />
+            <Button Grid.Column="1" x:Uid="CheckPage_CopyButton" Command="{x:Bind ViewModel.CopyCommand}" />
+            <Button Grid.Column="2" x:Uid="CheckPage_SaveButton" Command="{x:Bind ViewModel.SaveCommand}" />
+            <Button Grid.Column="3" x:Uid="CheckPage_ClearHistoryButton" Command="{x:Bind ViewModel.ClearHistoryCommand}" />
         </Grid>
 
         <!-- Ergebnisse -->
         <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="8">
                 <TextBlock
-                    Text="WEB"
+                    x:Uid="CheckPage_WebHeader"
                     Style="{StaticResource SectionHeaderTextStyle}"
                     Visibility="{x:Bind ViewModel.HasResult, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
                 <ItemsControl ItemsSource="{x:Bind ViewModel.WebFindings}" ItemTemplate="{StaticResource FindingTemplate}" />
                 <TextBlock
-                    Text="MAIL-EINRICHTUNG"
+                    x:Uid="CheckPage_MailHeader"
                     Style="{StaticResource SectionHeaderTextStyle}"
                     Margin="0,8,0,0"
                     Visibility="{x:Bind ViewModel.HasResult, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />

@@ -19,9 +19,9 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Spacing="2">
-            <TextBlock Text="Stresstest" Style="{StaticResource PageTitleTextStyle}" />
+            <TextBlock x:Uid="StressPage_Title" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock
-                Text="Belastet die Seite kurz mit vielen gleichzeitigen Anfragen und misst die Antwortzeiten."
+                x:Uid="StressPage_Subtitle"
                 Style="{StaticResource PageSubtitleTextStyle}" />
         </StackPanel>
 
@@ -30,12 +30,10 @@
                 IsOpen="True"
                 IsClosable="False"
                 Severity="Warning"
-                Title="Nur für eigene, selbst gehostete Seiten"
-                Message="Dies ist eine aktive Belastung. Vor jedem Lauf wird nachgefragt, ob die Seite dir gehört. Einen fremden oder gemieteten Server so zu belasten, kann als Angriff gelten." />
+                x:Uid="StressPage_Warning" />
 
             <TextBox
-                Header="Adresse"
-                PlaceholderText="z. B. meine-seite.de"
+                x:Uid="StressPage_AddressBox"
                 Text="{x:Bind ViewModel.AddressInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <Grid ColumnSpacing="24">
@@ -45,7 +43,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <TextBlock>
-                        <Run Text="Gleichzeitige Anfragen: " />
+                        <Run x:Uid="StressPage_Concurrency" />
                         <Run Text="{x:Bind ViewModel.Concurrency, Mode=OneWay}" FontWeight="SemiBold" />
                     </TextBlock>
                     <Slider
@@ -56,7 +54,7 @@
                 </StackPanel>
                 <StackPanel Grid.Column="1">
                     <TextBlock>
-                        <Run Text="Dauer (Sekunden): " />
+                        <Run x:Uid="StressPage_Duration" />
                         <Run Text="{x:Bind ViewModel.DurationSeconds, Mode=OneWay}" FontWeight="SemiBold" />
                     </TextBlock>
                     <Slider
@@ -69,12 +67,12 @@
 
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Button
-                    Content="Lasttest starten"
+                    x:Uid="StressPage_StartButton"
                     Style="{StaticResource PrimaryActionButtonStyle}"
                     Command="{x:Bind ViewModel.StartCommand}"
                     Visibility="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource InverseBoolToVisibility}}" />
                 <Button
-                    Content="Abbrechen"
+                    x:Uid="StressPage_CancelButton"
                     MinHeight="40"
                     Command="{x:Bind ViewModel.CancelCommand}"
                     Visibility="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
@@ -102,7 +100,7 @@
             Style="{StaticResource CardBorderStyle}"
             Visibility="{x:Bind ViewModel.HasResult, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
             <StackPanel Spacing="4">
-                <TextBlock Text="ERGEBNIS" Style="{StaticResource SectionHeaderTextStyle}" />
+                <TextBlock x:Uid="StressPage_ResultHeader" Style="{StaticResource SectionHeaderTextStyle}" />
                 <TextBlock
                     Text="{x:Bind ViewModel.ResultText, Mode=OneWay}"
                     Style="{StaticResource BodyTextStyle}"

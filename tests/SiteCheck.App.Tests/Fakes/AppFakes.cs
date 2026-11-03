@@ -2,6 +2,7 @@ using SiteCheck.App.Services;
 using SiteCheck.Application;
 using SiteCheck.Core.Abstractions;
 using SiteCheck.Core.Models;
+using SiteCheck.Core.Models.Guard;
 using SiteCheck.Core.Models.Stress;
 
 namespace SiteCheck.App.Tests.Fakes;
@@ -9,7 +10,13 @@ namespace SiteCheck.App.Tests.Fakes;
 /// <summary>Fabrik, die je Aufruf einen Runner über die vorgegebenen Prüfungen baut.</summary>
 internal sealed class FakeCheckRunnerFactory(params ICheck[] checks) : ICheckRunnerFactory
 {
-    public CheckRunner Create() => new(checks);
+    public CheckRunOptions? LastOptions { get; private set; }
+
+    public CheckRunner Create(CheckRunOptions options)
+    {
+        LastOptions = options;
+        return new CheckRunner(checks);
+    }
 }
 
 /// <summary>Lastsonde, die nie aufgerufen werden sollte (für Tests, die den Lauf vorher abfangen).</summary>
@@ -91,6 +98,30 @@ internal sealed class FakeConfirmationService(bool confirms) : IConfirmationServ
 {
     public int ConfirmCount { get; private set; }
 
+    public int NoticeCount { get; private set; }
+
+    public int SensitivePathsCount { get; private set; }
+
+    public int RetryCount { get; private set; }
+
+    public Task<bool> ConfirmHostNoticeAsync(IReadOnlyList<string> addresses, CancellationToken cancellationToken)
+    {
+        NoticeCount++;
+        return Task.FromResult(confirms);
+    }
+
+    public Task<bool> ConfirmSensitivePathsAsync(string address, CancellationToken cancellationToken)
+    {
+        SensitivePathsCount++;
+        return Task.FromResult(confirms);
+    }
+
+    public Task<bool> ConfirmRetryDuringHaltAsync(string address, string reason, CancellationToken cancellationToken)
+    {
+        RetryCount++;
+        return Task.FromResult(confirms);
+    }
+
     public Task ShowScopeNoticeAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     public Task<bool> ConfirmStressTestOwnershipAsync(string address, CancellationToken cancellationToken)
@@ -98,4 +129,67 @@ internal sealed class FakeConfirmationService(bool confirms) : IConfirmationServ
         ConfirmCount++;
         return Task.FromResult(confirms);
     }
+}
+
+/// <summary>Speicher der Sperrwache im Arbeitsspeicher.</summary>
+internal sealed class InMemoryGuardStore : IRequestGuardStore
+{
+    private IReadOnlyDictionary<string, HostGuardEntry> _hosts = new Dictionary<string, HostGuardEntry>();
+
+    public Task<IReadOnlyDictionary<string, HostGuardEntry>> LoadAsync(CancellationToken cancellationToken) => Task.FromResult(_hosts);
+
+    public Task SaveAsync(IReadOnlyDictionary<string, HostGuardEntry> hosts, CancellationToken cancellationToken)
+    {
+        _hosts = hosts;
+        return Task.CompletedTask;
+    }
+}
+
+/// <summary>DNS, das nichts kennt; die ViewModel-Tests senden nichts ins Netz.</summary>
+internal sealed class EmptyDnsProbe : IDnsProbe
+{
+    public Task<IReadOnlyList<string>> QueryMailExchangersAsync(string domain, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<string>>([]);
+
+    public Task<IReadOnlyList<string>> QueryTextRecordsAsync(string name, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<string>>([]);
+
+    public Task<IReadOnlyList<string>> ResolveIpv4Async(string host, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<string>>([]);
+
+    public Task<string?> QueryPointerAsync(string ipAddress, CancellationToken cancellationToken) => Task.FromResult<string?>(null);
+
+    public Task<bool> IsDnssecSignedAsync(string domain, CancellationToken cancellationToken) => Task.FromResult(false);
+
+    public Task<IReadOnlyList<string>> QueryCaaAsync(string domain, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<string>>([]);
+
+    public Task<bool> HasTlsaAsync(string name, CancellationToken cancellationToken) => Task.FromResult(false);
+}
+
+/// <summary>Baut eine Sperrwache für ViewModel-Tests.</summary>
+internal static class TestGuards
+{
+    public static HostRequestGuard Create(TimeProvider? clock = null) =>
+        new(clock ?? TimeProvider.System, new InMemoryGuardStore(), new EmptyDnsProbe());
+}
+
+/// <summary>Prüfung, die wie eine angehaltene Sonde sofort den Halt meldet.</summary>
+internal sealed class HaltingCheck : ICheck
+{
+    public int Calls { get; private set; }
+
+    public string Id => "stub.halting";
+
+    public CheckCategory Category => CheckCategory.Web;
+
+    public Task<IReadOnlyList<Finding>> RunAsync(CheckTarget target, CancellationToken cancellationToken)
+    {
+        Calls++;
+        throw new RequestsHaltedException(RequestHaltReason.HostRejected, target.Host, DateTimeOffset.UnixEpoch);
+    }
+}
+
+/// <summary>Liefert den Schlüssel statt des Textes, damit Tests die Aussage prüfen und keinen Satzteil.</summary>
+internal sealed class FakeStringResources : IStringResources
+{
+    public string GetString(string key) => key;
+
+    public string GetFormatted(string key, params object[] arguments) => key + "|" + string.Join("|", arguments);
 }

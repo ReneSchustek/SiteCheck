@@ -1,4 +1,5 @@
 using SiteCheck.Core.Models;
+using SiteCheck.Core.Models.Guard;
 using SiteCheck.Data.Storage;
 
 namespace SiteCheck.Data.Tests.Storage;
@@ -114,6 +115,35 @@ public sealed class StoreTests : IDisposable
 
         Finding restored = Assert.Single(loaded[0].Findings);
         Assert.Equal(finding, restored);
+    }
+
+    [Fact]
+    public async Task RequestGuardStore_RoundTrips()
+    {
+        RequestGuardStore store = new(_paths);
+        DateTimeOffset now = new(2026, 11, 3, 12, 0, 0, TimeSpan.Zero);
+        HostGuardEntry entry = new([now], now.AddHours(1), RequestHaltReason.HostRejected, NoticeAcknowledged: true);
+
+        await store.SaveAsync(new Dictionary<string, HostGuardEntry> { ["beispiel.de"] = entry }, TestContext.Current.CancellationToken);
+        IReadOnlyDictionary<string, HostGuardEntry> loaded = await new RequestGuardStore(_paths).LoadAsync(TestContext.Current.CancellationToken);
+
+        HostGuardEntry restored = loaded["BEISPIEL.de"];
+        Assert.Equal([now], restored.RecentRequests);
+        Assert.Equal(entry.BlockedUntil, restored.BlockedUntil);
+        Assert.Equal(RequestHaltReason.HostRejected, restored.BlockReason);
+        Assert.True(restored.NoticeAcknowledged);
+    }
+
+    [Fact]
+    public async Task RequestGuardStore_WhenFileIsMissingOrBroken_IsEmpty()
+    {
+        RequestGuardStore store = new(_paths);
+        Assert.Empty(await store.LoadAsync(TestContext.Current.CancellationToken));
+
+        _ = Directory.CreateDirectory(_root);
+        await File.WriteAllTextAsync(_paths.RequestGuardFile, "kein json", TestContext.Current.CancellationToken);
+
+        Assert.Empty(await store.LoadAsync(TestContext.Current.CancellationToken));
     }
 
     private static HistoryEntry Entry(DateTimeOffset ranAt) =>
