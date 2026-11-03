@@ -52,15 +52,17 @@ jobs:
           $projects = @(
             'tests/SiteCheck.Core.Tests/SiteCheck.Core.Tests.csproj',
             'tests/SiteCheck.Application.Tests/SiteCheck.Application.Tests.csproj',
-            'tests/SiteCheck.Data.Tests/SiteCheck.Data.Tests.csproj',
-            'tests/SiteCheck.App.Tests/SiteCheck.App.Tests.csproj'
+            'tests/SiteCheck.Data.Tests/SiteCheck.Data.Tests.csproj'
           )
           foreach ($p in $projects) {
-            # Die Solution baut die App-Tests für x64; ohne diese Angabe sucht der Lauf im AnyCPU-Pfad
-            # und findet dort nichts Startbares.
-            dotnet test $p --configuration Release --no-build -p:Platform=x64
+            dotnet test $p --configuration Release --no-build
             if ($LASTEXITCODE -ne 0) { throw "Tests fehlgeschlagen: $p" }
           }
+
+          # Nur die App-Tests baut die Solution für x64. Ohne diese Angabe sucht der Lauf im AnyCPU-Pfad
+          # und findet dort nichts Startbares; bei den übrigen Projekten wäre es umgekehrt.
+          dotnet test tests/SiteCheck.App.Tests/SiteCheck.App.Tests.csproj --configuration Release --no-build -p:Platform=x64
+          if ($LASTEXITCODE -ne 0) { throw 'Tests fehlgeschlagen: SiteCheck.App.Tests' }
 
       - name: CVE-Scan (inkl. transitiver Pakete)
         run: dotnet list ${{ env.SOLUTION_FILE }} package --vulnerable --include-transitive
