@@ -111,7 +111,7 @@ public sealed partial class StressTestViewModel(StressTestCoordinator coordinato
             return;
         }
 
-        _dispatcher ??= DispatcherQueue.GetForCurrentThread();
+        _dispatcher ??= UiDispatcher.TryGetCurrent();
         ResultText = string.Empty;
         Progress = 0;
         StatusText = _strings.GetString("Status_Stress_Running");
