@@ -135,11 +135,41 @@
   <data name="Finding_Change_Resolved" xml:space="preserve">
     <value>behoben</value>
   </data>
+  <data name="LogPage_FilterAll.Content" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="LogPage_FilterErrors.Content" xml:space="preserve">
+    <value>Nur Fehler</value>
+  </data>
+  <data name="LogPage_FilterWarnings.Content" xml:space="preserve">
+    <value>Warnungen und Fehler</value>
+  </data>
+  <data name="LogPage_ReloadButton.Content" xml:space="preserve">
+    <value>Aktualisieren</value>
+  </data>
+  <data name="LogPage_Search.PlaceholderText" xml:space="preserve">
+    <value>Suchen in Meldung und Bereich</value>
+  </data>
+  <data name="LogPage_Subtitle.Text" xml:space="preserve">
+    <value>Was SiteCheck in den letzten 14 Tagen getan hat, etwa wann und warum ein Lauf angehalten wurde. Inhalte fremder Seiten stehen hier nicht.</value>
+  </data>
+  <data name="LogPage_Title.Text" xml:space="preserve">
+    <value>Protokoll</value>
+  </data>
+  <data name="Log_Empty_NoMatch" xml:space="preserve">
+    <value>Nichts gefunden. Suche oder Filter ändern.</value>
+  </data>
+  <data name="Log_Empty_None" xml:space="preserve">
+    <value>Noch keine Einträge. Sie entstehen, sobald etwas geprüft wird.</value>
+  </data>
   <data name="MainWindow_NavAbout.Content" xml:space="preserve">
     <value>Über</value>
   </data>
   <data name="MainWindow_NavCheck.Content" xml:space="preserve">
     <value>Prüfen</value>
+  </data>
+  <data name="MainWindow_NavLog.Content" xml:space="preserve">
+    <value>Protokoll</value>
   </data>
   <data name="MainWindow_NavSites.Content" xml:space="preserve">
     <value>Meine Seiten</value>

@@ -1,5 +1,6 @@
 using SiteCheck.Core.Abstractions;
 using SiteCheck.Core.Checks;
+using SiteCheck.Core.Localization;
 
 namespace SiteCheck.Application;
 
@@ -35,8 +36,8 @@ public static class CheckCatalog
             new SecurityHeadersCheck(http),
             new CookieCheck(http),
             new VersionLeakCheck(http),
-            options.IncludeSensitivePaths ? sensitiveFiles : new OptInCheck(sensitiveFiles, "Nicht geprüft: heikle Dateien (.git, .env und andere)"),
-            options.IncludeSensitivePaths ? directoryListing : new OptInCheck(directoryListing, "Nicht geprüft: offene Verzeichnis-Auflistung"),
+            options.IncludeSensitivePaths ? sensitiveFiles : new OptInCheck(sensitiveFiles, DomainText.Get("Nicht geprüft: heikle Dateien (.git, .env und andere)")),
+            options.IncludeSensitivePaths ? directoryListing : new OptInCheck(directoryListing, DomainText.Get("Nicht geprüft: offene Verzeichnis-Auflistung")),
             new SecurityTxtCheck(http),
             new DnsHardeningCheck(dns),
             new MailSetupCheck(dns),

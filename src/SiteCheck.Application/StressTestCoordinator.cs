@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using SiteCheck.Core.Abstractions;
 using SiteCheck.Core.Models;
 using SiteCheck.Core.Models.Stress;
@@ -19,10 +21,11 @@ namespace SiteCheck.Application;
 /// endet der Test bei der ersten Abweisung, und danach ruht der Host für eine Abkühlzeit.
 /// </para>
 /// </summary>
-public sealed class StressTestCoordinator(ILoadProbe loadProbe, HostRequestGuard guard)
+public sealed class StressTestCoordinator(ILoadProbe loadProbe, HostRequestGuard guard, ILogger? logger = null)
 {
     private readonly ILoadProbe _loadProbe = loadProbe;
     private readonly HostRequestGuard _guard = guard;
+    private readonly ILogger _logger = logger ?? NullLogger.Instance;
 
     /// <summary>
     /// Führt den Lasttest aus.
@@ -54,6 +57,9 @@ public sealed class StressTestCoordinator(ILoadProbe loadProbe, HostRequestGuard
         await _guard.ThrowIfBlockedAsync(target.Host, cancellationToken).ConfigureAwait(false);
 
         StressTestOptions effective = options.Clamp();
+        double seconds = effective.Duration.TotalSeconds;
+        string address = target.ToString();
+        _logger.StressStarted(address, effective.Concurrency, seconds);
         List<RequestOutcome> outcomes = [];
         object outcomesLock = new();
 
@@ -92,6 +98,7 @@ public sealed class StressTestCoordinator(ILoadProbe loadProbe, HostRequestGuard
         {
             StoppedByRejection = rejected.IsCancellationRequested,
         };
+        _logger.StressFinished(address, result.TotalRequests, result.StoppedByRejection);
         progress?.Report(new StressTestProgress(result.TotalRequests, stopwatch.Elapsed, effective.Duration));
         return result;
     }

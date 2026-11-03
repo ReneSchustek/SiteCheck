@@ -1,4 +1,5 @@
 using SiteCheck.Core.Abstractions;
+using SiteCheck.Core.Localization;
 using SiteCheck.Core.Models;
 
 namespace SiteCheck.Application;
@@ -21,7 +22,6 @@ internal sealed class OptInCheck(ICheck check, string title) : ICheck
                 check.Category,
                 Severity.Info,
                 title,
-                "Diese Pfade sehen für die Abwehr eines Hosters wie ein Scanner aus und können den eigenen Anschluss sperren. "
-                + "Deshalb laufen sie nur nach ausdrücklicher Bestätigung."),
+                DomainText.Get("Diese Pfade sehen für die Abwehr eines Hosters wie ein Scanner aus und können den eigenen Anschluss sperren. Deshalb laufen sie nur nach ausdrücklicher Bestätigung.")),
         ]);
 }
