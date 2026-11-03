@@ -1,4 +1,3 @@
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
@@ -17,11 +16,12 @@ namespace SiteCheck.App.ViewModels;
 /// </summary>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable",
     Justification = "Die CancellationTokenSource gehört nur einem einzelnen Lauf: Sie wird in StartAsync erzeugt und im finally wieder freigegeben und auf null gesetzt. Als Singleton mit App-Lebensdauer wird das ViewModel nie disposed.")]
-public sealed partial class StressTestViewModel(StressTestCoordinator coordinator, IConfirmationService confirmation)
+public sealed partial class StressTestViewModel(StressTestCoordinator coordinator, IConfirmationService confirmation, IStringResources strings)
     : ObservableObject
 {
     private readonly StressTestCoordinator _coordinator = coordinator;
     private readonly IConfirmationService _confirmation = confirmation;
+    private readonly IStringResources _strings = strings;
 
     private DispatcherQueue? _dispatcher;
     private CancellationTokenSource? _cancellation;
@@ -107,14 +107,14 @@ public sealed partial class StressTestViewModel(StressTestCoordinator coordinato
         bool owns = await _confirmation.ConfirmStressTestOwnershipAsync(target.ToString(), CancellationToken.None);
         if (!owns)
         {
-            StatusText = "Abgebrochen — ohne Bestätigung kein Lasttest.";
+            StatusText = _strings.GetString("Status_Stress_NotConfirmed");
             return;
         }
 
         _dispatcher ??= DispatcherQueue.GetForCurrentThread();
         ResultText = string.Empty;
         Progress = 0;
-        StatusText = "Lasttest läuft …";
+        StatusText = _strings.GetString("Status_Stress_Running");
         State = CheckRunState.Running;
 
         StressTestOptions options = new((int)Concurrency, TimeSpan.FromSeconds(DurationSeconds));
@@ -125,8 +125,8 @@ public sealed partial class StressTestViewModel(StressTestCoordinator coordinato
             StressTestResult result = await _coordinator.RunAsync(target, options, ownershipConfirmed: true, progress, _cancellation.Token);
             ResultText = DescribeResult(result);
             StatusText = result.StoppedByRejection
-                ? "Lasttest beendet: Der Server hat abgewiesen. Bitte von hier jetzt nichts weiter abrufen."
-                : "Lasttest abgeschlossen. Die Seite ruht jetzt eine Viertelstunde.";
+                ? _strings.GetString("Status_Stress_Rejected")
+                : _strings.GetString("Status_Stress_Completed");
             State = CheckRunState.Completed;
         }
         catch (RequestsHaltedException ex)
@@ -136,12 +136,12 @@ public sealed partial class StressTestViewModel(StressTestCoordinator coordinato
         }
         catch (OperationCanceledException)
         {
-            StatusText = "Lasttest abgebrochen.";
+            StatusText = _strings.GetString("Status_Stress_Cancelled");
             State = CheckRunState.Cancelled;
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
         {
-            StatusText = "Der Lasttest ist fehlgeschlagen: " + ex.Message;
+            StatusText = _strings.GetFormatted("Status_Stress_Failed", ex.Message);
             State = CheckRunState.Error;
         }
         finally
@@ -165,7 +165,7 @@ public sealed partial class StressTestViewModel(StressTestCoordinator coordinato
         void Apply()
         {
             Progress = update.Fraction;
-            StatusText = string.Create(CultureInfo.CurrentCulture, $"Lasttest läuft … {update.CompletedRequests} Anfragen");
+            StatusText = _strings.GetFormatted("Status_Stress_Progress", update.CompletedRequests);
         }
 
         if (_dispatcher is { } dispatcher && !dispatcher.HasThreadAccess)
@@ -178,21 +178,23 @@ public sealed partial class StressTestViewModel(StressTestCoordinator coordinato
         }
     }
 
-    private static string DescribeResult(StressTestResult result) => string.Create(
-        CultureInfo.CurrentCulture,
-        $"""
-         {result.TotalRequests} Anfragen in {result.Elapsed.TotalSeconds:0.#} Sekunden
-         {result.RequestsPerSecond:0.#} Anfragen pro Sekunde
-         Erfolgreich: {result.SuccessCount}, fehlgeschlagen: {result.FailureCount} ({result.FailureRate:P0})
-         Antwortzeit im Mittel: {result.AverageMilliseconds:0} ms
-         Median: {result.MedianMilliseconds:0} ms, langsamstes Fünftel (95 %): {result.Percentile95Milliseconds:0} ms
-         """);
+    private string DescribeResult(StressTestResult result) => _strings.GetFormatted(
+        "Status_Stress_Result",
+        result.TotalRequests,
+        result.Elapsed.TotalSeconds,
+        result.RequestsPerSecond,
+        result.SuccessCount,
+        result.FailureCount,
+        result.FailureRate,
+        result.AverageMilliseconds,
+        result.MedianMilliseconds,
+        result.Percentile95Milliseconds);
 
-    private static string DescribeError(TargetParseError error) => error switch
+    private string DescribeError(TargetParseError error) => _strings.GetString(error switch
     {
-        TargetParseError.Empty => "Bitte zuerst die Adresse deiner Seite eingeben.",
-        TargetParseError.UnsupportedScheme => "Es lassen sich nur http- und https-Adressen testen.",
-        TargetParseError.ContainsCredentials => "Bitte die Adresse ohne Benutzername und Passwort eingeben.",
-        _ => "Das sieht nicht nach einer gültigen Web-Adresse aus. Beispiel: meine-seite.de",
-    };
+        TargetParseError.Empty => "Valid_Stress_Empty",
+        TargetParseError.UnsupportedScheme => "Valid_Stress_UnsupportedScheme",
+        TargetParseError.ContainsCredentials => "Valid_ContainsCredentials",
+        _ => "Valid_Invalid",
+    });
 }

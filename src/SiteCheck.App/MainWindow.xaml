@@ -20,17 +20,17 @@
         Loaded="OnLoaded">
 
         <NavigationView.MenuItems>
-            <NavigationViewItem Content="Prüfen" Tag="Check" IsSelected="True">
+            <NavigationViewItem x:Uid="MainWindow_NavCheck" Tag="Check" IsSelected="True">
                 <NavigationViewItem.Icon>
                     <FontIcon Glyph="&#xE721;" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem Content="Meine Seiten" Tag="Sites">
+            <NavigationViewItem x:Uid="MainWindow_NavSites" Tag="Sites">
                 <NavigationViewItem.Icon>
                     <FontIcon Glyph="&#xE71D;" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem Content="Stresstest" Tag="Stress">
+            <NavigationViewItem x:Uid="MainWindow_NavStress" Tag="Stress">
                 <NavigationViewItem.Icon>
                     <FontIcon Glyph="&#xEC4A;" />
                 </NavigationViewItem.Icon>
@@ -38,7 +38,7 @@
         </NavigationView.MenuItems>
 
         <NavigationView.FooterMenuItems>
-            <NavigationViewItem Content="Über" Tag="About">
+            <NavigationViewItem x:Uid="MainWindow_NavAbout" Tag="About">
                 <NavigationViewItem.Icon>
                     <FontIcon Glyph="&#xE946;" />
                 </NavigationViewItem.Icon>

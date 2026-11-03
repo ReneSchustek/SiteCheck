@@ -15,7 +15,7 @@ public sealed class CheckViewModelTests
             ? [new StubCheck(CheckCategory.Web, [new Finding("web.ok", CheckCategory.Web, Severity.Ok, "Alles gut")])]
             : checks;
         FakeCheckRunnerFactory factory = new(effective);
-        return new CheckViewModel(factory, new FakeTimeProvider(), history ?? new FakeHistoryStore(), new FakeReportExportService(), TestGuards.Create(), new FakeConfirmationService(confirms: true));
+        return new CheckViewModel(factory, new FakeTimeProvider(), history ?? new FakeHistoryStore(), new FakeReportExportService(), TestGuards.Create(), new FakeConfirmationService(confirms: true), new FakeStringResources());
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public sealed class CheckViewModelTests
         Assert.Equal("https://beispiel.de/", vm.AddressInput);
         _ = Assert.Single(vm.WebFindings);
         _ = Assert.Single(vm.MailFindings);
-        Assert.Contains("1 kritisch", vm.StatusText, StringComparison.Ordinal);
+        Assert.Equal("Status_Check_Summary|1|0|1", vm.StatusText);
         _ = Assert.Single(history.Appended);
     }
 
@@ -100,7 +100,7 @@ public sealed class CheckViewModelTests
     {
         FakeReportExportService export = new();
         FakeCheckRunnerFactory factory = new(new StubCheck(CheckCategory.Web, [new Finding("web.ok", CheckCategory.Web, Severity.Ok, "ok")]));
-        CheckViewModel vm = new(factory, new FakeTimeProvider(), new FakeHistoryStore(), export, TestGuards.Create(), new FakeConfirmationService(confirms: true));
+        CheckViewModel vm = new(factory, new FakeTimeProvider(), new FakeHistoryStore(), export, TestGuards.Create(), new FakeConfirmationService(confirms: true), new FakeStringResources());
         vm.AddressInput = "beispiel.de";
         await vm.RunCommand.ExecuteAsync(null);
 
@@ -111,7 +111,7 @@ public sealed class CheckViewModelTests
     }
 
     private static CheckViewModel BuildGuarded(FakeCheckRunnerFactory factory, FakeConfirmationService confirmation, HostRequestGuard guard, FakeHistoryStore? history = null) =>
-        new(factory, new FakeTimeProvider(), history ?? new FakeHistoryStore(), new FakeReportExportService(), guard, confirmation);
+        new(factory, new FakeTimeProvider(), history ?? new FakeHistoryStore(), new FakeReportExportService(), guard, confirmation, new FakeStringResources());
 
     private static FakeCheckRunnerFactory OkFactory() =>
         new(new StubCheck(CheckCategory.Web, [new Finding("w", CheckCategory.Web, Severity.Ok, "ok")]));

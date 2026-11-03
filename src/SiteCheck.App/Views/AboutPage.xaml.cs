@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -20,7 +21,11 @@ public sealed partial class AboutPage : Page
         base.OnNavigatedTo(e);
 
         Version? version = typeof(App).Assembly.GetName().Version;
-        VersionText.Text = version is not null ? $"Version {version.Major}.{version.Minor}.{version.Build}" : "Version 0.1.0";
+        if (version is not null)
+        {
+            string number = $"{version.Major}.{version.Minor}.{version.Build}";
+            VersionText.Text = App.Services.GetRequiredService<IStringResources>().GetFormatted("About_Version", number);
+        }
 
         // Spenden-Einstieg nur zeigen, wenn ein echter Handle hinterlegt ist.
         SupportPanel.Visibility = SupportDonation.IsConfigured ? Visibility.Visible : Visibility.Collapsed;

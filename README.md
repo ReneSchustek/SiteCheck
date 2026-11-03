@@ -101,6 +101,12 @@ Jedes Ergebnis lässt sich als Text **kopieren** und als gestaltete **HTML-Datei
 (hell und dunkel lesbar). Je Befund steht ein klarer Satz, eine Ampel in Worten und, wo es
 hilft, der konkrete Rat samt Beispiel zum Übernehmen.
 
+## Sprache und Protokoll
+
+Die Oberfläche folgt der Windows-Sprache: Englisch bei englischem Windows, sonst Deutsch. Befunde und
+Berichte sind vorerst nur deutsch. Das Protokoll liegt unter `%LocalAppData%\SiteCheck\logs` und
+bewahrt 14 Tagesdateien auf.
+
 ## Voraussetzungen
 
 - Windows 10 (ab 1809) oder Windows 11

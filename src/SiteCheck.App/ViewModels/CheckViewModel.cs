@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
@@ -23,7 +22,8 @@ public sealed partial class CheckViewModel(
     IHistoryStore history,
     IReportExportService export,
     HostRequestGuard guard,
-    IConfirmationService confirmation)
+    IConfirmationService confirmation,
+    IStringResources strings)
     : ObservableObject, ICheckProgress
 {
     private readonly ICheckRunnerFactory _runnerFactory = runnerFactory;
@@ -32,6 +32,7 @@ public sealed partial class CheckViewModel(
     private readonly IReportExportService _export = export;
     private readonly HostRequestGuard _guard = guard;
     private readonly IConfirmationService _confirmation = confirmation;
+    private readonly IStringResources _strings = strings;
 
     private DispatcherQueue? _dispatcher;
     private CancellationTokenSource? _cancellation;
@@ -108,7 +109,7 @@ public sealed partial class CheckViewModel(
         CheckRunOptions? options = await ConfirmRunAsync(target).ConfigureAwait(true);
         if (options is null)
         {
-            StatusText = "Abgebrochen — es wurde nichts gesendet.";
+            StatusText = _strings.GetString("Status_NothingSent");
             return;
         }
 
@@ -116,7 +117,7 @@ public sealed partial class CheckViewModel(
         WebFindings.Clear();
         MailFindings.Clear();
         Progress = 0;
-        StatusText = "Prüfung läuft … Zwischen den Anfragen liegen Pausen, damit der Hoster nicht sperrt.";
+        StatusText = _strings.GetString("Status_Check_Running");
         State = CheckRunState.Running;
 
         _cancellation = new CancellationTokenSource();
@@ -138,7 +139,7 @@ public sealed partial class CheckViewModel(
                 : ReportComparison.Compare(report.Findings, previous);
             FillFindings(compared);
             StatusText = report.WasHalted
-                ? "Prüfung angehalten, um deinen Anschluss zu schützen. Der Bericht ist unvollständig."
+                ? _strings.GetString("Status_Check_Halted")
                 : SummaryText(report.Summary);
             State = CheckRunState.Completed;
             if (!report.WasHalted)
@@ -148,12 +149,12 @@ public sealed partial class CheckViewModel(
         }
         catch (OperationCanceledException)
         {
-            StatusText = "Prüfung abgebrochen.";
+            StatusText = _strings.GetString("Status_Check_Cancelled");
             State = CheckRunState.Cancelled;
         }
         catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
         {
-            StatusText = "Die Prüfung ist unerwartet fehlgeschlagen: " + ex.Message;
+            StatusText = _strings.GetFormatted("Status_Check_Failed", ex.Message);
             State = CheckRunState.Error;
         }
         finally
@@ -220,7 +221,7 @@ public sealed partial class CheckViewModel(
         if (_lastReport is not null)
         {
             _export.CopyTextToClipboard(_lastReport);
-            StatusText = "Bericht in die Zwischenablage kopiert.";
+            StatusText = _strings.GetString("Status_Check_Copied");
         }
     }
 
@@ -236,7 +237,7 @@ public sealed partial class CheckViewModel(
         string? path = await _export.SaveHtmlAsync(_lastReport, CancellationToken.None);
         if (path is not null)
         {
-            StatusText = "Bericht gespeichert: " + path;
+            StatusText = _strings.GetFormatted("Status_Check_Saved", path);
         }
     }
 
@@ -252,11 +253,11 @@ public sealed partial class CheckViewModel(
         try
         {
             await _history.ClearAsync(_lastReport.Address, CancellationToken.None).ConfigureAwait(true);
-            StatusText = "Verlauf dieser Seite geleert.";
+            StatusText = _strings.GetString("Status_Check_HistoryCleared");
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            StatusText = "Der Verlauf konnte nicht geleert werden: " + ex.Message;
+            StatusText = _strings.GetFormatted("Status_Check_HistoryClearFailed", ex.Message);
         }
     }
 
@@ -280,7 +281,7 @@ public sealed partial class CheckViewModel(
     {
         foreach (ComparedFinding entry in compared)
         {
-            FindingViewModel item = new(entry.Finding, entry.Change);
+            FindingViewModel item = new(entry.Finding, _strings, entry.Change);
             if (entry.Finding.Category == CheckCategory.Mail)
             {
                 MailFindings.Add(item);
@@ -316,19 +317,18 @@ public sealed partial class CheckViewModel(
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             // Der Verlauf ist eine Beigabe; scheitert das Schreiben, bleibt das Ergebnis trotzdem stehen.
-            StatusText += " (Verlauf konnte nicht gespeichert werden.)";
+            StatusText = _strings.GetFormatted("Status_Check_HistoryNotSaved", StatusText);
         }
     }
 
-    private static string SummaryText(FindingSummary summary) => string.Create(
-        CultureInfo.CurrentCulture,
-        $"Ergebnis: {summary.OkCount} in Ordnung, {summary.WarningCount} zu verbessern, {summary.CriticalCount} kritisch.");
+    private string SummaryText(FindingSummary summary) =>
+        _strings.GetFormatted("Status_Check_Summary", summary.OkCount, summary.WarningCount, summary.CriticalCount);
 
-    private static string DescribeError(TargetParseError error) => error switch
+    private string DescribeError(TargetParseError error) => _strings.GetString(error switch
     {
-        TargetParseError.Empty => "Bitte zuerst eine Adresse eingeben, z. B. meine-seite.de.",
-        TargetParseError.UnsupportedScheme => "Es lassen sich nur http- und https-Adressen prüfen.",
-        TargetParseError.ContainsCredentials => "Bitte die Adresse ohne Benutzername und Passwort eingeben.",
-        _ => "Das sieht nicht nach einer gültigen Web-Adresse aus. Beispiel: meine-seite.de",
-    };
+        TargetParseError.Empty => "Valid_Empty",
+        TargetParseError.UnsupportedScheme => "Valid_UnsupportedScheme",
+        TargetParseError.ContainsCredentials => "Valid_ContainsCredentials",
+        _ => "Valid_Invalid",
+    });
 }

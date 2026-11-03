@@ -185,3 +185,11 @@ internal sealed class HaltingCheck : ICheck
         throw new RequestsHaltedException(RequestHaltReason.HostRejected, target.Host, DateTimeOffset.UnixEpoch);
     }
 }
+
+/// <summary>Liefert den Schlüssel statt des Textes, damit Tests die Aussage prüfen und keinen Satzteil.</summary>
+internal sealed class FakeStringResources : IStringResources
+{
+    public string GetString(string key) => key;
+
+    public string GetFormatted(string key, params object[] arguments) => key + "|" + string.Join("|", arguments);
+}

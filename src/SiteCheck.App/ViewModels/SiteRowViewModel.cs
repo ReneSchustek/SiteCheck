@@ -2,6 +2,7 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
+using SiteCheck.App.Services;
 using SiteCheck.Core.Models;
 
 namespace SiteCheck.App.ViewModels;
@@ -10,8 +11,10 @@ namespace SiteCheck.App.ViewModels;
 /// Eine Zeile in „Meine Seiten“: Name, Adresse und eine Ampel, die den schlimmsten Befund des
 /// letzten Laufs zeigt. Die Ampel steht nie allein über die Farbe — ein Wort trägt die Bedeutung mit.
 /// </summary>
-public sealed partial class SiteRowViewModel(Site site) : ObservableObject
+public sealed partial class SiteRowViewModel(Site site, IStringResources strings) : ObservableObject
 {
+    private readonly IStringResources _strings = strings;
+
     /// <summary>Die zugrunde liegende Seite (Name, Adresse).</summary>
     public Site Site { get; } = site;
 
@@ -34,15 +37,15 @@ public sealed partial class SiteRowViewModel(Site site) : ObservableObject
     public partial string LastRunText { get; private set; } = string.Empty;
 
     /// <summary>Das Wort zur Ampel.</summary>
-    public string AmpelWord => LastWorst switch
+    public string AmpelWord => _strings.GetString(LastWorst switch
     {
-        null => "Noch nicht geprüft",
-        Severity.Ok => "In Ordnung",
-        Severity.Info => "Hinweis",
-        Severity.Warning => "Zu verbessern",
-        Severity.Critical => "Kritisch",
-        _ => "Unbekannt",
-    };
+        null => "Sites_NeverChecked",
+        Severity.Ok => "Severity_Ok",
+        Severity.Info => "Severity_Info",
+        Severity.Warning => "Severity_Warning",
+        Severity.Critical => "Severity_Critical",
+        _ => "Severity_Unknown",
+    });
 
     /// <summary>Die Ampelfarbe; Grau, solange nie geprüft.</summary>
     public Brush AmpelBrush => LastWorst switch
@@ -67,7 +70,7 @@ public sealed partial class SiteRowViewModel(Site site) : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(summary);
         LastWorst = summary.WorstSeverity;
-        LastRunText = "Geprüft am " + ranAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", CultureInfo.GetCultureInfo("de-DE"));
+        LastRunText = _strings.GetFormatted("Sites_RanAt", ranAt.ToLocalTime().ToString("g", CultureInfo.CurrentCulture));
     }
 
     /// <summary>Markiert den Beginn bzw. das Ende einer Prüfung dieser Zeile.</summary>

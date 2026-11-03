@@ -8,7 +8,7 @@ Cobertura). Gemessen wird in der **Debug**-Konfiguration: Der Release-Build setz
 |---|---:|---|
 | SiteCheck.Core | 96,2 % | ≥ 90 % ✓ |
 | SiteCheck.Application | 98,1 % | ≥ 90 % ✓ |
-| SiteCheck.Data | 77,6 % | dokumentiert (siehe unten) |
+| SiteCheck.Data | 77,5 % | dokumentiert (siehe unten) |
 
 ## Warum Data unter 90 % liegt
 

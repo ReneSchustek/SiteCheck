@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SiteCheck.App.Services;
@@ -23,7 +22,8 @@ public sealed partial class SitesViewModel(
     ICheckRunnerFactory runnerFactory,
     TimeProvider clock,
     HostRequestGuard guard,
-    IConfirmationService confirmation)
+    IConfirmationService confirmation,
+    IStringResources strings)
     : ObservableObject
 {
     private readonly ISiteStore _store = store;
@@ -32,6 +32,7 @@ public sealed partial class SitesViewModel(
     private readonly TimeProvider _clock = clock;
     private readonly HostRequestGuard _guard = guard;
     private readonly IConfirmationService _confirmation = confirmation;
+    private readonly IStringResources _strings = strings;
 
     private CancellationTokenSource? _cancellation;
 
@@ -83,7 +84,7 @@ public sealed partial class SitesViewModel(
         Sites.Clear();
         foreach (Site site in loaded)
         {
-            SiteRowViewModel row = new(site);
+            SiteRowViewModel row = new(site, _strings);
             await ApplyLastRunAsync(row, cancellationToken).ConfigureAwait(true);
             Sites.Add(row);
         }
@@ -98,19 +99,19 @@ public sealed partial class SitesViewModel(
         ValidationMessage = string.Empty;
         if (!CheckTarget.TryParse(NewAddress, out CheckTarget? target, out _))
         {
-            ValidationMessage = "Bitte eine gültige Adresse eingeben, z. B. meine-seite.de.";
+            ValidationMessage = _strings.GetString("Valid_Sites_Invalid");
             return;
         }
 
         string address = target.ToString();
         if (Sites.Any(row => string.Equals(row.Address, address, StringComparison.OrdinalIgnoreCase)))
         {
-            ValidationMessage = "Diese Adresse ist bereits in der Liste.";
+            ValidationMessage = _strings.GetString("Valid_Sites_Duplicate");
             return;
         }
 
         string name = string.IsNullOrWhiteSpace(NewName) ? target.Host : NewName.Trim();
-        Sites.Add(new SiteRowViewModel(new Site(name, address)));
+        Sites.Add(new SiteRowViewModel(new Site(name, address), _strings));
         NewName = string.Empty;
         NewAddress = string.Empty;
         OnPropertyChanged(nameof(IsEmpty));
@@ -154,7 +155,7 @@ public sealed partial class SitesViewModel(
             SiteRowViewModel[] rows = [.. Sites];
             if (!await ConfirmNewHostsAsync(rows, token).ConfigureAwait(true))
             {
-                CheckAllStatus = "Abgebrochen — es wurde nichts gesendet.";
+                CheckAllStatus = _strings.GetString("Status_NothingSent");
                 return;
             }
 
@@ -162,22 +163,22 @@ public sealed partial class SitesViewModel(
             {
                 token.ThrowIfCancellationRequested();
                 SiteRowViewModel row = rows[index];
-                CheckAllStatus = string.Create(CultureInfo.CurrentCulture, $"Prüfe {index + 1} von {rows.Length}: {row.Name}");
+                CheckAllStatus = _strings.GetFormatted("Status_Sites_Checking", index + 1, rows.Length, row.Name);
 
                 // Die Sperrwache hält den Abstand über alle Seiten. Weist eine Seite ab, endet der ganze
                 // Lauf: Die übrigen liegen oft auf demselben Server, und gesperrt wird der Anschluss.
                 if (!await CheckOneAsync(row, token).ConfigureAwait(true))
                 {
-                    CheckAllStatus = $"Sammellauf angehalten bei {row.Name}, um deinen Anschluss zu schützen. Mehr dazu in der Prüf-Ansicht.";
+                    CheckAllStatus = _strings.GetFormatted("Status_Sites_Halted", row.Name);
                     return;
                 }
             }
 
-            CheckAllStatus = "Alle Seiten geprüft.";
+            CheckAllStatus = _strings.GetString("Status_Sites_AllChecked");
         }
         catch (OperationCanceledException)
         {
-            CheckAllStatus = "Sammellauf abgebrochen.";
+            CheckAllStatus = _strings.GetString("Status_Sites_Cancelled");
         }
         finally
         {
@@ -290,7 +291,7 @@ public sealed partial class SitesViewModel(
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            ValidationMessage = "Die Liste konnte nicht gespeichert werden: " + ex.Message;
+            ValidationMessage = _strings.GetFormatted("Valid_Sites_SaveFailed", ex.Message);
         }
     }
 }

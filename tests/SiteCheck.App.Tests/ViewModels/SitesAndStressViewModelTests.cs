@@ -13,7 +13,7 @@ public sealed class SitesAndStressViewModelTests
         FakeCheckRunnerFactory factory = new(checks.Length == 0
             ? [new StubCheck(CheckCategory.Web, [new Finding("w", CheckCategory.Web, Severity.Ok, "ok")])]
             : checks);
-        return new SitesViewModel(store, history ?? new FakeHistoryStore(), factory, new FakeTimeProvider(), TestGuards.Create(), new FakeConfirmationService(confirms: true));
+        return new SitesViewModel(store, history ?? new FakeHistoryStore(), factory, new FakeTimeProvider(), TestGuards.Create(), new FakeConfirmationService(confirms: true), new FakeStringResources());
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class SitesAndStressViewModelTests
     public async Task Stress_WithoutConfirmation_DoesNotRun()
     {
         FakeConfirmationService confirmation = new(confirms: false);
-        StressTestViewModel vm = new(new StressTestCoordinator(new SiteCheck.App.Tests.Fakes.NoopLoadProbe(), TestGuards.Create()), confirmation);
+        StressTestViewModel vm = new(new StressTestCoordinator(new SiteCheck.App.Tests.Fakes.NoopLoadProbe(), TestGuards.Create()), confirmation, new FakeStringResources());
         vm.AddressInput = "beispiel.de";
 
         await vm.StartCommand.ExecuteAsync(null);
@@ -102,7 +102,7 @@ public sealed class SitesAndStressViewModelTests
     [Fact]
     public async Task Stress_WithInvalidAddress_ShowsValidation()
     {
-        StressTestViewModel vm = new(new StressTestCoordinator(new NoopLoadProbe(), TestGuards.Create()), new FakeConfirmationService(confirms: true));
+        StressTestViewModel vm = new(new StressTestCoordinator(new NoopLoadProbe(), TestGuards.Create()), new FakeConfirmationService(confirms: true), new FakeStringResources());
         vm.AddressInput = "ohne punkt";
 
         await vm.StartCommand.ExecuteAsync(null);
@@ -127,7 +127,7 @@ public sealed class SitesAndStressViewModelTests
 
         Assert.Equal(1, check.Calls);
         Assert.Empty(history.Appended);
-        Assert.Contains("angehalten", vm.CheckAllStatus, StringComparison.Ordinal);
+        Assert.Equal("Status_Sites_Halted|Eins", vm.CheckAllStatus);
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public sealed class SitesAndStressViewModelTests
         FakeSiteStore store = new();
         await store.SaveAsync([new Site("Eins", "https://eins.example.com/")], TestContext.Current.CancellationToken);
         HaltingCheck check = new();
-        SitesViewModel vm = new(store, new FakeHistoryStore(), new FakeCheckRunnerFactory(check), new FakeTimeProvider(), TestGuards.Create(), new FakeConfirmationService(confirms: false));
+        SitesViewModel vm = new(store, new FakeHistoryStore(), new FakeCheckRunnerFactory(check), new FakeTimeProvider(), TestGuards.Create(), new FakeConfirmationService(confirms: false), new FakeStringResources());
         await vm.LoadAsync(TestContext.Current.CancellationToken);
 
         await vm.CheckAllCommand.ExecuteAsync(null);

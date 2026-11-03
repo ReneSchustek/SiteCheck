@@ -14,15 +14,19 @@ using SiteCheck.Data.Storage;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
+// Die Ausgabe ist hier die Benutzerschnittstelle. Sie läuft über einen Schreiber, damit klar bleibt,
+// dass diese Zeilen zum Produkt gehören und keine vergessene Fehlersuche sind.
+TextWriter output = Console.Out;
+
 if (args.Length == 0 || args[0] is "-h" or "--help")
 {
-    Console.WriteLine("Aufruf: sitecheck <adresse> [--sensitive-paths] [--retry-during-halt]");
-    Console.WriteLine("Beispiel: sitecheck https://music.example.com");
-    Console.WriteLine();
-    Console.WriteLine("  --sensitive-paths    fragt auch .git, .env, /backup/ und andere ab. Kann den eigenen Anschluss sperren.");
-    Console.WriteLine("  --retry-during-halt  hebt eine laufende Sperrzeit auf. Verlängert eine bestehende Hostersperre.");
-    Console.WriteLine();
-    Console.WriteLine("Rückgabewert: 0 in Ordnung, 1 kritischer Befund, 2 ungültige Eingabe, 3 Lauf angehalten.");
+    output.WriteLine("Aufruf: sitecheck <adresse> [--sensitive-paths] [--retry-during-halt]");
+    output.WriteLine("Beispiel: sitecheck https://music.example.com");
+    output.WriteLine();
+    output.WriteLine("  --sensitive-paths    fragt auch .git, .env, /backup/ und andere ab. Kann den eigenen Anschluss sperren.");
+    output.WriteLine("  --retry-during-halt  hebt eine laufende Sperrzeit auf. Verlängert eine bestehende Hostersperre.");
+    output.WriteLine();
+    output.WriteLine("Rückgabewert: 0 in Ordnung, 1 kritischer Befund, 2 ungültige Eingabe, 3 Lauf angehalten.");
     return 0;
 }
 
@@ -47,11 +51,11 @@ if (args.Contains("--retry-during-halt"))
 CheckRunnerFactory runnerFactory = new(httpProbe, tlsProbe, dnsProbe, TimeProvider.System, guard);
 CheckRunner runner = runnerFactory.Create(args.Contains("--sensitive-paths") ? CheckRunOptions.WithSensitivePaths : CheckRunOptions.Standard);
 
-Console.WriteLine();
-Console.WriteLine($"  Sicherheits-Check  {target}");
-Console.WriteLine($"  {DateTime.Now:dd.MM.yyyy HH:mm}");
-Console.WriteLine("  Fragt langsam ab und hält bei der ersten Abweisung an. Ein Hoster kann den Anschluss trotzdem sperren.");
-Console.WriteLine(new string('-', 60));
+output.WriteLine();
+output.WriteLine($"  Sicherheits-Check  {target}");
+output.WriteLine($"  {TimeProvider.System.GetLocalNow():dd.MM.yyyy HH:mm}");
+output.WriteLine("  Fragt langsam ab und hält bei der ersten Abweisung an. Ein Hoster kann den Anschluss trotzdem sperren.");
+output.WriteLine(new string('-', 60));
 
 CheckReport report = await runner.RunAsync(target, TimeProvider.System, progress: null, CancellationToken.None);
 
@@ -63,9 +67,9 @@ foreach (CheckCategory category in Enum.GetValues<CheckCategory>())
         continue;
     }
 
-    Console.WriteLine();
-    Console.WriteLine("  " + CategoryTitle(category));
-    Console.WriteLine();
+    output.WriteLine();
+    output.WriteLine("  " + CategoryTitle(category));
+    output.WriteLine();
     foreach (Finding finding in inCategory)
     {
         Write(finding);
@@ -73,10 +77,10 @@ foreach (CheckCategory category in Enum.GetValues<CheckCategory>())
 }
 
 FindingSummary summary = report.Summary;
-Console.WriteLine();
-Console.WriteLine(new string('-', 60));
-Console.WriteLine($"  Ergebnis: {summary.OkCount} in Ordnung, {summary.WarningCount} zu verbessern, {summary.CriticalCount} kritisch.");
-Console.WriteLine();
+output.WriteLine();
+output.WriteLine(new string('-', 60));
+output.WriteLine($"  Ergebnis: {summary.OkCount} in Ordnung, {summary.WarningCount} zu verbessern, {summary.CriticalCount} kritisch.");
+output.WriteLine();
 
 // Rückgabewert für geplante Läufe: Ein angehaltener Lauf ist unvollständig und zählt deshalb
 // weder als „in Ordnung“ noch als kritischer Befund über die Seite.
@@ -87,7 +91,7 @@ if (report.WasHalted)
 
 return summary.CriticalCount > 0 ? 1 : 0;
 
-static void Write(Finding finding)
+void Write(Finding finding)
 {
     (string marker, ConsoleColor color) = finding.Severity switch
     {
@@ -100,19 +104,19 @@ static void Write(Finding finding)
 
     ConsoleColor previous = Console.ForegroundColor;
     Console.ForegroundColor = color;
-    Console.Write("  " + marker);
+    output.Write("  " + marker);
     Console.ForegroundColor = previous;
-    Console.WriteLine(" " + finding.Title);
+    output.WriteLine(" " + finding.Title);
 
     WriteIndentedBlock(finding.Detail);
     if (finding.Recommendation is { } recommendation)
     {
-        Console.WriteLine("              → " + recommendation.Advice);
+        output.WriteLine("              → " + recommendation.Advice);
         WriteIndentedBlock(recommendation.Example, "                ");
     }
 }
 
-static void WriteIndentedBlock(string? text, string indent = "              ")
+void WriteIndentedBlock(string? text, string indent = "              ")
 {
     if (string.IsNullOrWhiteSpace(text))
     {
@@ -121,7 +125,7 @@ static void WriteIndentedBlock(string? text, string indent = "              ")
 
     foreach (string line in text.Split('\n'))
     {
-        Console.WriteLine(indent + line.TrimEnd());
+        output.WriteLine(indent + line.TrimEnd());
     }
 }
 

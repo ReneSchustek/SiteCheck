@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SiteCheck.App.Services;
 using SiteCheck.App.ViewModels;
 using SiteCheck.Application;
@@ -56,7 +57,11 @@ public static class ServiceRegistration
         _ = services.AddSingleton<ISiteStore, SiteStore>();
         _ = services.AddSingleton<IHistoryStore, HistoryStore>();
 
+        // Das Protokoll liegt neben den übrigen Daten und bleibt lesbar, wenn das Programm nicht startet.
+        _ = services.AddLogging(logging => logging.AddProvider(new FileLoggerProvider(new AppPaths().LogDirectory, TimeProvider.System)));
+
         // App-Dienste für die Oberfläche.
+        _ = services.AddSingleton<IStringResources, ReswStringResources>();
         _ = services.AddSingleton<IConfirmationService, ConfirmationService>();
         _ = services.AddSingleton<IReportExportService, ReportExportService>();
 

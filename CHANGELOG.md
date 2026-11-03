@@ -5,6 +5,12 @@ verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Hinzugefügt
+
+- Die Oberfläche folgt der Windows-Sprache und gibt es auf Deutsch und Englisch. Befunde und Berichte
+  sind vorerst nur deutsch.
+- Ein Protokoll je Tag unter `%LocalAppData%\SiteCheck\logs`, damit sich Fehler nachvollziehen lassen.
+
 ### Behoben
 
 - SiteCheck konnte den eigenen Anschluss beim Hoster sperren lassen. Es fragt jetzt höchstens

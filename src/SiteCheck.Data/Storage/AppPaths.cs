@@ -34,6 +34,9 @@ public sealed class AppPaths
     /// <summary>Datei mit dem Stand der Sperrwache je Host.</summary>
     public string RequestGuardFile => Path.Combine(RootDirectory, "request-guard.json");
 
+    /// <summary>Ordner mit den Protokolldateien.</summary>
+    public string LogDirectory => Path.Combine(RootDirectory, "logs");
+
     /// <summary>Ordner mit je einer Verlaufsdatei pro Seite.</summary>
     public string HistoryDirectory { get; }
 }

@@ -1,10 +1,5 @@
 name: CI
 
-# Hinweis: In den Ruhrcoder-Repositories laufen seit der Entscheidung vom 08.09.2026
-# („ich zahle nicht") in der Regel keine GitHub-Actions. Der maßgebliche Nachweis ist das
-# lokale Quality-Gate (Build ohne Warnung, alle Tests grün, CVE 0). Dieser Workflow hält den
-# gleichen Ablauf fest, damit er auf einem Läufer reproduzierbar ist, sobald welche laufen.
-
 on:
   push:
     branches: [main]
@@ -61,7 +56,9 @@ jobs:
             'tests/SiteCheck.App.Tests/SiteCheck.App.Tests.csproj'
           )
           foreach ($p in $projects) {
-            dotnet test $p --configuration Release --no-build
+            # Die Solution baut die App-Tests für x64; ohne diese Angabe sucht der Lauf im AnyCPU-Pfad
+            # und findet dort nichts Startbares.
+            dotnet test $p --configuration Release --no-build -p:Platform=x64
             if ($LASTEXITCODE -ne 0) { throw "Tests fehlgeschlagen: $p" }
           }
 

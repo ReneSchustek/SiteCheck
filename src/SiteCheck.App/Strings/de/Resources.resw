@@ -1,0 +1,333 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AboutPage_Description.Text" xml:space="preserve">
+    <value>SiteCheck prüft die eigenen Seiten von außen: Verschlüsselung, Schutz-Kopfzeilen, Cookies, offene Dateien und die Mail-Einrichtung (MX, SPF, DKIM, DMARC, Rückwärtsauflösung). Der Standardlauf stellt wenige gewöhnliche Anfragen und DNS-Abfragen, langsam und mit Halt bei der ersten Abweisung. Heikle Pfade und der Stresstest laufen nur nach Bestätigung, weil ein Hoster dafür deinen Anschluss sperren kann.</value>
+  </data>
+  <data name="AboutPage_SupportButton.Content" xml:space="preserve">
+    <value>☕ Kaffee spendieren</value>
+  </data>
+  <data name="AboutPage_SupportText.Text" xml:space="preserve">
+    <value>SiteCheck ist kostenlos. Wenn es dir hilft, kannst du freiwillig einen Kaffee spendieren.</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="Action_Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="CheckPage_AddressBox.PlaceholderText" xml:space="preserve">
+    <value>z. B. meine-seite.de</value>
+  </data>
+  <data name="CheckPage_Advice.Text" xml:space="preserve">
+    <value>Empfehlung:</value>
+  </data>
+  <data name="CheckPage_CancelButton.Content" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="CheckPage_ClearHistoryButton.Content" xml:space="preserve">
+    <value>Verlauf leeren</value>
+  </data>
+  <data name="CheckPage_CopyButton.Content" xml:space="preserve">
+    <value>Kopieren</value>
+  </data>
+  <data name="CheckPage_FromOutside.Text" xml:space="preserve">
+    <value>aus Sicht von außen</value>
+  </data>
+  <data name="CheckPage_MailHeader.Text" xml:space="preserve">
+    <value>MAIL-EINRICHTUNG</value>
+  </data>
+  <data name="CheckPage_RunButton.Content" xml:space="preserve">
+    <value>Prüfen</value>
+  </data>
+  <data name="CheckPage_SaveButton.Content" xml:space="preserve">
+    <value>Als Datei speichern</value>
+  </data>
+  <data name="CheckPage_SensitivePaths.Content" xml:space="preserve">
+    <value>Auch heikle Dateien und Verzeichnisse abfragen (.git, .env, /backup/ und andere). Kann den eigenen Anschluss sperren.</value>
+  </data>
+  <data name="CheckPage_Subtitle.Text" xml:space="preserve">
+    <value>Adresse der eigenen Seite eingeben und prüfen. Es wird nur von außen geschaut, langsam und mit Halt bei der ersten Abweisung.</value>
+  </data>
+  <data name="CheckPage_Title.Text" xml:space="preserve">
+    <value>Prüfen</value>
+  </data>
+  <data name="CheckPage_WebHeader.Text" xml:space="preserve">
+    <value>WEB</value>
+  </data>
+  <data name="Dialog_HostNotice_Advice" xml:space="preserve">
+    <value>SiteCheck fragt deshalb langsam ab und hält bei der ersten Abweisung an. Ganz ausschließen lässt sich eine Sperre von außen nicht. Sicherer ist es, die eigene Adresse beim Hoster freizuschalten, falls er das anbietet.</value>
+  </data>
+  <data name="Dialog_HostNotice_First" xml:space="preserve">
+    <value>Erste Prüfung von {0}.</value>
+  </data>
+  <data name="Dialog_HostNotice_Primary" xml:space="preserve">
+    <value>Verstanden, prüfen</value>
+  </data>
+  <data name="Dialog_HostNotice_Risk" xml:space="preserve">
+    <value>Ein Hoster kann auch langsame Prüfungen als Angriff werten und deinen Anschluss sperren. Dann erreichst du weder die Website noch die Postfächer auf diesem Server, unter Umständen tagelang.</value>
+  </data>
+  <data name="Dialog_HostNotice_Title" xml:space="preserve">
+    <value>Kann dein Anschluss gesperrt werden?</value>
+  </data>
+  <data name="Dialog_Retry_Primary" xml:space="preserve">
+    <value>Ja, erneut prüfen</value>
+  </data>
+  <data name="Dialog_Retry_Risk" xml:space="preserve">
+    <value>Ist dein Anschluss gesperrt, verlängert jede weitere Anfrage an {0} die Sperre. Prüfe zuerst von einem anderen Anschluss, ob die Seite läuft.</value>
+  </data>
+  <data name="Dialog_Retry_Title" xml:space="preserve">
+    <value>Trotzdem erneut prüfen?</value>
+  </data>
+  <data name="Dialog_ScopeNotice_Close" xml:space="preserve">
+    <value>Verstanden</value>
+  </data>
+  <data name="Dialog_ScopeNotice_Text" xml:space="preserve">
+    <value>SiteCheck prüft Seiten von außen: gewöhnliche Anfragen und DNS-Abfragen, langsam und mit Halt bei der ersten Abweisung. Benutze es nur für Seiten, die dir gehören oder für die du die ausdrückliche Erlaubnis hast. Viele Anbieter werten Prüfungen trotzdem als Angriff und sperren deine Adresse vorübergehend.</value>
+  </data>
+  <data name="Dialog_ScopeNotice_Title" xml:space="preserve">
+    <value>Nur eigene Seiten, nur von außen</value>
+  </data>
+  <data name="Dialog_SensitivePaths_Primary" xml:space="preserve">
+    <value>Ja, für diesen Lauf</value>
+  </data>
+  <data name="Dialog_SensitivePaths_Risk" xml:space="preserve">
+    <value>Genau danach suchen Angreifer, und die Abwehr vieler Hoster sperrt dafür den Anschluss schon nach wenigen Anfragen. Das ist das größte Risiko dieser Prüfung.</value>
+  </data>
+  <data name="Dialog_SensitivePaths_Scope" xml:space="preserve">
+    <value>Dieser Lauf fragt bei {0} Pfade wie .git, .env, config.php und /backup/ ab.</value>
+  </data>
+  <data name="Dialog_SensitivePaths_Title" xml:space="preserve">
+    <value>Heikle Dateien wirklich abfragen?</value>
+  </data>
+  <data name="Dialog_StressOwner_Load" xml:space="preserve">
+    <value>Der Lasttest schickt für kurze Zeit viele gleichzeitige Anfragen an {0}. Das ist eine aktive Belastung, anders als die übrigen Prüfungen.</value>
+  </data>
+  <data name="Dialog_StressOwner_Lockout" xml:space="preserve">
+    <value>Ein Hoster sperrt dafür deinen ganzen Anschluss, unter Umständen tagelang. Dann erreichst du weder die Website noch die Postfächer auf diesem Server. Der Test endet bei der ersten Abweisung, danach ruht die Seite eine Viertelstunde.</value>
+  </data>
+  <data name="Dialog_StressOwner_Only" xml:space="preserve">
+    <value>Bestätige nur, wenn diese Seite dir gehört und du sie selbst hostest. Einen fremden oder gemieteten Server so zu belasten, kann als Angriff gelten.</value>
+  </data>
+  <data name="Dialog_StressOwner_Primary" xml:space="preserve">
+    <value>Ja, es ist meine Seite</value>
+  </data>
+  <data name="Dialog_StressOwner_Title" xml:space="preserve">
+    <value>Gehört dir diese Seite?</value>
+  </data>
+  <data name="Export_HtmlFileType" xml:space="preserve">
+    <value>HTML-Bericht</value>
+  </data>
+  <data name="Finding_Change_New" xml:space="preserve">
+    <value>neu</value>
+  </data>
+  <data name="Finding_Change_Resolved" xml:space="preserve">
+    <value>behoben</value>
+  </data>
+  <data name="MainWindow_NavAbout.Content" xml:space="preserve">
+    <value>Über</value>
+  </data>
+  <data name="MainWindow_NavCheck.Content" xml:space="preserve">
+    <value>Prüfen</value>
+  </data>
+  <data name="MainWindow_NavSites.Content" xml:space="preserve">
+    <value>Meine Seiten</value>
+  </data>
+  <data name="MainWindow_NavStress.Content" xml:space="preserve">
+    <value>Stresstest</value>
+  </data>
+  <data name="Severity_Critical" xml:space="preserve">
+    <value>Kritisch</value>
+  </data>
+  <data name="Severity_Info" xml:space="preserve">
+    <value>Hinweis</value>
+  </data>
+  <data name="Severity_Ok" xml:space="preserve">
+    <value>In Ordnung</value>
+  </data>
+  <data name="Severity_Unknown" xml:space="preserve">
+    <value>Unbekannt</value>
+  </data>
+  <data name="Severity_Warning" xml:space="preserve">
+    <value>Zu verbessern</value>
+  </data>
+  <data name="SitesPage_AddButton.Content" xml:space="preserve">
+    <value>Hinzufügen</value>
+  </data>
+  <data name="SitesPage_AddressBox.PlaceholderText" xml:space="preserve">
+    <value>Adresse, z. B. meine-seite.de</value>
+  </data>
+  <data name="SitesPage_CancelAllButton.Content" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="SitesPage_CheckAllButton.Content" xml:space="preserve">
+    <value>Alle prüfen</value>
+  </data>
+  <data name="SitesPage_Empty.Text" xml:space="preserve">
+    <value>Noch keine Seite gespeichert. Oben eine Adresse hinzufügen.</value>
+  </data>
+  <data name="SitesPage_NameBox.PlaceholderText" xml:space="preserve">
+    <value>Name (optional)</value>
+  </data>
+  <data name="SitesPage_RemoveButton.Content" xml:space="preserve">
+    <value>Entfernen</value>
+  </data>
+  <data name="SitesPage_RowCheckButton.Content" xml:space="preserve">
+    <value>Prüfen</value>
+  </data>
+  <data name="SitesPage_Subtitle.Text" xml:space="preserve">
+    <value>Seiten, die du öfter prüfst. Prüfen kannst du jede Adresse auch direkt unter „Prüfen“.</value>
+  </data>
+  <data name="SitesPage_Title.Text" xml:space="preserve">
+    <value>Meine Seiten</value>
+  </data>
+  <data name="Sites_NeverChecked" xml:space="preserve">
+    <value>Noch nicht geprüft</value>
+  </data>
+  <data name="Sites_RanAt" xml:space="preserve">
+    <value>Geprüft am {0}</value>
+  </data>
+  <data name="SplashWindow_Tagline.Text" xml:space="preserve">
+    <value>Prüft die eigenen Seiten von außen — ehrlich und vorsichtig.</value>
+  </data>
+  <data name="Status_Check_Cancelled" xml:space="preserve">
+    <value>Prüfung abgebrochen.</value>
+  </data>
+  <data name="Status_Check_Copied" xml:space="preserve">
+    <value>Bericht in die Zwischenablage kopiert.</value>
+  </data>
+  <data name="Status_Check_Failed" xml:space="preserve">
+    <value>Die Prüfung ist unerwartet fehlgeschlagen: {0}</value>
+  </data>
+  <data name="Status_Check_Halted" xml:space="preserve">
+    <value>Prüfung angehalten, um deinen Anschluss zu schützen. Der Bericht ist unvollständig.</value>
+  </data>
+  <data name="Status_Check_HistoryClearFailed" xml:space="preserve">
+    <value>Der Verlauf konnte nicht geleert werden: {0}</value>
+  </data>
+  <data name="Status_Check_HistoryCleared" xml:space="preserve">
+    <value>Verlauf dieser Seite geleert.</value>
+  </data>
+  <data name="Status_Check_HistoryNotSaved" xml:space="preserve">
+    <value>{0} (Verlauf konnte nicht gespeichert werden.)</value>
+  </data>
+  <data name="Status_Check_Running" xml:space="preserve">
+    <value>Prüfung läuft … Zwischen den Anfragen liegen Pausen, damit der Hoster nicht sperrt.</value>
+  </data>
+  <data name="Status_Check_Saved" xml:space="preserve">
+    <value>Bericht gespeichert: {0}</value>
+  </data>
+  <data name="Status_Check_Summary" xml:space="preserve">
+    <value>Ergebnis: {0} in Ordnung, {1} zu verbessern, {2} kritisch.</value>
+  </data>
+  <data name="Status_NothingSent" xml:space="preserve">
+    <value>Abgebrochen — es wurde nichts gesendet.</value>
+  </data>
+  <data name="Status_Sites_AllChecked" xml:space="preserve">
+    <value>Alle Seiten geprüft.</value>
+  </data>
+  <data name="Status_Sites_Cancelled" xml:space="preserve">
+    <value>Sammellauf abgebrochen.</value>
+  </data>
+  <data name="Status_Sites_Checking" xml:space="preserve">
+    <value>Prüfe {0} von {1}: {2}</value>
+  </data>
+  <data name="Status_Sites_Halted" xml:space="preserve">
+    <value>Sammellauf angehalten bei {0}, um deinen Anschluss zu schützen. Mehr dazu in der Prüf-Ansicht.</value>
+  </data>
+  <data name="Status_Stress_Cancelled" xml:space="preserve">
+    <value>Lasttest abgebrochen.</value>
+  </data>
+  <data name="Status_Stress_Completed" xml:space="preserve">
+    <value>Lasttest abgeschlossen. Die Seite ruht jetzt eine Viertelstunde.</value>
+  </data>
+  <data name="Status_Stress_Failed" xml:space="preserve">
+    <value>Der Lasttest ist fehlgeschlagen: {0}</value>
+  </data>
+  <data name="Status_Stress_NotConfirmed" xml:space="preserve">
+    <value>Abgebrochen — ohne Bestätigung kein Lasttest.</value>
+  </data>
+  <data name="Status_Stress_Progress" xml:space="preserve">
+    <value>Lasttest läuft … {0} Anfragen</value>
+  </data>
+  <data name="Status_Stress_Rejected" xml:space="preserve">
+    <value>Lasttest beendet: Der Server hat abgewiesen. Bitte von hier jetzt nichts weiter abrufen.</value>
+  </data>
+  <data name="Status_Stress_Result" xml:space="preserve">
+    <value>{0} Anfragen in {1:0.#} Sekunden&#10;{2:0.#} Anfragen pro Sekunde&#10;Erfolgreich: {3}, fehlgeschlagen: {4} ({5:P0})&#10;Antwortzeit im Mittel: {6:0} ms&#10;Median: {7:0} ms, langsamstes Fünftel (95 %): {8:0} ms</value>
+  </data>
+  <data name="Status_Stress_Running" xml:space="preserve">
+    <value>Lasttest läuft …</value>
+  </data>
+  <data name="StressPage_AddressBox.Header" xml:space="preserve">
+    <value>Adresse</value>
+  </data>
+  <data name="StressPage_AddressBox.PlaceholderText" xml:space="preserve">
+    <value>z. B. meine-seite.de</value>
+  </data>
+  <data name="StressPage_CancelButton.Content" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="StressPage_Concurrency.Text" xml:space="preserve">
+    <value>Gleichzeitige Anfragen: </value>
+  </data>
+  <data name="StressPage_Duration.Text" xml:space="preserve">
+    <value>Dauer (Sekunden): </value>
+  </data>
+  <data name="StressPage_ResultHeader.Text" xml:space="preserve">
+    <value>ERGEBNIS</value>
+  </data>
+  <data name="StressPage_StartButton.Content" xml:space="preserve">
+    <value>Lasttest starten</value>
+  </data>
+  <data name="StressPage_Subtitle.Text" xml:space="preserve">
+    <value>Belastet die Seite kurz mit vielen gleichzeitigen Anfragen und misst die Antwortzeiten. Ein Hoster kann dafür deinen Anschluss sperren; der Test endet bei der ersten Abweisung.</value>
+  </data>
+  <data name="StressPage_Title.Text" xml:space="preserve">
+    <value>Stresstest</value>
+  </data>
+  <data name="StressPage_Warning.Message" xml:space="preserve">
+    <value>Dies ist eine aktive Belastung. Vor jedem Lauf wird nachgefragt, ob die Seite dir gehört. Einen fremden oder gemieteten Server so zu belasten, kann als Angriff gelten.</value>
+  </data>
+  <data name="StressPage_Warning.Title" xml:space="preserve">
+    <value>Nur für eigene, selbst gehostete Seiten</value>
+  </data>
+  <data name="Valid_ContainsCredentials" xml:space="preserve">
+    <value>Bitte die Adresse ohne Benutzername und Passwort eingeben.</value>
+  </data>
+  <data name="Valid_Empty" xml:space="preserve">
+    <value>Bitte zuerst eine Adresse eingeben, z. B. meine-seite.de.</value>
+  </data>
+  <data name="Valid_Invalid" xml:space="preserve">
+    <value>Das sieht nicht nach einer gültigen Web-Adresse aus. Beispiel: meine-seite.de</value>
+  </data>
+  <data name="Valid_Sites_Duplicate" xml:space="preserve">
+    <value>Diese Adresse ist bereits in der Liste.</value>
+  </data>
+  <data name="Valid_Sites_Invalid" xml:space="preserve">
+    <value>Bitte eine gültige Adresse eingeben, z. B. meine-seite.de.</value>
+  </data>
+  <data name="Valid_Sites_SaveFailed" xml:space="preserve">
+    <value>Die Liste konnte nicht gespeichert werden: {0}</value>
+  </data>
+  <data name="Valid_Stress_Empty" xml:space="preserve">
+    <value>Bitte zuerst die Adresse deiner Seite eingeben.</value>
+  </data>
+  <data name="Valid_Stress_UnsupportedScheme" xml:space="preserve">
+    <value>Es lassen sich nur http- und https-Adressen testen.</value>
+  </data>
+  <data name="Valid_UnsupportedScheme" xml:space="preserve">
+    <value>Es lassen sich nur http- und https-Adressen prüfen.</value>
+  </data>
+</root>

@@ -7,8 +7,10 @@ namespace SiteCheck.App.Services;
 /// Setzt Hinweise und Bestätigungen als <see cref="ContentDialog"/> um. Der Dialog braucht die
 /// Zeichenwurzel des Hauptfensters; die liefert <see cref="App.MainWindowRoot"/>.
 /// </summary>
-public sealed class ConfirmationService : IConfirmationService
+public sealed class ConfirmationService(IStringResources strings) : IConfirmationService
 {
+    private readonly IStringResources _strings = strings;
+
     /// <inheritdoc/>
     public async Task ShowScopeNoticeAsync(CancellationToken cancellationToken)
     {
@@ -21,16 +23,13 @@ public sealed class ConfirmationService : IConfirmationService
         ContentDialog dialog = new()
         {
             XamlRoot = root,
-            Title = "Nur eigene Seiten, nur passiv",
-            CloseButtonText = "Verstanden",
+            Title = _strings.GetString("Dialog_ScopeNotice_Title"),
+            CloseButtonText = _strings.GetString("Dialog_ScopeNotice_Close"),
             DefaultButton = ContentDialogButton.Close,
             Content = new TextBlock
             {
                 TextWrapping = TextWrapping.Wrap,
-                Text = "SiteCheck prüft Seiten von außen: gewöhnliche Anfragen und DNS-Abfragen, langsam und "
-                    + "mit Halt bei der ersten Abweisung. Benutze es nur für Seiten, die dir gehören oder für "
-                    + "die du die ausdrückliche Erlaubnis hast. Viele Anbieter werten Prüfungen trotzdem als "
-                    + "Angriff und sperren deine Adresse vorübergehend.",
+                Text = _strings.GetString("Dialog_ScopeNotice_Text"),
             },
         };
 
@@ -41,56 +40,44 @@ public sealed class ConfirmationService : IConfirmationService
     public async Task<bool> ConfirmStressTestOwnershipAsync(string address, CancellationToken cancellationToken)
     {
         return await ConfirmAsync(
-            "Gehört dir diese Seite?",
-            "Ja, es ist meine Seite",
+            _strings.GetString("Dialog_StressOwner_Title"),
+            _strings.GetString("Dialog_StressOwner_Primary"),
             [
-                $"Der Lasttest schickt für kurze Zeit viele gleichzeitige Anfragen an {address}. "
-                + "Das ist eine aktive Belastung, anders als die übrigen Prüfungen.",
-                "Bestätige nur, wenn diese Seite dir gehört und du sie selbst hostest. Einen fremden "
-                + "oder gemieteten Server so zu belasten, kann als Angriff gelten.",
-                "Ein Hoster sperrt dafür deinen ganzen Anschluss, unter Umständen tagelang. Dann erreichst "
-                + "du weder die Website noch die Postfächer auf diesem Server. Der Test endet bei der ersten "
-                + "Abweisung, danach ruht die Seite eine Viertelstunde.",
+                _strings.GetFormatted("Dialog_StressOwner_Load", address),
+                _strings.GetString("Dialog_StressOwner_Only"),
+                _strings.GetString("Dialog_StressOwner_Lockout"),
             ]).ConfigureAwait(true);
     }
 
     /// <inheritdoc/>
     public Task<bool> ConfirmHostNoticeAsync(IReadOnlyList<string> addresses, CancellationToken cancellationToken) =>
         ConfirmAsync(
-            "Kann dein Anschluss gesperrt werden?",
-            "Verstanden, prüfen",
+            _strings.GetString("Dialog_HostNotice_Title"),
+            _strings.GetString("Dialog_HostNotice_Primary"),
             [
-                "Erste Prüfung von " + string.Join(", ", addresses) + ".",
-                "Ein Hoster kann auch langsame Prüfungen als Angriff werten und deinen Anschluss sperren. Dann "
-                + "erreichst du weder die Website noch die Postfächer auf diesem Server, unter Umständen tagelang.",
-                "SiteCheck fragt deshalb langsam ab und hält bei der ersten Abweisung an. Ganz ausschließen lässt "
-                + "sich eine Sperre von außen nicht. Sicherer ist es, die eigene Adresse beim Hoster freizuschalten, "
-                + "falls er das anbietet.",
+                _strings.GetFormatted("Dialog_HostNotice_First", string.Join(", ", addresses)),
+                _strings.GetString("Dialog_HostNotice_Risk"),
+                _strings.GetString("Dialog_HostNotice_Advice"),
             ]);
 
     /// <inheritdoc/>
     public Task<bool> ConfirmSensitivePathsAsync(string address, CancellationToken cancellationToken) =>
         ConfirmAsync(
-            "Heikle Dateien wirklich abfragen?",
-            "Ja, für diesen Lauf",
+            _strings.GetString("Dialog_SensitivePaths_Title"),
+            _strings.GetString("Dialog_SensitivePaths_Primary"),
             [
-                $"Dieser Lauf fragt bei {address} Pfade wie .git, .env, config.php und /backup/ ab.",
-                "Genau danach suchen Angreifer, und die Abwehr vieler Hoster sperrt dafür den Anschluss schon "
-                + "nach wenigen Anfragen. Das ist das größte Risiko dieser Prüfung.",
+                _strings.GetFormatted("Dialog_SensitivePaths_Scope", address),
+                _strings.GetString("Dialog_SensitivePaths_Risk"),
             ]);
 
     /// <inheritdoc/>
     public Task<bool> ConfirmRetryDuringHaltAsync(string address, string reason, CancellationToken cancellationToken) =>
         ConfirmAsync(
-            "Trotzdem erneut prüfen?",
-            "Ja, erneut prüfen",
-            [
-                reason,
-                $"Ist dein Anschluss gesperrt, verlängert jede weitere Anfrage an {address} die Sperre. "
-                + "Prüfe zuerst von einem anderen Anschluss, ob die Seite läuft.",
-            ]);
+            _strings.GetString("Dialog_Retry_Title"),
+            _strings.GetString("Dialog_Retry_Primary"),
+            [reason, _strings.GetFormatted("Dialog_Retry_Risk", address)]);
 
-    private static async Task<bool> ConfirmAsync(string title, string primaryText, string[] paragraphs)
+    private async Task<bool> ConfirmAsync(string title, string primaryText, string[] paragraphs)
     {
         XamlRoot? root = App.MainWindowRoot;
         if (root is null)
@@ -110,7 +97,7 @@ public sealed class ConfirmationService : IConfirmationService
             XamlRoot = root,
             Title = title,
             PrimaryButtonText = primaryText,
-            CloseButtonText = "Abbrechen",
+            CloseButtonText = _strings.GetString("Action_Cancel"),
             DefaultButton = ContentDialogButton.Close,
             Content = panel,
         };
