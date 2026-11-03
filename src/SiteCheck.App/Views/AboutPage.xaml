@@ -17,7 +17,7 @@
                 <TextBlock
                     Style="{StaticResource BodyTextStyle}"
                     TextAlignment="Center"
-                    Text="SiteCheck prüft die eigenen Seiten von außen: Verschlüsselung, Schutz-Kopfzeilen, Cookies, offene Dateien und die Mail-Einrichtung (MX, SPF, DKIM, DMARC, Rückwärtsauflösung). Alles passiv — gewöhnliche Anfragen und DNS-Abfragen, nichts wird angegriffen. Nur der Stresstest belastet aktiv und nur nach Bestätigung, dass die Seite dir gehört." />
+                    Text="SiteCheck prüft die eigenen Seiten von außen: Verschlüsselung, Schutz-Kopfzeilen, Cookies, offene Dateien und die Mail-Einrichtung (MX, SPF, DKIM, DMARC, Rückwärtsauflösung). Der Standardlauf stellt wenige gewöhnliche Anfragen und DNS-Abfragen, langsam und mit Halt bei der ersten Abweisung. Heikle Pfade und der Stresstest laufen nur nach Bestätigung, weil ein Hoster dafür deinen Anschluss sperren kann." />
             </Border>
 
             <TextBlock Text="Ruhrcoder (René Schustek)" Style="{StaticResource BodyTextStyle}" HorizontalAlignment="Center" />

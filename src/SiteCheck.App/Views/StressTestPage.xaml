@@ -21,7 +21,7 @@
         <StackPanel Grid.Row="0" Spacing="2">
             <TextBlock Text="Stresstest" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock
-                Text="Belastet die Seite kurz mit vielen gleichzeitigen Anfragen und misst die Antwortzeiten."
+                Text="Belastet die Seite kurz mit vielen gleichzeitigen Anfragen und misst die Antwortzeiten. Ein Hoster kann dafür deinen Anschluss sperren; der Test endet bei der ersten Abweisung."
                 Style="{StaticResource PageSubtitleTextStyle}" />
         </StackPanel>
 

@@ -124,8 +124,15 @@ public sealed partial class StressTestViewModel(StressTestCoordinator coordinato
         {
             StressTestResult result = await _coordinator.RunAsync(target, options, ownershipConfirmed: true, progress, _cancellation.Token);
             ResultText = DescribeResult(result);
-            StatusText = "Lasttest abgeschlossen.";
+            StatusText = result.StoppedByRejection
+                ? "Lasttest beendet: Der Server hat abgewiesen. Bitte von hier jetzt nichts weiter abrufen."
+                : "Lasttest abgeschlossen. Die Seite ruht jetzt eine Viertelstunde.";
             State = CheckRunState.Completed;
+        }
+        catch (RequestsHaltedException ex)
+        {
+            StatusText = HaltedFindings.Describe(ex);
+            State = CheckRunState.Idle;
         }
         catch (OperationCanceledException)
         {

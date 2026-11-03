@@ -110,7 +110,7 @@
         <StackPanel Grid.Row="0" Spacing="2">
             <TextBlock Text="Prüfen" Style="{StaticResource PageTitleTextStyle}" />
             <TextBlock
-                Text="Adresse der eigenen Seite eingeben und prüfen. Es wird nur von außen geschaut, nichts verändert."
+                Text="Adresse der eigenen Seite eingeben und prüfen. Es wird nur von außen geschaut, langsam und mit Halt bei der ersten Abweisung."
                 Style="{StaticResource PageSubtitleTextStyle}" />
         </StackPanel>
 
@@ -142,6 +142,16 @@
                     Command="{x:Bind ViewModel.CancelCommand}"
                     Visibility="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
             </Grid>
+
+            <CheckBox
+                Content="Auch heikle Dateien und Verzeichnisse abfragen (.git, .env, /backup/ und andere). Kann den eigenen Anschluss sperren."
+                IsChecked="{x:Bind ViewModel.IncludeSensitivePaths, Mode=TwoWay}" />
+
+            <InfoBar
+                IsOpen="{x:Bind ViewModel.WasHalted, Mode=OneWay}"
+                Severity="Warning"
+                IsClosable="False"
+                Message="{x:Bind ViewModel.StatusText, Mode=OneWay}" />
 
             <InfoBar
                 IsOpen="{x:Bind ViewModel.HasValidationMessage, Mode=OneWay}"

@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SiteCheck.App.Services;
 using SiteCheck.Application;
 using SiteCheck.Core.Abstractions;
 using SiteCheck.Core.Models;
@@ -20,16 +21,17 @@ public sealed partial class SitesViewModel(
     ISiteStore store,
     IHistoryStore history,
     ICheckRunnerFactory runnerFactory,
-    TimeProvider clock)
+    TimeProvider clock,
+    HostRequestGuard guard,
+    IConfirmationService confirmation)
     : ObservableObject
 {
-    // Kurze Pause zwischen zwei Seiten, damit der Sammellauf keinen Server mit Anfragen überfährt.
-    private static readonly TimeSpan PauseBetweenSites = TimeSpan.FromMilliseconds(500);
-
     private readonly ISiteStore _store = store;
     private readonly IHistoryStore _history = history;
     private readonly ICheckRunnerFactory _runnerFactory = runnerFactory;
     private readonly TimeProvider _clock = clock;
+    private readonly HostRequestGuard _guard = guard;
+    private readonly IConfirmationService _confirmation = confirmation;
 
     private CancellationTokenSource? _cancellation;
 
@@ -150,17 +152,24 @@ public sealed partial class SitesViewModel(
         try
         {
             SiteRowViewModel[] rows = [.. Sites];
+            if (!await ConfirmNewHostsAsync(rows, token).ConfigureAwait(true))
+            {
+                CheckAllStatus = "Abgebrochen — es wurde nichts gesendet.";
+                return;
+            }
+
             for (int index = 0; index < rows.Length; index++)
             {
                 token.ThrowIfCancellationRequested();
                 SiteRowViewModel row = rows[index];
                 CheckAllStatus = string.Create(CultureInfo.CurrentCulture, $"Prüfe {index + 1} von {rows.Length}: {row.Name}");
-                await CheckOneAsync(row, token).ConfigureAwait(true);
 
-                // Kleine Pause zwischen den Seiten, damit kein Server überfahren wird.
-                if (index < rows.Length - 1)
+                // Die Sperrwache hält den Abstand über alle Seiten. Weist eine Seite ab, endet der ganze
+                // Lauf: Die übrigen liegen oft auf demselben Server, und gesperrt wird der Anschluss.
+                if (!await CheckOneAsync(row, token).ConfigureAwait(true))
                 {
-                    await Task.Delay(PauseBetweenSites, token).ConfigureAwait(true);
+                    CheckAllStatus = $"Sammellauf angehalten bei {row.Name}, um deinen Anschluss zu schützen. Mehr dazu in der Prüf-Ansicht.";
+                    return;
                 }
             }
 
@@ -184,19 +193,59 @@ public sealed partial class SitesViewModel(
     [RelayCommand(CanExecute = nameof(IsCheckingAll))]
     private void CancelAll() => _cancellation?.Cancel();
 
-    private async Task CheckOneAsync(SiteRowViewModel row, CancellationToken token)
+    private async Task<bool> ConfirmNewHostsAsync(SiteRowViewModel[] rows, CancellationToken token)
+    {
+        List<string> unacknowledged = [];
+        foreach (SiteRowViewModel row in rows)
+        {
+            if (CheckTarget.TryParse(row.Address, out CheckTarget? target, out _)
+                && !(await _guard.GetStatusAsync(target.Host, token).ConfigureAwait(true)).NoticeAcknowledged)
+            {
+                unacknowledged.Add(row.Address);
+            }
+        }
+
+        if (unacknowledged.Count == 0)
+        {
+            return true;
+        }
+
+        if (!await _confirmation.ConfirmHostNoticeAsync(unacknowledged, token).ConfigureAwait(true))
+        {
+            return false;
+        }
+
+        foreach (string address in unacknowledged)
+        {
+            if (CheckTarget.TryParse(address, out CheckTarget? target, out _))
+            {
+                await _guard.AcknowledgeNoticeAsync(target.Host, token).ConfigureAwait(true);
+            }
+        }
+
+        return true;
+    }
+
+    // Liefert false, wenn der Lauf angehalten wurde; die Ampel behält dann ihren letzten Stand.
+    private async Task<bool> CheckOneAsync(SiteRowViewModel row, CancellationToken token)
     {
         if (!CheckTarget.TryParse(row.Address, out CheckTarget? target, out _))
         {
-            return;
+            return true;
         }
 
         row.SetChecking(true);
         try
         {
-            CheckReport report = await _runnerFactory.Create().RunAsync(target, _clock, progress: null, token).ConfigureAwait(true);
+            CheckReport report = await _runnerFactory.Create(CheckRunOptions.Standard).RunAsync(target, _clock, progress: null, token).ConfigureAwait(true);
+            if (report.WasHalted)
+            {
+                return false;
+            }
+
             row.ApplyResult(report.Summary, report.StartedAt);
             await AppendHistoryAsync(report).ConfigureAwait(true);
+            return true;
         }
         finally
         {

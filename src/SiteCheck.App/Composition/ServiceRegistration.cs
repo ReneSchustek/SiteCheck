@@ -37,8 +37,18 @@ public static class ServiceRegistration
             provider.GetRequiredService<IHttpProbe>(),
             provider.GetRequiredService<ITlsProbe>(),
             provider.GetRequiredService<IDnsProbe>(),
-            provider.GetRequiredService<TimeProvider>()));
-        _ = services.AddSingleton(provider => new StressTestCoordinator(provider.GetRequiredService<ILoadProbe>()));
+            provider.GetRequiredService<TimeProvider>(),
+            provider.GetRequiredService<HostRequestGuard>()));
+        _ = services.AddSingleton(provider => new StressTestCoordinator(
+            provider.GetRequiredService<ILoadProbe>(),
+            provider.GetRequiredService<HostRequestGuard>()));
+
+        // Genau eine Sperrwache im Prozess: Prüflauf, Sammellauf und Lasttest teilen sich ihre Grenzen.
+        _ = services.AddSingleton<IRequestGuardStore, RequestGuardStore>();
+        _ = services.AddSingleton(provider => new HostRequestGuard(
+            provider.GetRequiredService<TimeProvider>(),
+            provider.GetRequiredService<IRequestGuardStore>(),
+            provider.GetRequiredService<IDnsProbe>()));
 
         // Speicher im Anwendungsdatenordner.
         _ = services.AddSingleton<AppPaths>();

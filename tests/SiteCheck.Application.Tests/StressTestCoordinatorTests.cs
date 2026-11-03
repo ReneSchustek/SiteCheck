@@ -1,11 +1,14 @@
 using SiteCheck.Application.Tests.Fakes;
 using SiteCheck.Core.Models;
+using SiteCheck.Core.Models.Guard;
 using SiteCheck.Core.Models.Stress;
 
 namespace SiteCheck.Application.Tests;
 
 public sealed class StressTestCoordinatorTests
 {
+    private static HostRequestGuard NewGuard() => new(TimeProvider.System, new InMemoryGuardStore(), new StubDnsProbe());
+
     private static CheckTarget Target()
     {
         Assert.True(CheckTarget.TryParse("https://beispiel.de", out CheckTarget? target, out _));
@@ -15,7 +18,7 @@ public sealed class StressTestCoordinatorTests
     [Fact]
     public async Task RunAsync_WithoutOwnershipConfirmation_Throws()
     {
-        StressTestCoordinator coordinator = new(new FakeLoadProbe());
+        StressTestCoordinator coordinator = new(new FakeLoadProbe(), NewGuard());
 
         _ = await Assert.ThrowsAsync<InvalidOperationException>(() => coordinator.RunAsync(
             Target(),
@@ -29,7 +32,7 @@ public sealed class StressTestCoordinatorTests
     public async Task RunAsync_WithConfirmation_SendsRequestsAndSummarizes()
     {
         FakeLoadProbe probe = new(statusCode: 200, elapsedMs: 2);
-        StressTestCoordinator coordinator = new(probe);
+        StressTestCoordinator coordinator = new(probe, NewGuard());
         StressTestOptions options = new(2, TimeSpan.FromSeconds(5));
 
         StressTestResult result = await coordinator.RunAsync(
@@ -47,7 +50,7 @@ public sealed class StressTestCoordinatorTests
     [Fact]
     public async Task RunAsync_WhenCancelled_Throws()
     {
-        StressTestCoordinator coordinator = new(new FakeLoadProbe());
+        StressTestCoordinator coordinator = new(new FakeLoadProbe(), NewGuard());
         using CancellationTokenSource cts = new();
         await cts.CancelAsync();
 
@@ -63,7 +66,7 @@ public sealed class StressTestCoordinatorTests
     public async Task RunAsync_WithProgress_ReportsAtLeastOnce()
     {
         FakeLoadProbe probe = new(statusCode: 200, elapsedMs: 1);
-        StressTestCoordinator coordinator = new(probe);
+        StressTestCoordinator coordinator = new(probe, NewGuard());
         CountingProgress progress = new();
 
         StressTestResult result = await coordinator.RunAsync(
@@ -80,6 +83,48 @@ public sealed class StressTestCoordinatorTests
 
     // Synchroner Fortschritts-Empfänger: Progress<T> würde die Rückrufe asynchron zustellen und
     // den Test flackern lassen; dieser zählt direkt und threadsicher.
+    [Fact]
+    public async Task RunAsync_OnRejection_StopsAtOnceAndRests()
+    {
+        FakeLoadProbe probe = new(statusCode: 429);
+        HostRequestGuard guard = NewGuard();
+        StressTestCoordinator coordinator = new(probe, guard);
+
+        StressTestResult result = await coordinator.RunAsync(
+            Target(), new StressTestOptions(1, TimeSpan.FromSeconds(30)), ownershipConfirmed: true, progress: null, TestContext.Current.CancellationToken);
+
+        Assert.True(result.StoppedByRejection);
+        Assert.Equal(1, probe.Calls);
+        Assert.Equal(RequestHaltReason.HostRejected, (await guard.GetStatusAsync("beispiel.de", TestContext.Current.CancellationToken)).BlockReason);
+    }
+
+    [Fact]
+    public async Task RunAsync_WhenHostIsBlocked_SendsNothing()
+    {
+        FakeLoadProbe probe = new();
+        HostRequestGuard guard = NewGuard();
+        await guard.StartCooldownAsync("beispiel.de", TestContext.Current.CancellationToken);
+        StressTestCoordinator coordinator = new(probe, guard);
+
+        _ = await Assert.ThrowsAsync<RequestsHaltedException>(() => coordinator.RunAsync(
+            Target(), StressTestOptions.Default, ownershipConfirmed: true, progress: null, TestContext.Current.CancellationToken));
+
+        Assert.Equal(0, probe.Calls);
+    }
+
+    [Fact]
+    public async Task RunAsync_AfterCompletion_BlocksHostForCooldown()
+    {
+        HostRequestGuard guard = NewGuard();
+        StressTestCoordinator coordinator = new(new FakeLoadProbe(), guard);
+
+        StressTestResult result = await coordinator.RunAsync(
+            Target(), new StressTestOptions(1, TimeSpan.FromSeconds(5)), ownershipConfirmed: true, progress: null, TestContext.Current.CancellationToken);
+
+        Assert.False(result.StoppedByRejection);
+        Assert.Equal(RequestHaltReason.CoolingDown, (await guard.GetStatusAsync("beispiel.de", TestContext.Current.CancellationToken)).BlockReason);
+    }
+
     private sealed class CountingProgress : IProgress<StressTestProgress>
     {
         private int _count;
@@ -100,7 +145,7 @@ public sealed class StressTestCoordinatorTests
     {
         // Eine absurd hohe Anforderung läuft, aber nur innerhalb der festen Dauergrenze.
         FakeLoadProbe probe = new(elapsedMs: 1);
-        StressTestCoordinator coordinator = new(probe);
+        StressTestCoordinator coordinator = new(probe, NewGuard());
         StressTestOptions tooMuch = new(10_000, TimeSpan.FromSeconds(5));
 
         StressTestResult result = await coordinator.RunAsync(

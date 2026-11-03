@@ -3,19 +3,26 @@ using SiteCheck.Application;
 using SiteCheck.Core.Abstractions;
 using SiteCheck.Core.Models;
 using SiteCheck.Data.Probes;
+using SiteCheck.Data.Storage;
 
 // Schmaler Konsolen-Zugang auf derselben Prüflogik wie die Oberfläche. Klopft eine Adresse
-// von außen ab und gibt die Befunde aus. Alles passiv; der Lasttest ist der Oberfläche
-// vorbehalten, weil er eine ausdrückliche Bestätigung verlangt.
+// von außen ab und gibt die Befunde aus. Der Lasttest ist der Oberfläche vorbehalten, weil er eine
+// ausdrückliche Bestätigung verlangt. Die Sperrwache gilt hier genauso: Ihr Stand liegt in derselben
+// Datei wie bei der Oberfläche, denn der Hoster zählt die Anfragen beider zusammen.
 //
-// Aufruf:  sitecheck https://music.example.com
+// Aufruf:  sitecheck https://music.example.com [--sensitive-paths] [--retry-during-halt]
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 if (args.Length == 0 || args[0] is "-h" or "--help")
 {
-    Console.WriteLine("Aufruf: sitecheck <adresse>");
+    Console.WriteLine("Aufruf: sitecheck <adresse> [--sensitive-paths] [--retry-during-halt]");
     Console.WriteLine("Beispiel: sitecheck https://music.example.com");
+    Console.WriteLine();
+    Console.WriteLine("  --sensitive-paths    fragt auch .git, .env, /backup/ und andere ab. Kann den eigenen Anschluss sperren.");
+    Console.WriteLine("  --retry-during-halt  hebt eine laufende Sperrzeit auf. Verlängert eine bestehende Hostersperre.");
+    Console.WriteLine();
+    Console.WriteLine("Rückgabewert: 0 in Ordnung, 1 kritischer Befund, 2 ungültige Eingabe, 3 Lauf angehalten.");
     return 0;
 }
 
@@ -31,12 +38,19 @@ IHttpProbe httpProbe = new HttpProbe(following, nonFollowing);
 ITlsProbe tlsProbe = new TlsProbe();
 IDnsProbe dnsProbe = new DnsProbe();
 
-CheckRunnerFactory runnerFactory = new(httpProbe, tlsProbe, dnsProbe, TimeProvider.System);
-CheckRunner runner = runnerFactory.Create();
+HostRequestGuard guard = new(TimeProvider.System, new RequestGuardStore(new AppPaths()), dnsProbe);
+if (args.Contains("--retry-during-halt"))
+{
+    await guard.ReleaseAsync(target.Host, CancellationToken.None);
+}
+
+CheckRunnerFactory runnerFactory = new(httpProbe, tlsProbe, dnsProbe, TimeProvider.System, guard);
+CheckRunner runner = runnerFactory.Create(args.Contains("--sensitive-paths") ? CheckRunOptions.WithSensitivePaths : CheckRunOptions.Standard);
 
 Console.WriteLine();
 Console.WriteLine($"  Sicherheits-Check  {target}");
 Console.WriteLine($"  {DateTime.Now:dd.MM.yyyy HH:mm}");
+Console.WriteLine("  Fragt langsam ab und hält bei der ersten Abweisung an. Ein Hoster kann den Anschluss trotzdem sperren.");
 Console.WriteLine(new string('-', 60));
 
 CheckReport report = await runner.RunAsync(target, TimeProvider.System, progress: null, CancellationToken.None);
@@ -64,7 +78,13 @@ Console.WriteLine(new string('-', 60));
 Console.WriteLine($"  Ergebnis: {summary.OkCount} in Ordnung, {summary.WarningCount} zu verbessern, {summary.CriticalCount} kritisch.");
 Console.WriteLine();
 
-// Rückgabewert für geplante Läufe: >0, sobald etwas Kritisches dabei ist.
+// Rückgabewert für geplante Läufe: Ein angehaltener Lauf ist unvollständig und zählt deshalb
+// weder als „in Ordnung“ noch als kritischer Befund über die Seite.
+if (report.WasHalted)
+{
+    return 3;
+}
+
 return summary.CriticalCount > 0 ? 1 : 0;
 
 static void Write(Finding finding)

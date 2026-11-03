@@ -13,7 +13,7 @@ public sealed class CatalogAndFactoryTests
     public void CheckCatalog_CreateDefault_ReturnsWebThenMailInOrder()
     {
         IReadOnlyList<ICheck> checks = CheckCatalog.CreateDefault(
-            new SilentHttpProbe(), new SilentTlsProbe(), new SilentDnsProbe(), new FakeTimeProvider());
+            new SilentHttpProbe(), new SilentTlsProbe(), new StubDnsProbe(resolves: false), new FakeTimeProvider(), CheckRunOptions.Standard);
 
         Assert.NotEmpty(checks);
         int firstMail = checks.ToList().FindIndex(c => c.Category == CheckCategory.Mail);
@@ -24,10 +24,12 @@ public sealed class CatalogAndFactoryTests
     [Fact]
     public async Task CheckRunnerFactory_Create_ProducesWorkingRunner()
     {
-        CheckRunnerFactory factory = new(new SilentHttpProbe(), new SilentTlsProbe(), new SilentDnsProbe(), new FakeTimeProvider());
+        FakeTimeProvider clock = new() { AutoAdvanceAmount = TimeSpan.FromSeconds(2) };
+        StubDnsProbe dns = new(resolves: false);
+        CheckRunnerFactory factory = new(new SilentHttpProbe(), new SilentTlsProbe(), dns, clock, new HostRequestGuard(clock, new InMemoryGuardStore(), dns));
         Assert.True(CheckTarget.TryParse("https://beispiel.de", out CheckTarget? target, out _));
 
-        CheckReport report = await factory.Create().RunAsync(target!, new FakeTimeProvider(), null, TestContext.Current.CancellationToken);
+        CheckReport report = await factory.Create(CheckRunOptions.Standard).RunAsync(target!, new FakeTimeProvider(), null, TestContext.Current.CancellationToken);
 
         Assert.Equal("https://beispiel.de/", report.Address);
         Assert.NotEmpty(report.Findings);
@@ -37,7 +39,7 @@ public sealed class CatalogAndFactoryTests
     public async Task StressTest_ReportsProgress()
     {
         List<StressTestProgress> updates = [];
-        StressTestCoordinator coordinator = new(new FakeLoadProbe(elapsedMs: 1));
+        StressTestCoordinator coordinator = new(new FakeLoadProbe(elapsedMs: 1), new HostRequestGuard(TimeProvider.System, new InMemoryGuardStore(), new StubDnsProbe()));
         Assert.True(CheckTarget.TryParse("https://beispiel.de", out CheckTarget? target, out _));
         Progress<StressTestProgress> progress = new(updates.Add);
 
@@ -58,16 +60,5 @@ public sealed class CatalogAndFactoryTests
     private sealed class SilentTlsProbe : ITlsProbe
     {
         public Task<TlsHandshakeResult?> HandshakeAsync(string host, int port, CancellationToken cancellationToken) => Task.FromResult<TlsHandshakeResult?>(null);
-    }
-
-    private sealed class SilentDnsProbe : IDnsProbe
-    {
-        public Task<IReadOnlyList<string>> QueryMailExchangersAsync(string domain, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<string>>([]);
-        public Task<IReadOnlyList<string>> QueryTextRecordsAsync(string name, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<string>>([]);
-        public Task<IReadOnlyList<string>> ResolveIpv4Async(string host, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<string>>([]);
-        public Task<string?> QueryPointerAsync(string ipAddress, CancellationToken cancellationToken) => Task.FromResult<string?>(null);
-        public Task<bool> IsDnssecSignedAsync(string domain, CancellationToken cancellationToken) => Task.FromResult(false);
-        public Task<IReadOnlyList<string>> QueryCaaAsync(string domain, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<string>>([]);
-        public Task<bool> HasTlsaAsync(string name, CancellationToken cancellationToken) => Task.FromResult(false);
     }
 }

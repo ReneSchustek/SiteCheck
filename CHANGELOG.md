@@ -3,6 +3,26 @@
 Das Format folgt [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), und das Projekt
 verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Behoben
+
+- SiteCheck konnte den eigenen Anschluss beim Hoster sperren lassen. Es fragt jetzt höchstens
+  40-mal je Minute und 150-mal je Domain und Stunde ab, auch über Neustarts und zwischen Oberfläche
+  und Konsole hinweg.
+- Weist ein Server ab oder antwortet wiederholt nicht, hält der Lauf sofort an und versucht es nicht
+  erneut. Die Domain ruht dann eine Stunde; was nicht lief, steht als „nicht geprüft“ im Bericht.
+- Der Stresstest endet bei der ersten Abweisung, und die Domain ruht danach mindestens eine Viertelstunde.
+- Was nicht geprüft wurde, erscheint im Vergleich zum vorigen Lauf nicht mehr als „behoben“.
+
+### Geändert
+
+- Heikle Dateien und Verzeichnis-Auflistung werden nur noch nach Bestätigung für den einzelnen Lauf
+  abgefragt (Konsole: `--sensitive-paths`), weil sie für Hoster wie ein Angriff aussehen.
+- Vor der ersten Prüfung einer Domain erscheint ein Hinweis auf die Gefahr einer Sperre.
+- Der Sammellauf endet, sobald eine Seite abweist, weil die übrigen oft auf demselben Server liegen.
+- Die Konsole meldet einen angehaltenen Lauf mit dem Rückgabewert `3`.
+
 ## [0.1.0] – 2026-10-26
 
 Erste Vorab-Version.

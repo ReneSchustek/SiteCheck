@@ -7,6 +7,7 @@ using SiteCheck.App.Services;
 using SiteCheck.Application;
 using SiteCheck.Core.Abstractions;
 using SiteCheck.Core.Models;
+using SiteCheck.Core.Models.Guard;
 
 namespace SiteCheck.App.ViewModels;
 
@@ -20,13 +21,17 @@ public sealed partial class CheckViewModel(
     ICheckRunnerFactory runnerFactory,
     TimeProvider clock,
     IHistoryStore history,
-    IReportExportService export)
+    IReportExportService export,
+    HostRequestGuard guard,
+    IConfirmationService confirmation)
     : ObservableObject, ICheckProgress
 {
     private readonly ICheckRunnerFactory _runnerFactory = runnerFactory;
     private readonly TimeProvider _clock = clock;
     private readonly IHistoryStore _history = history;
     private readonly IReportExportService _export = export;
+    private readonly HostRequestGuard _guard = guard;
+    private readonly IConfirmationService _confirmation = confirmation;
 
     private DispatcherQueue? _dispatcher;
     private CancellationTokenSource? _cancellation;
@@ -35,6 +40,10 @@ public sealed partial class CheckViewModel(
     /// <summary>Die vom Nutzer eingegebene Adresse.</summary>
     [ObservableProperty]
     public partial string AddressInput { get; set; } = string.Empty;
+
+    /// <summary>Ob dieser Lauf auch heikle Pfade abfragen soll. Wird nach jedem Lauf zurückgesetzt.</summary>
+    [ObservableProperty]
+    public partial bool IncludeSensitivePaths { get; set; }
 
     /// <summary>Der aktuelle Zustand des Laufs.</summary>
     [ObservableProperty]
@@ -64,6 +73,9 @@ public sealed partial class CheckViewModel(
     /// <summary>Ob ein abgeschlossenes Ergebnis vorliegt (für Kopieren/Speichern und die Ergebnisliste).</summary>
     public bool HasResult => State is CheckRunState.Completed && _lastReport is not null;
 
+    /// <summary>Ob der letzte Lauf angehalten wurde, weil der Server abgewiesen hat oder eine Grenze erreicht war.</summary>
+    public bool WasHalted => _lastReport is { WasHalted: true } && State == CheckRunState.Completed;
+
     /// <summary>Ob die Fehlermeldung zur Eingabe sichtbar ist.</summary>
     public bool HasValidationMessage => !string.IsNullOrEmpty(ValidationMessage);
 
@@ -71,6 +83,7 @@ public sealed partial class CheckViewModel(
     {
         OnPropertyChanged(nameof(IsRunning));
         OnPropertyChanged(nameof(HasResult));
+        OnPropertyChanged(nameof(WasHalted));
         RunCommand.NotifyCanExecuteChanged();
         CancelCommand.NotifyCanExecuteChanged();
         CopyCommand.NotifyCanExecuteChanged();
@@ -91,32 +104,47 @@ public sealed partial class CheckViewModel(
             return;
         }
 
-        _dispatcher ??= DispatcherQueue.GetForCurrentThread();
         AddressInput = target.ToString();
+        CheckRunOptions? options = await ConfirmRunAsync(target).ConfigureAwait(true);
+        if (options is null)
+        {
+            StatusText = "Abgebrochen — es wurde nichts gesendet.";
+            return;
+        }
+
+        _dispatcher ??= DispatcherQueue.GetForCurrentThread();
         WebFindings.Clear();
         MailFindings.Clear();
         Progress = 0;
-        StatusText = "Prüfung läuft …";
+        StatusText = "Prüfung läuft … Zwischen den Anfragen liegen Pausen, damit der Hoster nicht sperrt.";
         State = CheckRunState.Running;
 
         _cancellation = new CancellationTokenSource();
         try
         {
-            CheckReport report = await _runnerFactory.Create().RunAsync(target, _clock, this, _cancellation.Token);
+            CheckReport report = await _runnerFactory.Create(options).RunAsync(target, _clock, this, _cancellation.Token);
             _lastReport = report;
 
             // Mit dem vorigen Lauf vergleichen, bevor dieser abgelegt wird: So lässt sich je
             // Befund zeigen, was neu, behoben oder unverändert ist.
-            IReadOnlyList<Finding> previous = await LoadPreviousFindingsAsync(report.Address).ConfigureAwait(true);
+            // Ein angehaltener Lauf sagt nichts über Veränderungen und kommt nicht in den Verlauf.
+            IReadOnlyList<Finding> previous = report.WasHalted
+                ? []
+                : await LoadPreviousFindingsAsync(report.Address).ConfigureAwait(true);
             // Beim allerersten Lauf gibt es keinen Vergleich — dann steht alles als unverändert da,
             // nicht als „neu“. Erst ein zweiter Lauf zeigt, was sich bewegt hat.
             IReadOnlyList<ComparedFinding> compared = previous.Count == 0
                 ? [.. report.Findings.Select(finding => new ComparedFinding(finding, FindingChange.Unchanged))]
                 : ReportComparison.Compare(report.Findings, previous);
             FillFindings(compared);
-            StatusText = SummaryText(report.Summary);
+            StatusText = report.WasHalted
+                ? "Prüfung angehalten, um deinen Anschluss zu schützen. Der Bericht ist unvollständig."
+                : SummaryText(report.Summary);
             State = CheckRunState.Completed;
-            await AppendToHistoryAsync(report).ConfigureAwait(true);
+            if (!report.WasHalted)
+            {
+                await AppendToHistoryAsync(report).ConfigureAwait(true);
+            }
         }
         catch (OperationCanceledException)
         {
@@ -133,7 +161,50 @@ public sealed partial class CheckViewModel(
             _cancellation.Dispose();
             _cancellation = null;
             Progress = 0;
+
+            // Die Bestätigung gilt je Lauf, der Haken darf nicht stehen bleiben.
+            IncludeSensitivePaths = false;
         }
+    }
+
+    // Liefert, was der Lauf umfassen soll, oder null, wenn eine Bestätigung ausblieb.
+    private async Task<CheckRunOptions?> ConfirmRunAsync(CheckTarget target)
+    {
+        string address = target.ToString();
+        HostGuardStatus status = await _guard.GetStatusAsync(target.Host, CancellationToken.None).ConfigureAwait(true);
+
+        if (status.IsBlocked)
+        {
+            string reason = HaltedFindings.Describe(new RequestsHaltedException(
+                status.BlockReason ?? RequestHaltReason.HostRejected,
+                target.Host,
+                status.BlockedUntil ?? _clock.GetUtcNow()));
+            if (!await _confirmation.ConfirmRetryDuringHaltAsync(address, reason, CancellationToken.None).ConfigureAwait(true))
+            {
+                return null;
+            }
+
+            await _guard.ReleaseAsync(target.Host, CancellationToken.None).ConfigureAwait(true);
+        }
+
+        if (!status.NoticeAcknowledged)
+        {
+            if (!await _confirmation.ConfirmHostNoticeAsync([address], CancellationToken.None).ConfigureAwait(true))
+            {
+                return null;
+            }
+
+            await _guard.AcknowledgeNoticeAsync(target.Host, CancellationToken.None).ConfigureAwait(true);
+        }
+
+        if (!IncludeSensitivePaths)
+        {
+            return CheckRunOptions.Standard;
+        }
+
+        return await _confirmation.ConfirmSensitivePathsAsync(address, CancellationToken.None).ConfigureAwait(true)
+            ? CheckRunOptions.WithSensitivePaths
+            : null;
     }
 
     private bool CanRun() => State != CheckRunState.Running;

@@ -1,14 +1,14 @@
 # Testabdeckung
 
-Gemessen am 26.10.2026 mit `tools/coverage-snapshot.ps1` (Microsoft Testing Platform,
+Gemessen am 03.11.2026 mit `tools/coverage-snapshot.ps1` (Microsoft Testing Platform,
 Cobertura). Gemessen wird in der **Debug**-Konfiguration: Der Release-Build setzt
 `DebugType=none` und liefert keine PDBs, ohne die keine Instrumentierung möglich ist.
 
 | Assembly | Zeilenrate | Gate |
 |---|---:|---|
-| SiteCheck.Core | 97,0 % | ≥ 90 % ✓ |
-| SiteCheck.Application | 97,1 % | ≥ 90 % ✓ |
-| SiteCheck.Data | 76,8 % | dokumentiert (siehe unten) |
+| SiteCheck.Core | 96,2 % | ≥ 90 % ✓ |
+| SiteCheck.Application | 98,1 % | ≥ 90 % ✓ |
+| SiteCheck.Data | 77,6 % | dokumentiert (siehe unten) |
 
 ## Warum Data unter 90 % liegt
 
