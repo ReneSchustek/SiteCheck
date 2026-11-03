@@ -118,6 +118,30 @@ public sealed class StoreTests : IDisposable
     }
 
     [Fact]
+    public async Task SettingsStore_KeepsUpdateState()
+    {
+        SettingsStore store = new(_paths);
+        DateTimeOffset checkedAt = new(2026, 11, 3, 12, 0, 0, TimeSpan.Zero);
+        AppSettings settings = AppSettings.Default with { AutoUpdateEnabled = false, LastUpdateCheck = checkedAt, PendingUpdateVersion = "1.2.3", PendingUpdateSha256 = "abc" };
+
+        await store.SaveAsync(settings, TestContext.Current.CancellationToken);
+
+        Assert.Equal(settings, await new SettingsStore(_paths).LoadAsync(TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task SettingsStore_OldFileWithoutUpdateFields_TurnsUpdatesOn()
+    {
+        _ = Directory.CreateDirectory(_root);
+        await File.WriteAllTextAsync(_paths.SettingsFile, """{ "scopeNoticeAcknowledged": true }""", TestContext.Current.CancellationToken);
+
+        AppSettings loaded = await new SettingsStore(_paths).LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(loaded.ScopeNoticeAcknowledged);
+        Assert.True(loaded.AutoUpdateEnabled);
+    }
+
+    [Fact]
     public async Task RequestGuardStore_RoundTrips()
     {
         RequestGuardStore store = new(_paths);

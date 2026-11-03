@@ -6,7 +6,7 @@
 .DESCRIPTION
     Führt 'dotnet publish' für SiteCheck.App aus (Self-Contained, win-x64, das Windows
     App SDK mitgeliefert) und packt das Ergebnis als 'SiteCheck-Portable-v<Version>.zip'
-    nach dist/. Ein MSIX-Paket und eine Signatur entstehen hier bewusst nicht — das ist
+    nach dist/. Ein MSIX-Paket entsteht hier bewusst nicht; die Signatur erzeugt tools/sign-release.ps1 — das ist
     ein eigener, noch offener Schritt (braucht ein Code-Signing-Zertifikat).
 
 .PARAMETER Version

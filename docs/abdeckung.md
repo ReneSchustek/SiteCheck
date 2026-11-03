@@ -6,9 +6,9 @@ Cobertura). Gemessen wird in der **Debug**-Konfiguration: Der Release-Build setz
 
 | Assembly | Zeilenrate | Gate |
 |---|---:|---|
-| SiteCheck.Core | 95,9 % | ≥ 90 % ✓ |
+| SiteCheck.Core | 96,0 % | ≥ 90 % ✓ |
 | SiteCheck.Application | 98,3 % | ≥ 90 % ✓ |
-| SiteCheck.Data | 77,7 % | dokumentiert (siehe unten) |
+| SiteCheck.Data | 73,1 % | dokumentiert (siehe unten) |
 
 ## Warum Data unter 90 % liegt
 
@@ -20,6 +20,9 @@ echte HTTP-Verbindung, einen echten TLS-Handschlag oder einen laufenden DNS-Reso
   echten TLS-Server nicht sinnvoll nachstellen.
 - `DnsProbe`: die MX-/TXT-/CAA-/DNSSEC-/TLSA-Abfragen gehen über `DnsClient` an einen Resolver.
 - `HttpProbe`: die Verbindungs-Fehlerpfade (Namensauflösung, abgewiesene Verbindung).
+- `HttpGetClient`: der echte Download der Update-Pakete von GitHub. Die Logik dahinter (Signatur, Entpacken,
+  Einspielen, Rücksprung) ist über eine Attrappe getestet; den Dateitausch selbst belegt ein lokaler Lauf mit zwei
+  Self-contained-Ständen.
 
 Diese Pfade sind über die **Integrationssicht** abgedeckt: Die Konsole (`SiteCheck.Cli`) läuft
 regelmäßig gegen echte Seiten (`example.com`, die Musik-Seite) und übt genau diesen Code. Der

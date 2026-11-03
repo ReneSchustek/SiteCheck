@@ -12,14 +12,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AboutPage_AutoUpdate.Header" xml:space="preserve">
+    <value>Automatic updates</value>
+  </data>
+  <data name="AboutPage_AutoUpdate.OffContent" xml:space="preserve">
+    <value>Only on request</value>
+  </data>
+  <data name="AboutPage_AutoUpdate.OnContent" xml:space="preserve">
+    <value>Look once a day and install on next start</value>
+  </data>
+  <data name="AboutPage_CheckUpdateButton.Content" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
   <data name="AboutPage_Description.Text" xml:space="preserve">
     <value>SiteCheck checks your own sites from the outside: encryption, security headers, cookies, exposed files and the mail setup (MX, SPF, DKIM, DMARC, reverse DNS). The standard run makes a few ordinary requests and DNS lookups, slowly, and stops at the first rejection. Sensitive paths and the stress test only run after you confirm, because a hosting provider can block your connection for them.</value>
+  </data>
+  <data name="AboutPage_InstallUpdateButton.Content" xml:space="preserve">
+    <value>Update now</value>
   </data>
   <data name="AboutPage_SupportButton.Content" xml:space="preserve">
     <value>☕ Buy me a coffee</value>
   </data>
   <data name="AboutPage_SupportText.Text" xml:space="preserve">
     <value>SiteCheck is free. If it helps you, you are welcome to buy me a coffee, entirely voluntarily.</value>
+  </data>
+  <data name="AboutPage_UpdateNote.Text" xml:space="preserve">
+    <value>The request goes to GitHub, never to a checked site. Only a package with a valid signature is installed.</value>
   </data>
   <data name="About_Version" xml:space="preserve">
     <value>Version {0}</value>
@@ -299,6 +317,24 @@
   </data>
   <data name="Status_Stress_Running" xml:space="preserve">
     <value>Stress test running …</value>
+  </data>
+  <data name="Status_Update_Available" xml:space="preserve">
+    <value>Version {0} is available.</value>
+  </data>
+  <data name="Status_Update_Checking" xml:space="preserve">
+    <value>Checking for updates …</value>
+  </data>
+  <data name="Status_Update_InstallFailed" xml:space="preserve">
+    <value>The update could not be installed. Opening the release page.</value>
+  </data>
+  <data name="Status_Update_Installing" xml:space="preserve">
+    <value>Downloading and verifying the update …</value>
+  </data>
+  <data name="Status_Update_None" xml:space="preserve">
+    <value>No newer version found.</value>
+  </data>
+  <data name="Status_Update_SaveFailed" xml:space="preserve">
+    <value>The setting could not be saved: {0}</value>
   </data>
   <data name="StressPage_AddressBox.Header" xml:space="preserve">
     <value>Address</value>

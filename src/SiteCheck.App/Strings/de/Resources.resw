@@ -12,14 +12,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AboutPage_AutoUpdate.Header" xml:space="preserve">
+    <value>Automatische Updates</value>
+  </data>
+  <data name="AboutPage_AutoUpdate.OffContent" xml:space="preserve">
+    <value>Nur auf Wunsch</value>
+  </data>
+  <data name="AboutPage_AutoUpdate.OnContent" xml:space="preserve">
+    <value>Einmal am Tag nachsehen und beim nächsten Start einspielen</value>
+  </data>
+  <data name="AboutPage_CheckUpdateButton.Content" xml:space="preserve">
+    <value>Nach Updates suchen</value>
+  </data>
   <data name="AboutPage_Description.Text" xml:space="preserve">
     <value>SiteCheck prüft die eigenen Seiten von außen: Verschlüsselung, Schutz-Kopfzeilen, Cookies, offene Dateien und die Mail-Einrichtung (MX, SPF, DKIM, DMARC, Rückwärtsauflösung). Der Standardlauf stellt wenige gewöhnliche Anfragen und DNS-Abfragen, langsam und mit Halt bei der ersten Abweisung. Heikle Pfade und der Stresstest laufen nur nach Bestätigung, weil ein Hoster dafür deinen Anschluss sperren kann.</value>
+  </data>
+  <data name="AboutPage_InstallUpdateButton.Content" xml:space="preserve">
+    <value>Jetzt aktualisieren</value>
   </data>
   <data name="AboutPage_SupportButton.Content" xml:space="preserve">
     <value>☕ Kaffee spendieren</value>
   </data>
   <data name="AboutPage_SupportText.Text" xml:space="preserve">
     <value>SiteCheck ist kostenlos. Wenn es dir hilft, kannst du freiwillig einen Kaffee spendieren.</value>
+  </data>
+  <data name="AboutPage_UpdateNote.Text" xml:space="preserve">
+    <value>Die Abfrage geht an GitHub, nie an eine geprüfte Seite. Eingespielt wird nur ein Paket mit gültiger Signatur.</value>
   </data>
   <data name="About_Version" xml:space="preserve">
     <value>Version {0}</value>
@@ -299,6 +317,24 @@
   </data>
   <data name="Status_Stress_Running" xml:space="preserve">
     <value>Lasttest läuft …</value>
+  </data>
+  <data name="Status_Update_Available" xml:space="preserve">
+    <value>Version {0} ist verfügbar.</value>
+  </data>
+  <data name="Status_Update_Checking" xml:space="preserve">
+    <value>Suche nach Updates …</value>
+  </data>
+  <data name="Status_Update_InstallFailed" xml:space="preserve">
+    <value>Das Update ließ sich nicht einspielen. Die Release-Seite wird geöffnet.</value>
+  </data>
+  <data name="Status_Update_Installing" xml:space="preserve">
+    <value>Update wird geladen und geprüft …</value>
+  </data>
+  <data name="Status_Update_None" xml:space="preserve">
+    <value>Keine neuere Version gefunden.</value>
+  </data>
+  <data name="Status_Update_SaveFailed" xml:space="preserve">
+    <value>Die Einstellung konnte nicht gespeichert werden: {0}</value>
   </data>
   <data name="StressPage_AddressBox.Header" xml:space="preserve">
     <value>Adresse</value>
