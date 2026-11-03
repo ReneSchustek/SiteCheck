@@ -59,9 +59,13 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw "Tests fehlgeschlagen: $p" }
           }
 
-          # Nur die App-Tests baut die Solution für x64. Ohne diese Angabe sucht der Lauf im AnyCPU-Pfad
-          # und findet dort nichts Startbares; bei den übrigen Projekten wäre es umgekehrt.
-          dotnet test tests/SiteCheck.App.Tests/SiteCheck.App.Tests.csproj --configuration Release --no-build -p:Platform=x64
+      # Eigener Schritt mit knappem Limit: Hängt ein Test, nennt -longRunning seinen Namen, und der Lauf bleibt
+      # nicht bis zum Limit des ganzen Jobs stehen. Das Programm direkt, weil dotnet test den Namen verschluckt.
+      - name: App-Tests
+        shell: pwsh
+        timeout-minutes: 5
+        run: |
+          & 'tests/SiteCheck.App.Tests/bin/x64/Release/net10.0-windows10.0.19041.0/win-x64/SiteCheck.App.Tests.exe' -longRunning 20
           if ($LASTEXITCODE -ne 0) { throw 'Tests fehlgeschlagen: SiteCheck.App.Tests' }
 
       - name: CVE-Scan (inkl. transitiver Pakete)
