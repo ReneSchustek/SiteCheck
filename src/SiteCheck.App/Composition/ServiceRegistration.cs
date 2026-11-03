@@ -4,6 +4,7 @@ using SiteCheck.App.Services;
 using SiteCheck.App.ViewModels;
 using SiteCheck.Application;
 using SiteCheck.Core.Abstractions;
+using SiteCheck.Data.Logging;
 using SiteCheck.Data.Probes;
 using SiteCheck.Data.Storage;
 
@@ -39,17 +40,20 @@ public static class ServiceRegistration
             provider.GetRequiredService<ITlsProbe>(),
             provider.GetRequiredService<IDnsProbe>(),
             provider.GetRequiredService<TimeProvider>(),
-            provider.GetRequiredService<HostRequestGuard>()));
+            provider.GetRequiredService<HostRequestGuard>(),
+            provider.GetRequiredService<ILogger<CheckRunner>>()));
         _ = services.AddSingleton(provider => new StressTestCoordinator(
             provider.GetRequiredService<ILoadProbe>(),
-            provider.GetRequiredService<HostRequestGuard>()));
+            provider.GetRequiredService<HostRequestGuard>(),
+            provider.GetRequiredService<ILogger<StressTestCoordinator>>()));
 
         // Genau eine Sperrwache im Prozess: Prüflauf, Sammellauf und Lasttest teilen sich ihre Grenzen.
         _ = services.AddSingleton<IRequestGuardStore, RequestGuardStore>();
         _ = services.AddSingleton(provider => new HostRequestGuard(
             provider.GetRequiredService<TimeProvider>(),
             provider.GetRequiredService<IRequestGuardStore>(),
-            provider.GetRequiredService<IDnsProbe>()));
+            provider.GetRequiredService<IDnsProbe>(),
+            provider.GetRequiredService<ILogger<HostRequestGuard>>()));
 
         // Speicher im Anwendungsdatenordner.
         _ = services.AddSingleton<AppPaths>();
@@ -68,7 +72,9 @@ public static class ServiceRegistration
         // ViewModels als Singletons: In diesem Einzelfenster soll der Zustand (Eingabe,
         // Ergebnis, Verlauf) den Seitenwechsel überstehen, und die Seitenliste muss der
         // Prüf-Ansicht eine Adresse übergeben können.
+        _ = services.AddSingleton<ILogReader>(provider => new LogFileReader(provider.GetRequiredService<AppPaths>().LogDirectory));
         _ = services.AddSingleton<CheckViewModel>();
+        _ = services.AddSingleton<LogViewModel>();
         _ = services.AddSingleton<SitesViewModel>();
         _ = services.AddSingleton<StressTestViewModel>();
 

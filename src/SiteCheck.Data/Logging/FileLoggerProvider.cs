@@ -1,7 +1,7 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 
-namespace SiteCheck.App.Services;
+namespace SiteCheck.Data.Logging;
 
 /// <summary>
 /// Schreibt das Protokoll in eine Datei je Tag und hebt 14 Tage auf. Die Datei ist lesbar, auch

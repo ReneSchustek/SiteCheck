@@ -62,6 +62,7 @@ public sealed partial class MainWindow : Window
             "Check" => typeof(CheckPage),
             "Sites" => typeof(SitesPage),
             "Stress" => typeof(StressTestPage),
+            "Log" => typeof(LogPage),
             "About" => typeof(AboutPage),
             _ => typeof(CheckPage),
         };

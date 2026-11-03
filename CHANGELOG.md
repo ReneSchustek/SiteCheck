@@ -7,9 +7,9 @@ verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ### Hinzugefügt
 
-- Die Oberfläche folgt der Windows-Sprache und gibt es auf Deutsch und Englisch. Befunde und Berichte
-  sind vorerst nur deutsch.
-- Ein Protokoll je Tag unter `%LocalAppData%\SiteCheck\logs`, damit sich Fehler nachvollziehen lassen.
+- Oberfläche, Befunde, Berichte und Konsole folgen der Windows-Sprache und gibt es auf Deutsch und Englisch.
+- Ein Protokoll je Tag unter `%LocalAppData%\SiteCheck\logs` mit Prüfläufen, Lasttests und jedem Halt,
+  dazu die Ansicht „Protokoll“ mit Suche und Filter.
 
 ### Behoben
 

@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
-using SiteCheck.App.Services;
+using SiteCheck.Data.Logging;
 
-namespace SiteCheck.App.Tests.Services;
+namespace SiteCheck.Data.Tests.Logging;
 
 public sealed class FileLoggerProviderTests : IDisposable
 {

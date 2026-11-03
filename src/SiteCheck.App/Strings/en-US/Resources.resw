@@ -135,11 +135,41 @@
   <data name="Finding_Change_Resolved" xml:space="preserve">
     <value>resolved</value>
   </data>
+  <data name="LogPage_FilterAll.Content" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="LogPage_FilterErrors.Content" xml:space="preserve">
+    <value>Errors only</value>
+  </data>
+  <data name="LogPage_FilterWarnings.Content" xml:space="preserve">
+    <value>Warnings and errors</value>
+  </data>
+  <data name="LogPage_ReloadButton.Content" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="LogPage_Search.PlaceholderText" xml:space="preserve">
+    <value>Search message and area</value>
+  </data>
+  <data name="LogPage_Subtitle.Text" xml:space="preserve">
+    <value>What SiteCheck has done over the last 14 days, such as when and why a run was stopped. No content from other sites is stored here.</value>
+  </data>
+  <data name="LogPage_Title.Text" xml:space="preserve">
+    <value>Log</value>
+  </data>
+  <data name="Log_Empty_NoMatch" xml:space="preserve">
+    <value>Nothing found. Change the search or filter.</value>
+  </data>
+  <data name="Log_Empty_None" xml:space="preserve">
+    <value>No entries yet. They appear as soon as something is checked.</value>
+  </data>
   <data name="MainWindow_NavAbout.Content" xml:space="preserve">
     <value>About</value>
   </data>
   <data name="MainWindow_NavCheck.Content" xml:space="preserve">
     <value>Check</value>
+  </data>
+  <data name="MainWindow_NavLog.Content" xml:space="preserve">
+    <value>Log</value>
   </data>
   <data name="MainWindow_NavSites.Content" xml:space="preserve">
     <value>My sites</value>

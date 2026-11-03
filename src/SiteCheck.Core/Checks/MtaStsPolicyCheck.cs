@@ -1,6 +1,7 @@
 using SiteCheck.Core.Abstractions;
-using SiteCheck.Core.Models;
+using SiteCheck.Core.Localization;
 using SiteCheck.Core.Models.Probes;
+using SiteCheck.Core.Models;
 
 namespace SiteCheck.Core.Checks;
 
@@ -41,16 +42,16 @@ public sealed class MtaStsPolicyCheck(IHttpProbe http) : ICheck
 
         string mode = ReadMode(response.BodyPrefix);
         return mode.Equals("enforce", StringComparison.OrdinalIgnoreCase)
-            ? [new Finding($"{Id}.enforce", Category, Severity.Ok, "MTA-STS ist scharf gestellt (mode: enforce)")]
+            ? [new Finding($"{Id}.enforce", Category, Severity.Ok, DomainText.Get("MTA-STS ist scharf gestellt (mode: enforce)"))]
             :
             [
                 new Finding(
                     $"{Id}.testing",
                     Category,
                     Severity.Info,
-                    $"MTA-STS ist nur angekündigt (mode: {mode})",
-                    "Im Modus testing oder none wird verschlüsselter Transport noch nicht erzwungen.",
-                    new Recommendation("Nach einer Beobachtungszeit in der Policy-Datei auf mode: enforce stellen.")),
+                    DomainText.Format($"MTA-STS ist nur angekündigt (mode: {mode})"),
+                    DomainText.Get("Im Modus testing oder none wird verschlüsselter Transport noch nicht erzwungen."),
+                    new Recommendation(DomainText.Get("Nach einer Beobachtungszeit in der Policy-Datei auf mode: enforce stellen."))),
             ];
     }
 

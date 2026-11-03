@@ -1,7 +1,8 @@
 using System.Globalization;
 using SiteCheck.Core.Abstractions;
-using SiteCheck.Core.Models;
+using SiteCheck.Core.Localization;
 using SiteCheck.Core.Models.Guard;
+using SiteCheck.Core.Models;
 
 namespace SiteCheck.Application;
 
@@ -22,8 +23,7 @@ public static class HaltedFindings
             Title(halt.Reason),
             Describe(halt),
             new Recommendation(
-                "Die Seite von einem anderen Anschluss öffnen, etwa über Mobilfunk. Läuft sie dort, ist wahrscheinlich "
-                + "dieser Anschluss gesperrt: dann warten und von hier nichts weiter abrufen."))
+                DomainText.Get("Die Seite von einem anderen Anschluss öffnen, etwa über Mobilfunk. Läuft sie dort, ist wahrscheinlich dieser Anschluss gesperrt: dann warten und von hier nichts weiter abrufen.")))
         {
             Confidence = Confidence.Inferred,
         };
@@ -39,8 +39,8 @@ public static class HaltedFindings
             check.Id + CheckReport.NotCheckedKeySuffix,
             check.Category,
             Severity.Info,
-            "Nicht geprüft — der Lauf wurde angehalten",
-            "Kennung der Prüfung: " + check.Id);
+            DomainText.Get("Nicht geprüft — der Lauf wurde angehalten"),
+            DomainText.Get("Kennung der Prüfung: ") + check.Id);
     }
 
     /// <summary>Beschreibt einen Halt in wenigen Sätzen, für Statuszeilen und die Konsole.</summary>
@@ -54,19 +54,18 @@ public static class HaltedFindings
         return halt.Reason switch
         {
             RequestHaltReason.BudgetUsed =>
-                $"Für {halt.Host} ist das Budget dieser Stunde aufgebraucht. Bis {until} Uhr geht nichts mehr hinaus, sonst sieht der Hoster einen Angriff.",
+                DomainText.Format($"Für {halt.Host} ist das Budget dieser Stunde aufgebraucht. Bis {until} Uhr geht nichts mehr hinaus, sonst sieht der Hoster einen Angriff."),
             RequestHaltReason.CoolingDown =>
-                $"Nach dem Lasttest ruht {halt.Host} bis {until} Uhr, damit die Abwehr des Hosters sich beruhigt.",
+                DomainText.Format($"Nach dem Lasttest ruht {halt.Host} bis {until} Uhr, damit die Abwehr des Hosters sich beruhigt."),
             _ =>
-                $"{halt.Host} hat abgewiesen oder nicht mehr geantwortet. Entweder ist die Seite gerade weg, oder der Hoster sperrt diesen Anschluss. "
-                + $"Weitere Anfragen würden eine Sperre verlängern, deshalb geht bis {until} Uhr nichts mehr hinaus.",
+                DomainText.Format($"{halt.Host} hat abgewiesen oder nicht mehr geantwortet. Entweder ist die Seite gerade weg, oder der Hoster sperrt diesen Anschluss. Weitere Anfragen würden eine Sperre verlängern, deshalb geht bis {until} Uhr nichts mehr hinaus."),
         };
     }
 
     private static string Title(RequestHaltReason reason) => reason switch
     {
-        RequestHaltReason.BudgetUsed => "Prüfung angehalten: Anfragebudget dieser Stunde aufgebraucht",
-        RequestHaltReason.CoolingDown => "Prüfung angehalten: Abkühlzeit nach dem Lasttest",
-        _ => "Prüfung angehalten: Der Server weist ab oder antwortet nicht mehr",
+        RequestHaltReason.BudgetUsed => DomainText.Get("Prüfung angehalten: Anfragebudget dieser Stunde aufgebraucht"),
+        RequestHaltReason.CoolingDown => DomainText.Get("Prüfung angehalten: Abkühlzeit nach dem Lasttest"),
+        _ => DomainText.Get("Prüfung angehalten: Der Server weist ab oder antwortet nicht mehr"),
     };
 }

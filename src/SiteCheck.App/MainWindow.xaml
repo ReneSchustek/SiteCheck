@@ -38,6 +38,11 @@
         </NavigationView.MenuItems>
 
         <NavigationView.FooterMenuItems>
+            <NavigationViewItem x:Uid="MainWindow_NavLog" Tag="Log">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE9D9;" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
             <NavigationViewItem x:Uid="MainWindow_NavAbout" Tag="About">
                 <NavigationViewItem.Icon>
                     <FontIcon Glyph="&#xE946;" />

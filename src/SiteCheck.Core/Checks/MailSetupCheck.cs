@@ -1,4 +1,5 @@
 using SiteCheck.Core.Abstractions;
+using SiteCheck.Core.Localization;
 using SiteCheck.Core.Models;
 
 namespace SiteCheck.Core.Checks;
@@ -43,8 +44,8 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                     Id + ".noip",
                     Category,
                     Severity.Info,
-                    "Keine Mail-Prüfung für eine IP-Adresse",
-                    "Mail-Einträge (MX, SPF, DMARC) hängen an einem Domainnamen, nicht an einer IP."),
+                    DomainText.Get("Keine Mail-Prüfung für eine IP-Adresse"),
+                    DomainText.Get("Mail-Einträge (MX, SPF, DMARC) hängen an einem Domainnamen, nicht an einer IP.")),
             ];
         }
 
@@ -57,11 +58,9 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 Id + ".subdomain",
                 Category,
                 Severity.Info,
-                $"Geprüft wird die Domain {domain} (die Seite läuft auf {target.Host})",
-                $"Aus Sicht von außen: Verschickt die Seite mit einer Absenderadresse @{target.Host}, gelten SPF "
-                + "und DKIM dieser Subdomain — und die sind oft nicht eingerichtet. Welche Absenderadresse die "
-                + "Seite wirklich nutzt, ist von außen nicht feststellbar.",
-                new Recommendation($"Als Absenderadresse @{domain} verwenden oder SPF/DKIM auch für die Subdomain einrichten."))
+                DomainText.Format($"Geprüft wird die Domain {domain} (die Seite läuft auf {target.Host})"),
+                DomainText.Format($"Aus Sicht von außen: Verschickt die Seite mit einer Absenderadresse @{target.Host}, gelten SPF und DKIM dieser Subdomain — und die sind oft nicht eingerichtet. Welche Absenderadresse die Seite wirklich nutzt, ist von außen nicht feststellbar."),
+                new Recommendation(DomainText.Format($"Als Absenderadresse @{domain} verwenden oder SPF/DKIM auch für die Subdomain einrichten.")))
             {
                 Confidence = Confidence.Inferred,
             });
@@ -93,7 +92,7 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
     {
         if (exchangers.Count > 0)
         {
-            return new Finding($"{Id}.mx", Category, Severity.Ok, $"MX-Eintrag vorhanden: {string.Join(", ", exchangers)}");
+            return new Finding($"{Id}.mx", Category, Severity.Ok, DomainText.Format($"MX-Eintrag vorhanden: {string.Join(", ", exchangers)}"));
         }
 
         if (isNullMx)
@@ -102,9 +101,8 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.mx.null",
                 Category,
                 Severity.Info,
-                $"{domain} hat einen Null-MX (nimmt bewusst keine Mail an)",
-                "Ein MX „.“ (RFC 7505) sagt ausdrücklich, dass die Domain keine Mail empfängt. Das ist eine "
-                + "bewusste Einstellung, kein Fehler — passend für eine reine Versand- oder Web-Domain.");
+                DomainText.Format($"{domain} hat einen Null-MX (nimmt bewusst keine Mail an)"),
+                DomainText.Get("Ein MX „.“ (RFC 7505) sagt ausdrücklich, dass die Domain keine Mail empfängt. Das ist eine bewusste Einstellung, kein Fehler — passend für eine reine Versand- oder Web-Domain."));
         }
 
         // Technisch regelt MX das Empfangen. In der Praxis ist ein fehlender MX aber ein
@@ -115,11 +113,9 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
             $"{Id}.mx.missing",
             Category,
             Severity.Warning,
-            $"{domain} hat keinen MX-Eintrag",
-            "Ohne MX kann die Domain keine Mail empfangen, und viele Empfänger misstrauen einer Domain ganz "
-            + "ohne MX — ein häufiger Grund dafür, dass Bestätigungsmails nicht ankommen. Erfahrungsgemäß hilft "
-            + "es spürbar, den MX zu setzen.",
-            new Recommendation("Beim Mail-Anbieter den MX-Eintrag der Domain setzen."));
+            DomainText.Format($"{domain} hat keinen MX-Eintrag"),
+            DomainText.Get("Ohne MX kann die Domain keine Mail empfangen, und viele Empfänger misstrauen einer Domain ganz ohne MX — ein häufiger Grund dafür, dass Bestätigungsmails nicht ankommen. Erfahrungsgemäß hilft es spürbar, den MX zu setzen."),
+            new Recommendation(DomainText.Get("Beim Mail-Anbieter den MX-Eintrag der Domain setzen.")));
     }
 
     private async Task<SpfRecord?> ReadSpfAsync(string domain, CancellationToken cancellationToken)
@@ -137,9 +133,9 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.spf.missing",
                 Category,
                 Severity.Warning,
-                "Kein SPF-Eintrag",
-                "Ohne SPF kann der Empfänger nicht prüfen, ob der Server überhaupt für die Domain senden darf.",
-                new Recommendation("Einen SPF-Eintrag als TXT-Record setzen.", "v=spf1 include:_spf.deinanbieter.de -all"));
+                DomainText.Get("Kein SPF-Eintrag"),
+                DomainText.Get("Ohne SPF kann der Empfänger nicht prüfen, ob der Server überhaupt für die Domain senden darf."),
+                new Recommendation(DomainText.Get("Einen SPF-Eintrag als TXT-Record setzen."), "v=spf1 include:_spf.deinanbieter.de -all"));
             yield break;
         }
 
@@ -149,24 +145,24 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.spf.open",
                 Category,
                 Severity.Critical,
-                "SPF erlaubt jedem das Senden (+all)",
+                DomainText.Get("SPF erlaubt jedem das Senden (+all)"),
                 spf.Raw,
-                new Recommendation("Das Ende des SPF-Eintrags auf -all setzen.", "v=spf1 … -all")),
-            SpfAllQualifier.Fail => new Finding($"{Id}.spf", Category, Severity.Ok, "SPF-Eintrag vorhanden und hart abschließend (-all)", spf.Raw),
+                new Recommendation(DomainText.Get("Das Ende des SPF-Eintrags auf -all setzen."), "v=spf1 … -all")),
+            SpfAllQualifier.Fail => new Finding($"{Id}.spf", Category, Severity.Ok, DomainText.Get("SPF-Eintrag vorhanden und hart abschließend (-all)"), spf.Raw),
             SpfAllQualifier.SoftFail => new Finding(
                 $"{Id}.spf.soft",
                 Category,
                 Severity.Info,
-                "SPF endet auf ~all (weich)",
+                DomainText.Get("SPF endet auf ~all (weich)"),
                 spf.Raw,
-                new Recommendation("Für den Betrieb auf -all anheben, sobald alle Versandwege erfasst sind.")),
+                new Recommendation(DomainText.Get("Für den Betrieb auf -all anheben, sobald alle Versandwege erfasst sind."))),
             _ => new Finding(
                 $"{Id}.spf.noall",
                 Category,
                 Severity.Warning,
-                "SPF ohne klaren Abschluss (-all fehlt)",
+                DomainText.Get("SPF ohne klaren Abschluss (-all fehlt)"),
                 spf.Raw,
-                new Recommendation("Den Eintrag mit -all abschließen, damit nicht erfasste Absender abgewiesen werden.")),
+                new Recommendation(DomainText.Get("Den Eintrag mit -all abschließen, damit nicht erfasste Absender abgewiesen werden."))),
         };
 
         // RFC 7208 begrenzt die DNS-Abfragen eines SPF-Laufs auf zehn; darüber bricht die
@@ -177,9 +173,9 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.spf.lookups",
                 Category,
                 Severity.Warning,
-                $"SPF löst zu viele DNS-Abfragen aus ({spf.DnsLookupMechanismCount}, erlaubt sind 10)",
-                "Über der Grenze bewerten Empfänger SPF als Fehler (PermError).",
-                new Recommendation("Die include-Kette verschlanken oder zusammenfassen (SPF-Flattening)."));
+                DomainText.Format($"SPF löst zu viele DNS-Abfragen aus ({spf.DnsLookupMechanismCount}, erlaubt sind 10)"),
+                DomainText.Get("Über der Grenze bewerten Empfänger SPF als Fehler (PermError)."),
+                new Recommendation(DomainText.Get("Die include-Kette verschlanken oder zusammenfassen (SPF-Flattening).")));
         }
     }
 
@@ -195,9 +191,8 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                     $"{Id}.ptr.unknown",
                     Category,
                     Severity.Info,
-                    "Versandhosts von außen nicht bestimmbar",
-                    "Ohne SPF lässt sich nicht sagen, welche Server für die Domain senden. Die Rückwärtsauflösung "
-                    + "(PTR) ist deshalb nicht prüfbar.")
+                    DomainText.Get("Versandhosts von außen nicht bestimmbar"),
+                    DomainText.Get("Ohne SPF lässt sich nicht sagen, welche Server für die Domain senden. Die Rückwärtsauflösung (PTR) ist deshalb nicht prüfbar."))
                 {
                     Confidence = Confidence.Inferred,
                 },
@@ -214,9 +209,8 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.ptr.relay",
                 Category,
                 Severity.Info,
-                $"Versand läuft (laut SPF) über: {string.Join(", ", spf.IncludedDomains)}",
-                "Bei diesen Anbietern liegt die maßgebliche Einrichtung samt Rückwärtsauflösung. Von außen ist "
-                + "sie hier nicht prüfbar.")
+                DomainText.Format($"Versand läuft (laut SPF) über: {string.Join(", ", spf.IncludedDomains)}"),
+                DomainText.Get("Bei diesen Anbietern liegt die maßgebliche Einrichtung samt Rückwärtsauflösung. Von außen ist sie hier nicht prüfbar."))
             {
                 Confidence = Confidence.Inferred,
             });
@@ -248,9 +242,9 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.ptr.missing.{ip}",
                 Category,
                 Severity.Info,
-                $"Versand-IP {ip} hat keine Rückwärtsauflösung (PTR)",
-                "Fehlt der PTR, lehnen manche Empfänger die Mail ab.",
-                new Recommendation("Beim Anbieter für diese IP einen PTR-Eintrag auf einen Namen der Domain setzen lassen."))
+                DomainText.Format($"Versand-IP {ip} hat keine Rückwärtsauflösung (PTR)"),
+                DomainText.Get("Fehlt der PTR, lehnen manche Empfänger die Mail ab."),
+                new Recommendation(DomainText.Get("Beim Anbieter für diese IP einen PTR-Eintrag auf einen Namen der Domain setzen lassen.")))
             {
                 Confidence = Confidence.Inferred,
             };
@@ -258,7 +252,7 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
 
         if (pointer.Contains(domain, StringComparison.OrdinalIgnoreCase))
         {
-            return new Finding($"{Id}.ptr.{ip}", Category, Severity.Ok, $"Versand-IP {ip} löst passend auf ({pointer})");
+            return new Finding($"{Id}.ptr.{ip}", Category, Severity.Ok, DomainText.Format($"Versand-IP {ip} löst passend auf ({pointer})"));
         }
 
         // Forward-Bestätigung: Zeigt der PTR-Name vorwärts wieder auf dieselbe IP (FCrDNS), ist
@@ -271,20 +265,17 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.ptr.fcrdns.{ip}",
                 Category,
                 Severity.Ok,
-                $"Versand-IP {ip} hat eine saubere Rückwärtsauflösung ({pointer})",
-                "Der Name zeigt vorwärts wieder auf dieselbe IP (forward-bestätigt). Dass er nicht die Domain "
-                + "enthält, ist bei gemeinsamem Hosting normal und kein Mangel.");
+                DomainText.Format($"Versand-IP {ip} hat eine saubere Rückwärtsauflösung ({pointer})"),
+                DomainText.Get("Der Name zeigt vorwärts wieder auf dieselbe IP (forward-bestätigt). Dass er nicht die Domain enthält, ist bei gemeinsamem Hosting normal und kein Mangel."));
         }
 
         return new Finding(
             $"{Id}.ptr.mismatch.{ip}",
             Category,
             Severity.Info,
-            $"Versand-IP {ip} löst auf einen fremden Namen auf",
-            $"Aus Sicht von außen: {ip} zeigt rückwärts auf {pointer}, nicht auf {domain}, und der Name ist nicht "
-            + "forward-bestätigt. Ein allgemeiner Anbieter-Name kann ein Spam-Signal sein; bei einem gemeinsamen "
-            + "Versanddienst ist das aber oft normal.",
-            new Recommendation("Wenn es ein eigener Versandserver ist, den PTR auf einen Namen der Domain setzen lassen."))
+            DomainText.Format($"Versand-IP {ip} löst auf einen fremden Namen auf"),
+            DomainText.Format($"Aus Sicht von außen: {ip} zeigt rückwärts auf {pointer}, nicht auf {domain}, und der Name ist nicht forward-bestätigt. Ein allgemeiner Anbieter-Name kann ein Spam-Signal sein; bei einem gemeinsamen Versanddienst ist das aber oft normal."),
+            new Recommendation(DomainText.Get("Wenn es ein eigener Versandserver ist, den PTR auf einen Namen der Domain setzen lassen.")))
         {
             Confidence = Confidence.Inferred,
         };
@@ -302,7 +293,7 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
             string? dkim = records.FirstOrDefault(record => record.Contains("v=DKIM1", StringComparison.OrdinalIgnoreCase));
             if (dkim is not null)
             {
-                return [new Finding($"{Id}.dkim", Category, Severity.Ok, $"DKIM gefunden (Wahlschlüssel „{selector}“)"), DescribeDkimStrength(dkim)];
+                return [new Finding($"{Id}.dkim", Category, Severity.Ok, DomainText.Format($"DKIM gefunden (Wahlschlüssel „{selector}“)")), DescribeDkimStrength(dkim)];
             }
         }
 
@@ -314,10 +305,9 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.dkim.missing",
                 Category,
                 Severity.Warning,
-                "Kein DKIM unter den üblichen Namen gefunden",
-                "Der tatsächlich benutzte Wahlschlüssel ist von außen nicht sicher feststellbar — er kann unter einem "
-                + "anderen Namen liegen. Der verlässliche Nachweis ist eine Testmail (siehe unten).",
-                new Recommendation("DKIM beim Mail-Anbieter aktivieren; den genutzten Wahlschlüssel über eine Testmail bestätigen."))
+                DomainText.Get("Kein DKIM unter den üblichen Namen gefunden"),
+                DomainText.Get("Der tatsächlich benutzte Wahlschlüssel ist von außen nicht sicher feststellbar — er kann unter einem anderen Namen liegen. Der verlässliche Nachweis ist eine Testmail (siehe unten)."),
+                new Recommendation(DomainText.Get("DKIM beim Mail-Anbieter aktivieren; den genutzten Wahlschlüssel über eine Testmail bestätigen.")))
             {
                 Confidence = Confidence.Inferred,
             },
@@ -334,8 +324,8 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.dkim.key",
                 Category,
                 Severity.Info,
-                "DKIM-Schlüssellänge nicht bestimmbar",
-                "Der veröffentlichte Schlüssel ist kein lesbarer RSA-Schlüssel (z. B. Ed25519 oder widerrufen).");
+                DomainText.Get("DKIM-Schlüssellänge nicht bestimmbar"),
+                DomainText.Get("Der veröffentlichte Schlüssel ist kein lesbarer RSA-Schlüssel (z. B. Ed25519 oder widerrufen)."));
         }
 
         return bits switch
@@ -344,17 +334,17 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.dkim.key",
                 Category,
                 Severity.Warning,
-                $"DKIM-Schlüssel ist zu kurz ({bits} Bit)",
-                "Unter 1024 Bit gilt der Schlüssel als unsicher.",
-                new Recommendation("Einen neuen DKIM-Schlüssel mit mindestens 2048 Bit erzeugen.")),
+                DomainText.Format($"DKIM-Schlüssel ist zu kurz ({bits} Bit)"),
+                DomainText.Get("Unter 1024 Bit gilt der Schlüssel als unsicher."),
+                new Recommendation(DomainText.Get("Einen neuen DKIM-Schlüssel mit mindestens 2048 Bit erzeugen."))),
             < 2048 => new Finding(
                 $"{Id}.dkim.key",
                 Category,
                 Severity.Info,
-                $"DKIM-Schlüssel ist 1024 Bit",
-                "1024 Bit ist das Mindestmaß; 2048 Bit sind heute empfohlen.",
-                new Recommendation("Bei Gelegenheit auf einen 2048-Bit-Schlüssel wechseln.")),
-            _ => new Finding($"{Id}.dkim.key", Category, Severity.Ok, $"DKIM-Schlüssel ausreichend lang ({bits} Bit)"),
+                DomainText.Format($"DKIM-Schlüssel ist 1024 Bit"),
+                DomainText.Get("1024 Bit ist das Mindestmaß; 2048 Bit sind heute empfohlen."),
+                new Recommendation(DomainText.Get("Bei Gelegenheit auf einen 2048-Bit-Schlüssel wechseln."))),
+            _ => new Finding($"{Id}.dkim.key", Category, Severity.Ok, DomainText.Format($"DKIM-Schlüssel ausreichend lang ({bits} Bit)")),
         };
     }
 
@@ -371,10 +361,9 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                     $"{Id}.dmarc.missing",
                     Category,
                     Severity.Warning,
-                    "Kein DMARC-Eintrag",
-                    "DMARC sagt dem Empfänger, was mit Mails geschehen soll, die SPF/DKIM nicht bestehen. Gmail und "
-                    + "Yahoo verlangen seit 2024 von Massenversendern einen DMARC-Eintrag.",
-                    new Recommendation("Einen DMARC-Eintrag als TXT unter _dmarc setzen.", "v=DMARC1; p=quarantine; rua=mailto:dmarc@deinedomain.de")),
+                    DomainText.Get("Kein DMARC-Eintrag"),
+                    DomainText.Get("DMARC sagt dem Empfänger, was mit Mails geschehen soll, die SPF/DKIM nicht bestehen. Gmail und Yahoo verlangen seit 2024 von Massenversendern einen DMARC-Eintrag."),
+                    new Recommendation(DomainText.Get("Einen DMARC-Eintrag als TXT unter _dmarc setzen."), "v=DMARC1; p=quarantine; rua=mailto:dmarc@deinedomain.de")),
             ];
         }
 
@@ -393,10 +382,10 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                     $"{Id}.dmarc.none",
                     Category,
                     Severity.Info,
-                    "DMARC vorhanden, aber nur beobachtend (p=none)",
-                    "p=none meldet nur, ohne zu schützen.",
-                    new Recommendation("Nach einer Beobachtungszeit auf p=quarantine oder p=reject anheben."))
-                : new Finding($"{Id}.dmarc", Category, Severity.Ok, $"DMARC vorhanden (p={policy})", dmarc),
+                    DomainText.Get("DMARC vorhanden, aber nur beobachtend (p=none)"),
+                    DomainText.Get("p=none meldet nur, ohne zu schützen."),
+                    new Recommendation(DomainText.Get("Nach einer Beobachtungszeit auf p=quarantine oder p=reject anheben.")))
+                : new Finding($"{Id}.dmarc", Category, Severity.Ok, DomainText.Format($"DMARC vorhanden (p={policy})"), dmarc),
         ];
 
         // Ohne Berichtsadresse (rua) bekommt man keine Auswertung, wer im eigenen Namen sendet.
@@ -406,9 +395,9 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.dmarc.norua",
                 Category,
                 Severity.Info,
-                "DMARC ohne Berichtsadresse (rua)",
-                "Ohne rua bekommst du keine Berichte darüber, wer im Namen der Domain sendet und was durchfällt.",
-                new Recommendation("Eine rua-Adresse ergänzen.", "rua=mailto:dmarc@deinedomain.de")));
+                DomainText.Get("DMARC ohne Berichtsadresse (rua)"),
+                DomainText.Get("Ohne rua bekommst du keine Berichte darüber, wer im Namen der Domain sendet und was durchfällt."),
+                new Recommendation(DomainText.Get("Eine rua-Adresse ergänzen."), "rua=mailto:dmarc@deinedomain.de")));
         }
 
         // pct < 100 wendet die Politik nur auf einen Teil des Verkehrs an.
@@ -418,8 +407,8 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{Id}.dmarc.pct",
                 Category,
                 Severity.Info,
-                $"DMARC wirkt nur auf {percent} % des Verkehrs (pct={percent})",
-                "Der Rest wird von der Politik nicht erfasst. Für vollen Schutz pct weglassen (= 100)."));
+                DomainText.Format($"DMARC wirkt nur auf {percent} % des Verkehrs (pct={percent})"),
+                DomainText.Get("Der Rest wird von der Politik nicht erfasst. Für vollen Schutz pct weglassen (= 100).")));
         }
 
         return findings;
@@ -440,14 +429,14 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
         return
         [
             hasTlsa
-                ? new Finding($"{Id}.dane", Category, Severity.Ok, $"DANE/TLSA am Mailserver vorhanden ({primaryMx})")
+                ? new Finding($"{Id}.dane", Category, Severity.Ok, DomainText.Format($"DANE/TLSA am Mailserver vorhanden ({primaryMx})"))
                 : new Finding(
                     $"{Id}.dane.absent",
                     Category,
                     Severity.Info,
-                    "DANE/TLSA nicht eingerichtet (bei vorhandenem DNSSEC möglich)",
-                    "Mit DNSSEC lässt sich über TLSA zusätzlich der verschlüsselte Mail-Transport absichern. Kein Muss.",
-                    new Recommendation($"TLSA-Eintrag für _25._tcp.{primaryMx} veröffentlichen.")),
+                    DomainText.Get("DANE/TLSA nicht eingerichtet (bei vorhandenem DNSSEC möglich)"),
+                    DomainText.Get("Mit DNSSEC lässt sich über TLSA zusätzlich der verschlüsselte Mail-Transport absichern. Kein Muss."),
+                    new Recommendation(DomainText.Format($"TLSA-Eintrag für _25._tcp.{primaryMx} veröffentlichen."))),
         ];
     }
 
@@ -455,11 +444,8 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
         $"{Id}.bulk",
         Category,
         Severity.Info,
-        "Für Massenversand (Newsletter an Gmail/Yahoo) gelten Extra-Regeln",
-        "Ab etwa 5.000 Mails am Tag verlangen Gmail und Yahoo seit 2024: SPF, DKIM und DMARC (prüft dieses "
-        + "Werkzeug), eine Ein-Klick-Abmeldung (List-Unsubscribe im Mail-Programm) und eine Spam-Rate unter 0,1 % "
-        + "(hart: 0,3 %) in den Google Postmaster Tools. Die letzten beiden Punkte sieht ein Blick von außen nicht "
-        + "— sie gehören im Versandprogramm und in den Postmaster Tools nachgesehen.")
+        DomainText.Get("Für Massenversand (Newsletter an Gmail/Yahoo) gelten Extra-Regeln"),
+        DomainText.Get("Ab etwa 5.000 Mails am Tag verlangen Gmail und Yahoo seit 2024: SPF, DKIM und DMARC (prüft dieses Werkzeug), eine Ein-Klick-Abmeldung (List-Unsubscribe im Mail-Programm) und eine Spam-Rate unter 0,1 % (hart: 0,3 %) in den Google Postmaster Tools. Die letzten beiden Punkte sieht ein Blick von außen nicht — sie gehören im Versandprogramm und in den Postmaster Tools nachgesehen."))
     {
         Confidence = Confidence.Inferred,
     };
@@ -471,13 +457,13 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
         List<Finding> findings = [];
 
         findings.Add(await MaturityRecordAsync(
-            $"_mta-sts.{domain}", "v=STSv1", "MTA-STS", "erzwingt verschlüsselten Mail-Transport zur Domain",
+            $"_mta-sts.{domain}", "v=STSv1", "MTA-STS", DomainText.Get("erzwingt verschlüsselten Mail-Transport zur Domain"),
             $"{Id}.mtasts", cancellationToken).ConfigureAwait(false));
         findings.Add(await MaturityRecordAsync(
-            $"_smtp._tls.{domain}", "v=TLSRPTv1", "TLS-RPT", "lässt sich über Transport-Probleme berichten",
+            $"_smtp._tls.{domain}", "v=TLSRPTv1", "TLS-RPT", DomainText.Get("lässt sich über Transport-Probleme berichten"),
             $"{Id}.tlsrpt", cancellationToken).ConfigureAwait(false));
         findings.Add(await MaturityRecordAsync(
-            $"default._bimi.{domain}", "v=BIMI1", "BIMI", "zeigt das Marken-Logo in unterstützenden Mail-Programmen",
+            $"default._bimi.{domain}", "v=BIMI1", "BIMI", DomainText.Get("zeigt das Marken-Logo in unterstützenden Mail-Programmen"),
             $"{Id}.bimi", cancellationToken).ConfigureAwait(false));
 
         return findings;
@@ -500,24 +486,21 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
                 $"{key}.absent",
                 Category,
                 Severity.Info,
-                $"{label} nicht eingerichtet",
-                $"{label} {purpose}. Das ist kein Fehler, sondern ein Reifegrad-Zeichen für fortgeschrittene Absender.");
+                DomainText.Format($"{label} nicht eingerichtet"),
+                DomainText.Format($"{label} {purpose}. Das ist kein Fehler, sondern ein Reifegrad-Zeichen für fortgeschrittene Absender."));
     }
 
     private Finding VerificationNote() => new(
         $"{Id}.verify",
         Category,
         Severity.Info,
-        "Verlässlich prüfen lässt sich die Mail nur mit einer Testmail",
-        "Schick eine Testmail an eine Gmail- und eine iCloud-Adresse und öffne dort „Original anzeigen“. In der "
-        + "Zeile Authentication-Results muss spf=pass, dkim=pass und dmarc=pass stehen. iCloud ist strenger als "
-        + "Gmail, deshalb beide.");
+        DomainText.Get("Verlässlich prüfen lässt sich die Mail nur mit einer Testmail"),
+        DomainText.Get("Schick eine Testmail an eine Gmail- und eine iCloud-Adresse und öffne dort „Original anzeigen“. In der Zeile Authentication-Results muss spf=pass, dkim=pass und dmarc=pass stehen. iCloud ist strenger als Gmail, deshalb beide."));
 
     private Finding ScopeNote() => new(
         $"{Id}.scope",
         Category,
         Severity.Info,
-        "Was ein Blick von außen nicht sieht",
-        "Diese Prüfung liest nur öffentliche DNS-Einträge. Den tatsächlichen Versandweg, den verwendeten "
-        + "DKIM-Schlüssel und alles hinter einer Anmeldung sieht sie nicht — dafür ist die Testmail da.");
+        DomainText.Get("Was ein Blick von außen nicht sieht"),
+        DomainText.Get("Diese Prüfung liest nur öffentliche DNS-Einträge. Den tatsächlichen Versandweg, den verwendeten DKIM-Schlüssel und alles hinter einer Anmeldung sieht sie nicht — dafür ist die Testmail da."));
 }

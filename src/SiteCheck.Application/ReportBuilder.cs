@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Net;
 using System.Text;
+using SiteCheck.Core.Localization;
 using SiteCheck.Core.Models;
 
 namespace SiteCheck.Application;
@@ -13,7 +14,6 @@ namespace SiteCheck.Application;
 /// </summary>
 public static class ReportBuilder
 {
-    private static readonly CultureInfo German = CultureInfo.GetCultureInfo("de-DE");
 
     /// <summary>Baut den Textbericht einer Seite.</summary>
     /// <param name="report">Der Prüfbericht.</param>
@@ -23,13 +23,13 @@ public static class ReportBuilder
         ArgumentNullException.ThrowIfNull(report);
 
         StringBuilder text = new();
-        _ = text.Append("Sicherheits-Check für ").AppendLine(report.Address);
-        _ = text.Append("Geprüft am ").AppendLine(report.StartedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", German));
+        _ = text.Append(DomainText.Get("Sicherheits-Check für ")).AppendLine(report.Address);
+        _ = text.Append(DomainText.Get("Geprüft am ")).AppendLine(report.StartedAt.ToLocalTime().ToString("g", CultureInfo.CurrentCulture));
         _ = text.AppendLine();
         _ = text.AppendLine(SummaryLine(report.Summary));
         _ = text.AppendLine();
-        _ = text.AppendLine("Was bedeuten die Zeichen: [ok] ist in Ordnung, [Hinweis] nur zur Kenntnis,");
-        _ = text.AppendLine("[!] sollte verbessert werden, [kritisch] bitte zeitnah beheben.");
+        _ = text.AppendLine(DomainText.Get("Was bedeuten die Zeichen: [ok] ist in Ordnung, [Hinweis] nur zur Kenntnis,"));
+        _ = text.AppendLine(DomainText.Get("[!] sollte verbessert werden, [kritisch] bitte zeitnah beheben."));
         _ = text.AppendLine();
 
         foreach (CheckCategory category in Enum.GetValues<CheckCategory>())
@@ -40,7 +40,7 @@ public static class ReportBuilder
                 continue;
             }
 
-            _ = text.AppendLine(CategoryTitle(category).ToUpper(German));
+            _ = text.AppendLine(CategoryTitle(category).ToUpper(CultureInfo.CurrentCulture));
             foreach (Finding finding in inCategory)
             {
                 AppendTextFinding(text, finding);
@@ -62,7 +62,7 @@ public static class ReportBuilder
         FindingSummary summary = report.Summary;
         StringBuilder html = new();
         _ = html.AppendLine("<!DOCTYPE html>");
-        _ = html.AppendLine("<html lang=\"de\">");
+        _ = html.AppendLine("<html lang=\"" + CultureInfo.CurrentUICulture.TwoLetterISOLanguageName + "\">");
         _ = html.AppendLine("<head>");
         _ = html.AppendLine("<meta charset=\"utf-8\">");
         _ = html.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
@@ -71,14 +71,14 @@ public static class ReportBuilder
         _ = html.AppendLine("</head>");
         _ = html.AppendLine("<body>");
         _ = html.AppendLine("<main>");
-        _ = html.AppendLine("<h1>Sicherheits-Check</h1>");
+        _ = html.Append("<h1>").Append(DomainText.Get("Sicherheits-Check")).AppendLine("</h1>");
         _ = html.Append("<p class=\"addr\">").Append(Encode(report.Address)).AppendLine("</p>");
-        _ = html.Append("<p class=\"meta\">Geprüft am ")
-            .Append(Encode(report.StartedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm 'Uhr'", German)))
+        _ = html.Append("<p class=\"meta\">").Append(DomainText.Get("Geprüft am "))
+            .Append(Encode(report.StartedAt.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)))
             .AppendLine("</p>");
 
         AppendHtmlSummary(html, summary);
-        _ = html.AppendLine("<p class=\"legend\">Die Farbe und das Wort vor jedem Punkt sagen, wie dringend er ist.</p>");
+        _ = html.Append("<p class=\"legend\">").Append(DomainText.Get("Die Farbe und das Wort vor jedem Punkt sagen, wie dringend er ist.")).AppendLine("</p>");
 
         foreach (CheckCategory category in Enum.GetValues<CheckCategory>())
         {
@@ -103,7 +103,7 @@ public static class ReportBuilder
 
     private static void AppendTextFinding(StringBuilder text, Finding finding)
     {
-        string title = finding.Confidence == Confidence.Inferred ? finding.Title + "  (aus Sicht von außen)" : finding.Title;
+        string title = finding.Confidence == Confidence.Inferred ? finding.Title + "  (" + DomainText.Get("aus Sicht von außen") + ")" : finding.Title;
         _ = text.Append("  ").Append(Marker(finding.Severity)).Append(' ').AppendLine(title);
         if (!string.IsNullOrWhiteSpace(finding.Detail))
         {
@@ -129,9 +129,9 @@ public static class ReportBuilder
     private static void AppendHtmlSummary(StringBuilder html, FindingSummary summary)
     {
         _ = html.AppendLine("<div class=\"summary\">");
-        _ = html.Append("<span class=\"pill ok\">").Append(summary.OkCount).AppendLine(" in Ordnung</span>");
-        _ = html.Append("<span class=\"pill warning\">").Append(summary.WarningCount).AppendLine(" zu verbessern</span>");
-        _ = html.Append("<span class=\"pill critical\">").Append(summary.CriticalCount).AppendLine(" kritisch</span>");
+        _ = html.Append("<span class=\"pill ok\">").Append(summary.OkCount).Append(' ').Append(DomainText.Get("in Ordnung")).AppendLine("</span>");
+        _ = html.Append("<span class=\"pill warning\">").Append(summary.WarningCount).Append(' ').Append(DomainText.Get("zu verbessern")).AppendLine("</span>");
+        _ = html.Append("<span class=\"pill critical\">").Append(summary.CriticalCount).Append(' ').Append(DomainText.Get("kritisch")).AppendLine("</span>");
         _ = html.AppendLine("</div>");
     }
 
@@ -142,7 +142,7 @@ public static class ReportBuilder
             .Append("</span> ").Append(Encode(finding.Title));
         if (finding.Confidence == Confidence.Inferred)
         {
-            _ = html.Append(" <span class=\"inferred\">aus Sicht von außen</span>");
+            _ = html.Append(" <span class=\"inferred\">").Append(DomainText.Get("aus Sicht von außen")).Append("</span>");
         }
 
         _ = html.AppendLine("</p>");
@@ -154,7 +154,7 @@ public static class ReportBuilder
 
         if (finding.Recommendation is { } recommendation)
         {
-            _ = html.Append("<p class=\"advice\"><strong>Empfehlung:</strong> ").Append(Encode(recommendation.Advice)).AppendLine("</p>");
+            _ = html.Append("<p class=\"advice\"><strong>").Append(DomainText.Get("Empfehlung:")).Append("</strong> ").Append(Encode(recommendation.Advice)).AppendLine("</p>");
             if (!string.IsNullOrWhiteSpace(recommendation.Example))
             {
                 _ = html.Append("<pre>").Append(EncodeMultiline(recommendation.Example)).AppendLine("</pre>");
@@ -165,21 +165,21 @@ public static class ReportBuilder
     }
 
     private static string SummaryLine(FindingSummary summary) =>
-        $"Ergebnis: {summary.OkCount} in Ordnung, {summary.WarningCount} zu verbessern, {summary.CriticalCount} kritisch.";
+        DomainText.Format($"Ergebnis: {summary.OkCount} in Ordnung, {summary.WarningCount} zu verbessern, {summary.CriticalCount} kritisch.");
 
     private static string CategoryTitle(CheckCategory category) => category switch
     {
-        CheckCategory.Web => "Web",
-        CheckCategory.Mail => "Mail-Einrichtung",
+        CheckCategory.Web => DomainText.Get("Web"),
+        CheckCategory.Mail => DomainText.Get("Mail-Einrichtung"),
         _ => category.ToString(),
     };
 
     private static string Marker(Severity severity) => severity switch
     {
         Severity.Ok => "[ok]",
-        Severity.Info => "[Hinweis]",
+        Severity.Info => "[" + DomainText.Get("Hinweis") + "]",
         Severity.Warning => "[!]",
-        Severity.Critical => "[kritisch]",
+        Severity.Critical => "[" + DomainText.Get("kritisch") + "]",
         _ => "[?]",
     };
 
@@ -196,11 +196,11 @@ public static class ReportBuilder
 
     private static string SeverityWord(Severity severity) => severity switch
     {
-        Severity.Ok => "In Ordnung",
-        Severity.Info => "Hinweis",
-        Severity.Warning => "Zu verbessern",
-        Severity.Critical => "Kritisch",
-        _ => "Unbekannt",
+        Severity.Ok => DomainText.Get("In Ordnung"),
+        Severity.Info => DomainText.Get("Hinweis"),
+        Severity.Warning => DomainText.Get("Zu verbessern"),
+        Severity.Critical => DomainText.Get("Kritisch"),
+        _ => DomainText.Get("Unbekannt"),
     };
 
     private static string[] SplitLines(string value) =>

@@ -1,6 +1,7 @@
 using SiteCheck.Core.Abstractions;
-using SiteCheck.Core.Models;
+using SiteCheck.Core.Localization;
 using SiteCheck.Core.Models.Probes;
+using SiteCheck.Core.Models;
 
 namespace SiteCheck.Core.Checks;
 
@@ -42,7 +43,7 @@ public sealed class SensitiveFilesCheck(IHttpProbe http) : ICheck
         // Timeouts liefen.
         if (await http.FetchAsync(target.Address, cancellationToken).ConfigureAwait(false) is null)
         {
-            return [new Finding(Id + ".skipped", Category, Severity.Info, "Nicht geprüft — die Seite war nicht erreichbar")];
+            return [new Finding(Id + ".skipped", Category, Severity.Info, DomainText.Get("Nicht geprüft — die Seite war nicht erreichbar"))];
         }
 
         List<string> exposed = [];
@@ -62,7 +63,7 @@ public sealed class SensitiveFilesCheck(IHttpProbe http) : ICheck
         {
             return
             [
-                new Finding(Id + ".ok", Category, Severity.Ok, "Keine der geprüften heiklen Dateien ist offen erreichbar"),
+                new Finding(Id + ".ok", Category, Severity.Ok, DomainText.Get("Keine der geprüften heiklen Dateien ist offen erreichbar")),
             ];
         }
 
@@ -72,10 +73,10 @@ public sealed class SensitiveFilesCheck(IHttpProbe http) : ICheck
                 Id + ".exposed",
                 Category,
                 Severity.Critical,
-                $"{exposed.Count} heikle Datei(en) offen lesbar",
+                DomainText.Format($"{exposed.Count} heikle Datei(en) offen lesbar"),
                 string.Join("\n", exposed.Select(path => "- " + path)),
                 new Recommendation(
-                    "Den Zugriff auf diese Pfade serverseitig sperren und die Dateien aus dem Web-Wurzelverzeichnis nehmen.",
+                    DomainText.Get("Den Zugriff auf diese Pfade serverseitig sperren und die Dateien aus dem Web-Wurzelverzeichnis nehmen."),
                     "RewriteRule \"(^|/)\\.(git|env|htaccess)\" - [F]")),
         ];
     }

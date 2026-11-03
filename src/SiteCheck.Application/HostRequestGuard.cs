@@ -1,4 +1,6 @@
 using System.Net;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using SiteCheck.Core.Abstractions;
 using SiteCheck.Core.Models;
 using SiteCheck.Core.Models.Guard;
@@ -15,7 +17,7 @@ namespace SiteCheck.Application;
 /// Hosters sind von außen unbekannt.
 /// </para>
 /// </summary>
-public sealed class HostRequestGuard(TimeProvider clock, IRequestGuardStore store, IDnsProbe dns)
+public sealed class HostRequestGuard(TimeProvider clock, IRequestGuardStore store, IDnsProbe dns, ILogger? logger = null)
 {
     // 1500 ms ergeben 40 Anfragen je Minute. Übliche Grenzen im geteilten Hosting liegen bei 60 bis
     // 120; 5 Anfragen je Sekunde führten bei ruhrcoder.de zur Sperre, dieses Tempo läuft dort ohne.
@@ -39,6 +41,7 @@ public sealed class HostRequestGuard(TimeProvider clock, IRequestGuardStore stor
     private readonly TimeProvider _clock = clock;
     private readonly IRequestGuardStore _store = store;
     private readonly IDnsProbe _dns = dns;
+    private readonly ILogger _logger = logger ?? NullLogger.Instance;
     private readonly Lock _gate = new();
     private readonly Dictionary<string, HostGuardEntry> _hosts = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, int> _unanswered = new(StringComparer.OrdinalIgnoreCase);
@@ -62,6 +65,7 @@ public sealed class HostRequestGuard(TimeProvider clock, IRequestGuardStore stor
 
             if (entry.RecentRequests.Count >= HourlyRequestBudget)
             {
+                _logger.RequestsHalted(key, entry.RecentRequests[0] + BudgetWindow, RequestHaltReason.BudgetUsed);
                 throw new RequestsHaltedException(RequestHaltReason.BudgetUsed, key, entry.RecentRequests[0] + BudgetWindow);
             }
 
@@ -213,6 +217,8 @@ public sealed class HostRequestGuard(TimeProvider clock, IRequestGuardStore stor
             _ = _unanswered.Remove(key);
         }
 
+        _logger.HaltReleased(key);
+
         await SaveAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -251,6 +257,7 @@ public sealed class HostRequestGuard(TimeProvider clock, IRequestGuardStore stor
             _ = _unanswered.Remove(key);
         }
 
+        _logger.RequestsHalted(key, until, RequestHaltReason.HostRejected);
         await SaveAsync(cancellationToken).ConfigureAwait(false);
         throw new RequestsHaltedException(RequestHaltReason.HostRejected, key, until);
     }

@@ -6,9 +6,9 @@ Cobertura). Gemessen wird in der **Debug**-Konfiguration: Der Release-Build setz
 
 | Assembly | Zeilenrate | Gate |
 |---|---:|---|
-| SiteCheck.Core | 96,2 % | ≥ 90 % ✓ |
-| SiteCheck.Application | 98,1 % | ≥ 90 % ✓ |
-| SiteCheck.Data | 77,5 % | dokumentiert (siehe unten) |
+| SiteCheck.Core | 95,9 % | ≥ 90 % ✓ |
+| SiteCheck.Application | 98,3 % | ≥ 90 % ✓ |
+| SiteCheck.Data | 77,7 % | dokumentiert (siehe unten) |
 
 ## Warum Data unter 90 % liegt
 

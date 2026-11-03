@@ -103,9 +103,9 @@ hilft, der konkrete Rat samt Beispiel zum Übernehmen.
 
 ## Sprache und Protokoll
 
-Die Oberfläche folgt der Windows-Sprache: Englisch bei englischem Windows, sonst Deutsch. Befunde und
-Berichte sind vorerst nur deutsch. Das Protokoll liegt unter `%LocalAppData%\SiteCheck\logs` und
-bewahrt 14 Tagesdateien auf.
+Oberfläche, Befunde, Berichte und Konsole folgen der Windows-Sprache: Englisch bei englischem Windows,
+sonst Deutsch. Der Verlauf zeigt ältere Läufe in der Sprache, in der sie entstanden sind. Das Protokoll
+steht in der App unter „Protokoll“ und liegt unter `%LocalAppData%\SiteCheck\logs` (14 Tagesdateien).
 
 ## Voraussetzungen
 
