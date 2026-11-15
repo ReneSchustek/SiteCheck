@@ -5,6 +5,11 @@ verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.2.0] – 2026-11-15
+
+Wer 0.1.0 benutzt, wechselt einmal von Hand: 0.1.0 kennt noch kein Selbst-Update und kann die eigene
+Verbindung beim Hoster sperren lassen. Ab 0.2.0 kommen neue Versionen von selbst.
+
 ### Hinzugefügt
 
 - Die portable Fassung aktualisiert sich selbst: täglicher Blick auf GitHub, Download im Hintergrund, Einspielen
