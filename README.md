@@ -31,7 +31,7 @@ Start („Der Computer wurde geschützt" → **Weitere Informationen** → **Tro
 Sicherheit steht im Release die **SHA-256-Prüfsumme** jeder Datei; so lässt sich der Download prüfen:
 
 ```powershell
-Get-FileHash .\SiteCheck-Setup-v0.1.0.exe -Algorithm SHA256
+Get-FileHash .\SiteCheck-Setup-v0.2.0.exe -Algorithm SHA256
 ```
 
 ## Updates
@@ -41,6 +41,9 @@ lädt sie im Hintergrund und spielt sie beim nächsten Start ein. Eingespielt wi
 Signatur, ohne sie wird das Update abgewiesen. Eine Installation im schreibgeschützten Ordner „Programme“
 öffnet stattdessen die Release-Seite. Abschalten lässt sich das unter „Über“. Die Abfrage geht an GitHub, nie
 an eine geprüfte Seite.
+
+Version 0.1.0 aktualisiert sich noch nicht selbst. Wer sie nutzt, lädt 0.2.0 einmal von Hand herunter; danach
+kommen neue Versionen von allein.
 
 ## Schutz vor der eigenen Sperre
 
