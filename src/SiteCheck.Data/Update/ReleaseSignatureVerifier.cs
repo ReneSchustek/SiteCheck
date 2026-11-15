@@ -17,7 +17,7 @@ public sealed class ReleaseSignatureVerifier
     /// Base64). Der private Gegenpart liegt ausschließlich offline beim Maintainer.
     /// </summary>
     public const string DefaultPublicKeySpkiBase64 =
-        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE+JcAQWoglDmdl/liqh6roTxI+j7R7pdW6jP5Ta+tE8o3fJWqY1vZNmqbDuDjJNi2Jn784GkTFl3r7Efojn2oXA==";
+        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEuAqelSU9sqzbAdNNah08aSxaV0C1TqgiaFxx2vl3w+Bejp4nDROjpyTt0CgtWdoTGTZmqfesJ+n/sf1Dpf9hMA==";
 
     private readonly byte[] _publicKeySpki;
 
