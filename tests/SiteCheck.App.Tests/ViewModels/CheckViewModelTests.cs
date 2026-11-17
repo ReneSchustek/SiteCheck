@@ -184,6 +184,9 @@ public sealed class CheckViewModelTests
 
         Assert.True(vm.WasHalted);
         Assert.Empty(history.Appended);
+        Assert.Equal("Status_Check_Halted", vm.HaltMessage);
+        Assert.NotEqual(vm.HaltMessage, vm.StatusText);
+        Assert.StartsWith("Status_Check_Summary|", vm.StatusText, StringComparison.Ordinal);
     }
 
     [Fact]

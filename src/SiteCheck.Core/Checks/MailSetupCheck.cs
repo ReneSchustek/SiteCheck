@@ -29,6 +29,9 @@ public sealed class MailSetupCheck(IDnsProbe dns) : ICheck
     public string Id => "mail.setup";
 
     /// <inheritdoc/>
+    public string Name => DomainText.Get("Mail-Einrichtung (SPF, DKIM, DMARC)");
+
+    /// <inheritdoc/>
     public CheckCategory Category => CheckCategory.Mail;
 
     /// <inheritdoc/>

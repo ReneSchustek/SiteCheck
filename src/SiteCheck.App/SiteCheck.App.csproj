@@ -95,6 +95,16 @@
     <Content Include="Assets\SplashScreen.scale-200.png" />
   </ItemGroup>
 
+  <!-- Windows bringt Roboto Flex und Roboto Mono nicht mit; ohne die Dateien entschiede das
+       Zielsystem über das Schriftbild. Die Lizenztexte gehören nach der SIL Open Font License
+       zu jeder weitergegebenen Kopie. -->
+  <ItemGroup>
+    <Content Include="Assets\Fonts\roboto-flex-variable.ttf" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\Fonts\roboto-mono-variable.ttf" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\Fonts\OFL-roboto-flex.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\Fonts\OFL-roboto-mono.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>

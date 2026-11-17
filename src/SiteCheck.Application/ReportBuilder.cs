@@ -67,6 +67,7 @@ public static class ReportBuilder
         _ = html.AppendLine("<meta charset=\"utf-8\">");
         _ = html.AppendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
         _ = html.Append("<title>Sicherheits-Check ").Append(Encode(report.Address)).AppendLine("</title>");
+        _ = html.Append(ReportFonts.Style);
         _ = html.AppendLine(Styles);
         _ = html.AppendLine("</head>");
         _ = html.AppendLine("<body>");
@@ -211,7 +212,8 @@ public static class ReportBuilder
     private static string EncodeMultiline(string value) => Encode(value).Replace("\n", "<br>", StringComparison.Ordinal);
 
     // Farben als CSS-Variablen mit heller und dunkler Belegung, damit die Datei in beiden
-    // Erscheinungsbildern lesbar bleibt. Gedeckte Statusfarben nach der Gestaltungslinie;
+    // Erscheinungsbildern lesbar bleibt. Roboto Flex und Roboto Mono kommen aus ReportFonts und
+    // stecken in der Datei; die Rückfallkette greift nur für Zeichen außerhalb der Teilmenge. Gedeckte Statusfarben nach der Gestaltungslinie;
     // der Zustand steht zusätzlich als Wort vor jedem Punkt, nie allein über die Farbe.
     private const string Styles = """
         <style>
@@ -227,7 +229,7 @@ public static class ReportBuilder
               --border: rgba(255,255,255,0.1);
             }
           }
-          body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.6;
+          body { font-family: "Roboto Flex", system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.6;
                  background: var(--bg); color: var(--text); margin: 0; padding: 24px; }
           main { max-width: 760px; margin: 0 auto; }
           h1 { font-size: 1.6rem; margin: 0 0 4px; }

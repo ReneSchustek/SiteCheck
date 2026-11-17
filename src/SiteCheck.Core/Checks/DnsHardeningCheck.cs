@@ -17,6 +17,9 @@ public sealed class DnsHardeningCheck(IDnsProbe dns) : ICheck
     public string Id => "web.dns";
 
     /// <inheritdoc/>
+    public string Name => DomainText.Get("DNS-Härtung (DNSSEC, CAA)");
+
+    /// <inheritdoc/>
     public CheckCategory Category => CheckCategory.Web;
 
     /// <inheritdoc/>

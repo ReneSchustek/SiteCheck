@@ -151,7 +151,7 @@
                 IsOpen="{x:Bind ViewModel.WasHalted, Mode=OneWay}"
                 Severity="Warning"
                 IsClosable="False"
-                Message="{x:Bind ViewModel.StatusText, Mode=OneWay}" />
+                Message="{x:Bind ViewModel.HaltMessage, Mode=OneWay}" />
 
             <InfoBar
                 IsOpen="{x:Bind ViewModel.HasValidationMessage, Mode=OneWay}"

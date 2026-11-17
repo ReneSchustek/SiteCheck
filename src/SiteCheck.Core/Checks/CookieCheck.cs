@@ -17,6 +17,9 @@ public sealed class CookieCheck(IHttpProbe http) : ICheck
     public string Id => "web.cookies";
 
     /// <inheritdoc/>
+    public string Name => DomainText.Get("Cookies");
+
+    /// <inheritdoc/>
     public CheckCategory Category => CheckCategory.Web;
 
     /// <inheritdoc/>

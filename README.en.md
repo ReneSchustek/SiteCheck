@@ -31,7 +31,7 @@ your PC" → **More info** → **Run anyway**). Each release lists the **SHA-256
 can verify your download:
 
 ```powershell
-Get-FileHash .\SiteCheck-Setup-v0.2.0.exe -Algorithm SHA256
+Get-FileHash .\SiteCheck-Setup-v0.3.0.exe -Algorithm SHA256
 ```
 
 ## Updates
@@ -41,7 +41,7 @@ background and installs it on the next start. Only a package with a valid signat
 one, the update is rejected. An installation in a read-only folder such as "Program Files" opens the release
 page instead. You can turn this off under "About". The request goes to GitHub, never to a checked site.
 
-Version 0.1.0 does not update itself yet. If you use it, download 0.2.0 once by hand; after that, new versions
+Version 0.1.0 does not update itself yet. If you use it, download the current version once by hand; after that, new versions
 arrive on their own.
 
 ## Protection against getting yourself blocked
@@ -167,6 +167,11 @@ increase the risk of a block.
 The console returns `1` as soon as there is a critical finding, `3` if the run was stopped and the report is
 incomplete, and `0` otherwise, which is handy for scheduled runs.
 
+**Demo:** `SiteCheck.exe --demo` starts with sample data, for screenshots or a presentation. The sites are
+called `meine-seite.example`, `shop.example` and `blog.example`; checks run against fixed answers and not a
+single request goes to the network. The demo works in a folder of its own that is recreated on every start.
+Your own sites, history and rest periods stay untouched. The window title says "Demo".
+
 ## What it deliberately does NOT do
 
 No attacks; only the explicitly confirmed stress test puts active load on your own site: no SQL injection, no
@@ -188,3 +193,12 @@ temporarily block the address, see [Protection against getting yourself blocked]
 ## License
 
 MIT, see [LICENSE](LICENSE).
+
+### Fonts
+
+SiteCheck ships its fonts and loads none from the internet. The app uses
+[Roboto Flex](https://github.com/googlefonts/roboto-flex) and
+[Roboto Mono](https://github.com/googlefonts/RobotoMono), both under the
+[SIL Open Font License 1.1](https://openfontlicense.org). The license texts sit next to the font
+files in `Assets/Fonts`. The saved HTML report contains reduced versions of both fonts, so it looks
+the same for the recipient as it does in the app.

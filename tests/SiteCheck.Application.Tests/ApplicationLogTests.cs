@@ -35,6 +35,23 @@ public sealed class ApplicationLogTests
     }
 
     [Fact]
+    public async Task Halt_NamesItsEndInTheLocalTimeOfTheClock()
+    {
+        ListLogger logger = new();
+        FakeTimeProvider clock = new(new DateTimeOffset(2026, 11, 17, 11, 8, 20, TimeSpan.Zero));
+        clock.SetLocalTimeZone(TimeZoneInfo.CreateCustomTimeZone("Test+1", TimeSpan.FromHours(1), "Test+1", "Test+1"));
+        HostRequestGuard guard = new(clock, new InMemoryGuardStore(), new StubDnsProbe(), logger);
+
+        _ = await Assert.ThrowsAsync<RequestsHaltedException>(() => guard.ObserveResponseAsync(new Uri("https://beispiel.de/"), 429, Token));
+
+        DateTimeOffset until = clock.GetUtcNow() + HostRequestGuard.HaltCooldown;
+        string expected = until.ToOffset(TimeSpan.FromHours(1)).ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+        string message = Assert.Single(logger.Messages, message => message.StartsWith("Anfragen an beispiel.de angehalten", StringComparison.Ordinal));
+        Assert.Equal($"Anfragen an beispiel.de angehalten bis {expected}: HostRejected", message);
+        Assert.DoesNotContain("Z:", message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task BudgetAndRelease_AreLogged()
     {
         ListLogger logger = new();

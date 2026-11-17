@@ -31,7 +31,7 @@ Start („Der Computer wurde geschützt" → **Weitere Informationen** → **Tro
 Sicherheit steht im Release die **SHA-256-Prüfsumme** jeder Datei; so lässt sich der Download prüfen:
 
 ```powershell
-Get-FileHash .\SiteCheck-Setup-v0.2.0.exe -Algorithm SHA256
+Get-FileHash .\SiteCheck-Setup-v0.3.0.exe -Algorithm SHA256
 ```
 
 ## Updates
@@ -42,7 +42,7 @@ Signatur, ohne sie wird das Update abgewiesen. Eine Installation im schreibgesch
 öffnet stattdessen die Release-Seite. Abschalten lässt sich das unter „Über“. Die Abfrage geht an GitHub, nie
 an eine geprüfte Seite.
 
-Version 0.1.0 aktualisiert sich noch nicht selbst. Wer sie nutzt, lädt 0.2.0 einmal von Hand herunter; danach
+Version 0.1.0 aktualisiert sich noch nicht selbst. Wer sie nutzt, lädt die aktuelle Version einmal von Hand herunter; danach
 kommen neue Versionen von allein.
 
 ## Schutz vor der eigenen Sperre
@@ -169,6 +169,12 @@ Ruhezeit auf. Beides erhöht das Risiko einer Sperre.
 Rückgabewert der Konsole ist `1`, sobald ein kritischer Punkt dabei ist, `3`, wenn der Lauf
 angehalten wurde und der Bericht unvollständig ist, sonst `0` — praktisch für einen geplanten Lauf.
 
+**Vorführung:** `SiteCheck.exe --demo` startet mit Beispieldaten, etwa für Bildschirmfotos oder eine
+Vorstellung. Die Seiten heißen `meine-seite.example`, `shop.example` und `blog.example`; geprüft wird
+gegen feste Antworten, es geht keine einzige Anfrage ins Netz. Die Vorführung arbeitet in einem eigenen
+Ordner, der bei jedem Start neu angelegt wird. Eigene Seiten, Verlauf und Sperrzeiten bleiben unberührt.
+Der Fenstertitel trägt „Vorführung“.
+
 ## Was er bewusst NICHT macht
 
 Keine Angriffe, nur der ausdrücklich bestätigte Stresstest belastet die eigene Seite aktiv:
@@ -192,3 +198,12 @@ werten Prüfungen als Angriff und sperren die Adresse vorübergehend, siehe
 ## Lizenz
 
 MIT — siehe [LICENSE](LICENSE).
+
+### Schriften
+
+SiteCheck bringt seine Schriften mit und lädt keine aus dem Netz. Das Programm nutzt
+[Roboto Flex](https://github.com/googlefonts/roboto-flex) und
+[Roboto Mono](https://github.com/googlefonts/RobotoMono), beide unter der
+[SIL Open Font License 1.1](https://openfontlicense.org). Die Lizenztexte liegen neben den
+Schriftdateien unter `Assets/Fonts`. Der gespeicherte HTML-Bericht enthält verkleinerte Fassungen
+beider Schriften, damit er auch beim Empfänger so aussieht wie im Programm.

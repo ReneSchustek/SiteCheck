@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using SiteCheck.App.Composition;
 using SiteCheck.App.Services;
 using SiteCheck.App.ViewModels;
 using SiteCheck.App.Views;
@@ -22,7 +23,10 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
         AppWindow.Resize(new Windows.Graphics.SizeInt32(1100, 760));
-        Title = "SiteCheck";
+        // Die Vorführung trägt es im Titel, damit kein Bild mit Beispieldaten für echte Befunde gehalten wird.
+        Title = App.Services.GetRequiredService<AppRunMode>().IsDemo
+            ? App.Services.GetRequiredService<IStringResources>().GetString("MainWindow_DemoTitle")
+            : "SiteCheck";
 
         // Icon für Taskleiste und Titelleiste. Absoluter Pfad ab dem App-Verzeichnis, damit es
         // auch greift, wenn die App nicht aus ihrem Ordner heraus gestartet wird.

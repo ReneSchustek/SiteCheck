@@ -65,7 +65,7 @@ public sealed class HostRequestGuard(TimeProvider clock, IRequestGuardStore stor
 
             if (entry.RecentRequests.Count >= HourlyRequestBudget)
             {
-                _logger.RequestsHalted(key, entry.RecentRequests[0] + BudgetWindow, RequestHaltReason.BudgetUsed);
+                _logger.RequestsHalted(key, entry.RecentRequests[0] + BudgetWindow, RequestHaltReason.BudgetUsed, _clock);
                 throw new RequestsHaltedException(RequestHaltReason.BudgetUsed, key, entry.RecentRequests[0] + BudgetWindow);
             }
 
@@ -257,7 +257,7 @@ public sealed class HostRequestGuard(TimeProvider clock, IRequestGuardStore stor
             _ = _unanswered.Remove(key);
         }
 
-        _logger.RequestsHalted(key, until, RequestHaltReason.HostRejected);
+        _logger.RequestsHalted(key, until, RequestHaltReason.HostRejected, _clock);
         await SaveAsync(cancellationToken).ConfigureAwait(false);
         throw new RequestsHaltedException(RequestHaltReason.HostRejected, key, until);
     }

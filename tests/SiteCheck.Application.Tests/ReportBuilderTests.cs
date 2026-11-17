@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using SiteCheck.Core.Models;
 
 namespace SiteCheck.Application.Tests;
@@ -85,5 +86,51 @@ public sealed class ReportBuilderTests
 
         Assert.DoesNotContain("<script>alert(1)</script>", html, StringComparison.Ordinal);
         Assert.Contains("&lt;script&gt;", html, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void BuildHtml_EmbedsBothFontsAndUsesThemFirst()
+    {
+        string html = ReportBuilder.BuildHtml(SampleReport());
+
+        Assert.Contains("@font-face { font-family: \"Roboto Flex\"", html, StringComparison.Ordinal);
+        Assert.Contains("@font-face { font-family: \"Roboto Mono\"", html, StringComparison.Ordinal);
+        Assert.Contains("body { font-family: \"Roboto Flex\",", html, StringComparison.Ordinal);
+        Assert.Contains("font-family: \"Roboto Mono\", ui-monospace", html, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void BuildHtml_LoadsNothingFromOtherHosts()
+    {
+        string html = ReportBuilder.BuildHtml(SampleReport());
+
+        // Jede Quelle im Bericht ist eingebettet. Ein Verweis nach außen würde beim Öffnen die
+        // IP-Adresse des Lesers an einen fremden Host geben.
+        MatchCollection sources = Regex.Matches(html, @"url\((?<source>[^)]*)\)");
+        Assert.Equal(2, sources.Count);
+        Assert.All(sources, source => Assert.StartsWith("data:font/woff2;base64,", source.Groups["source"].Value, StringComparison.Ordinal));
+        Assert.DoesNotContain("<link", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("<script", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("@import", html, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Theory]
+    [InlineData(ReportFonts.FlexResourceName)]
+    [InlineData(ReportFonts.MonoResourceName)]
+    public void ReportFonts_AreEmbeddedAsWoff2(string resourceName)
+    {
+        byte[] font = ReportFonts.ReadResource(resourceName);
+
+        Assert.True(font.Length > 1024, $"{resourceName} ist verdächtig klein ({font.Length} Bytes).");
+        Assert.Equal("wOF2"u8.ToArray(), font[..4]);
+    }
+
+    [Fact]
+    public void ReportFonts_MissingResource_FailsWithItsName()
+    {
+        InvalidOperationException error = Assert.Throws<InvalidOperationException>(
+            () => ReportFonts.ReadResource("SiteCheck.Fonts.fehlt.woff2"));
+
+        Assert.Contains("SiteCheck.Fonts.fehlt.woff2", error.Message, StringComparison.Ordinal);
     }
 }

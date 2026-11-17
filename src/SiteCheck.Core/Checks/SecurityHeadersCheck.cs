@@ -59,6 +59,9 @@ public sealed class SecurityHeadersCheck(IHttpProbe http) : ICheck
     public string Id => "web.headers";
 
     /// <inheritdoc/>
+    public string Name => DomainText.Get("Schutz-Kopfzeilen");
+
+    /// <inheritdoc/>
     public CheckCategory Category => CheckCategory.Web;
 
     /// <inheritdoc/>

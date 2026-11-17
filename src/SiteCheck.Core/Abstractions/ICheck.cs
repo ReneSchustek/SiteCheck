@@ -11,6 +11,9 @@ public interface ICheck
     /// <summary>Stabile Kennung der Prüfung, etwa <c>web.redirect</c>. Ordnet Befunde ihrer Quelle zu.</summary>
     string Id { get; }
 
+    /// <summary>Lesbarer Name der Prüfung in der Anzeigesprache, etwa „Umleitung auf https“. Steht im Bericht, wo sonst die Kennung stünde.</summary>
+    string Name { get; }
+
     /// <summary>Bereich, zu dem die Prüfung gehört; steuert die Gruppierung in Ausgabe und Bericht.</summary>
     CheckCategory Category { get; }
 
