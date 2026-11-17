@@ -4,10 +4,10 @@
 ; Build (vom Repo-Root):
 ;   tools\publish-setup.ps1            -> publiziert + kompiliert die Setup.exe
 ; oder direkt:
-;   ISCC.exe /DMyAppVersion=0.2.0 installer\SiteCheck.iss
+;   ISCC.exe /DMyAppVersion=0.3.0 installer\SiteCheck.iss
 
 #ifndef MyAppVersion
-  #define MyAppVersion "0.2.0"
+  #define MyAppVersion "0.3.0"
 #endif
 #define MyAppName "SiteCheck"
 #define MyAppPublisher "Ruhrcoder (Rene Schustek)"
