@@ -5,6 +5,12 @@ verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Geändert
+
+- Oberfläche und gespeicherter Bericht erscheinen auf jedem Rechner in Roboto Flex, Codebeispiele in
+  Roboto Mono. Bisher standen dort Segoe UI und die Systemschrift, weil Windows beide Schriften nicht
+  mitbringt. Der Bericht lädt dafür nichts aus dem Netz, die Schrift steckt in der Datei.
+
 ## [0.2.0] – 2026-11-15
 
 Wer 0.1.0 benutzt, wechselt einmal von Hand: 0.1.0 kennt noch kein Selbst-Update und kann die eigene

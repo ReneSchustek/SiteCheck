@@ -21,4 +21,11 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 
+  <!-- Verkleinerte Schriften für den HTML-Bericht, erzeugt mit tools/build-report-fonts.ps1.
+       Feste logische Namen, damit ein Umbenennen des Ordners den Bericht nicht still bricht. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Fonts\roboto-flex-latin.woff2" LogicalName="SiteCheck.Fonts.roboto-flex-latin.woff2" />
+    <EmbeddedResource Include="Fonts\roboto-mono-latin.woff2" LogicalName="SiteCheck.Fonts.roboto-mono-latin.woff2" />
+  </ItemGroup>
+
 </Project>

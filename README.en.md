@@ -188,3 +188,12 @@ temporarily block the address, see [Protection against getting yourself blocked]
 ## License
 
 MIT, see [LICENSE](LICENSE).
+
+### Fonts
+
+SiteCheck ships its fonts and loads none from the internet. The app uses
+[Roboto Flex](https://github.com/googlefonts/roboto-flex) and
+[Roboto Mono](https://github.com/googlefonts/RobotoMono), both under the
+[SIL Open Font License 1.1](https://openfontlicense.org). The license texts sit next to the font
+files in `Assets/Fonts`. The saved HTML report contains reduced versions of both fonts, so it looks
+the same for the recipient as it does in the app.
