@@ -5,6 +5,8 @@ verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+## [0.3.0] – 2026-11-17
+
 ### Hinzugefügt
 
 - Vorführung mit Beispieldaten: `--demo` zeigt alle Bereiche mit erfundenen Seiten, ohne eine einzige

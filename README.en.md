@@ -31,7 +31,7 @@ your PC" → **More info** → **Run anyway**). Each release lists the **SHA-256
 can verify your download:
 
 ```powershell
-Get-FileHash .\SiteCheck-Setup-v0.2.0.exe -Algorithm SHA256
+Get-FileHash .\SiteCheck-Setup-v0.3.0.exe -Algorithm SHA256
 ```
 
 ## Updates
@@ -41,7 +41,7 @@ background and installs it on the next start. Only a package with a valid signat
 one, the update is rejected. An installation in a read-only folder such as "Program Files" opens the release
 page instead. You can turn this off under "About". The request goes to GitHub, never to a checked site.
 
-Version 0.1.0 does not update itself yet. If you use it, download 0.2.0 once by hand; after that, new versions
+Version 0.1.0 does not update itself yet. If you use it, download the current version once by hand; after that, new versions
 arrive on their own.
 
 ## Protection against getting yourself blocked
