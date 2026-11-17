@@ -11,6 +11,12 @@ verwendet [Semantic Versioning](https://semver.org/lang/de/).
   Roboto Mono. Bisher standen dort Segoe UI und die Systemschrift, weil Windows beide Schriften nicht
   mitbringt. Der Bericht lädt dafür nichts aus dem Netz, die Schrift steckt in der Datei.
 
+### Behoben
+
+- Hauptschaltflächen, Schalter, Schieberegler, Haken und der Fokus-Unterstrich im Eingabefeld trugen die
+  Akzentfarbe aus den Windows-Einstellungen. Sie erscheinen jetzt auf jedem Rechner in Petrol, im dunklen
+  Erscheinungsbild in Stahlgrau.
+
 ## [0.2.0] – 2026-11-15
 
 Wer 0.1.0 benutzt, wechselt einmal von Hand: 0.1.0 kennt noch kein Selbst-Update und kann die eigene
