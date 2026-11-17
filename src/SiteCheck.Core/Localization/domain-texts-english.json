@@ -159,8 +159,8 @@
   "Ein Angreifer sieht sofort, welche Fassung er sich vornehmen kann.": "An attacker can immediately see which version they can target.",
   "Die Versionsangabe aus der {0}-Kopfzeile entfernen oder kürzen.": "Remove or shorten the version information from the {0} header.",
   "Die Seite von einem anderen Anschluss öffnen, etwa über Mobilfunk. Läuft sie dort, ist wahrscheinlich dieser Anschluss gesperrt: dann warten und von hier nichts weiter abrufen.": "Open the site from a different internet connection, such as via mobile data. If it works there, this connection is likely blocked: in that case, wait and do not request anything further from here.",
-  "Nicht geprüft — der Lauf wurde angehalten": "Not checked — the run was stopped",
-  "Kennung der Prüfung: ": "Check ID: ",
+  "Nicht geprüft: {0}": "Not checked: {0}",
+  "Der Lauf wurde angehalten, bevor diese Prüfung an der Reihe war.": "The run was stopped before this check was reached.",
   "Für {0} ist das Budget dieser Stunde aufgebraucht. Bis {1} Uhr geht nichts mehr hinaus, sonst sieht der Hoster einen Angriff.": "The budget for this hour is used up for {0}. Nothing more goes out until {1}, otherwise the hosting provider sees an attack.",
   "Nach dem Lasttest ruht {0} bis {1} Uhr, damit die Abwehr des Hosters sich beruhigt.": "After the stress test, {0} rests until {1} so the hosting provider's defenses can settle down.",
   "{0} hat abgewiesen oder nicht mehr geantwortet. Entweder ist die Seite gerade weg, oder der Hoster sperrt diesen Anschluss. Weitere Anfragen würden eine Sperre verlängern, deshalb geht bis {1} Uhr nichts mehr hinaus.": "{0} rejected requests or stopped responding. Either the site is down right now, or the hosting provider is blocking this connection. Further requests would extend a block, so nothing more goes out until {1}.",
@@ -208,5 +208,16 @@
   "Verschlüsselung: TLS 1.3": "Encryption: TLS 1.3",
   "Verschlüsselung: TLS 1.2": "Encryption: TLS 1.2",
   "Der Server nennt keine genaue Version": "The server does not reveal an exact version",
-  "  Sicherheits-Check  {0}": "  Security check  {0}"
+  "  Sicherheits-Check  {0}": "  Security check  {0}",
+  "Cookies": "Cookies",
+  "Offene Verzeichnis-Auflistung": "Open directory listing",
+  "DNS-Härtung (DNSSEC, CAA)": "DNS hardening (DNSSEC, CAA)",
+  "Mail-Einrichtung (SPF, DKIM, DMARC)": "Mail setup (SPF, DKIM, DMARC)",
+  "MTA-STS-Richtlinie": "MTA-STS policy",
+  "Umleitung auf https": "Redirect to https",
+  "Schutz-Kopfzeilen": "Security headers",
+  "Meldeweg für Sicherheitslücken (security.txt)": "Vulnerability reporting contact (security.txt)",
+  "Heikle Dateien (.git, .env und andere)": "Sensitive files (.git, .env and others)",
+  "Verschlüsselung und Zertifikat": "Encryption and certificate",
+  "Versionsangabe des Servers": "Server version disclosure"
 }

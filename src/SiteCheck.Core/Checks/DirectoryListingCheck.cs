@@ -17,6 +17,9 @@ public sealed class DirectoryListingCheck(IHttpProbe http) : ICheck
     public string Id => "web.listing";
 
     /// <inheritdoc/>
+    public string Name => DomainText.Get("Offene Verzeichnis-Auflistung");
+
+    /// <inheritdoc/>
     public CheckCategory Category => CheckCategory.Web;
 
     /// <inheritdoc/>

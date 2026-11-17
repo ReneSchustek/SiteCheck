@@ -39,8 +39,8 @@ public static class HaltedFindings
             check.Id + CheckReport.NotCheckedKeySuffix,
             check.Category,
             Severity.Info,
-            DomainText.Get("Nicht geprüft — der Lauf wurde angehalten"),
-            DomainText.Get("Kennung der Prüfung: ") + check.Id);
+            DomainText.Format($"Nicht geprüft: {check.Name}"),
+            DomainText.Get("Der Lauf wurde angehalten, bevor diese Prüfung an der Reihe war."));
     }
 
     /// <summary>Beschreibt einen Halt in wenigen Sätzen, für Statuszeilen und die Konsole.</summary>

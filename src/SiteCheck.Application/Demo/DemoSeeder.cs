@@ -89,7 +89,7 @@ public sealed class DemoSeeder(ISiteStore sites, IHistoryStore history, ISetting
         ILogger guard = _loggers.CreateLogger(CategoryOf<HostRequestGuard>());
         ILogger stress = _loggers.CreateLogger(CategoryOf<StressTestCoordinator>());
         DateTimeOffset haltAt = now - HaltAgo;
-        yield return (haltAt, () => Log(() => guard.RequestsHalted(plan.HaltedHost, haltAt + HostRequestGuard.HaltCooldown, RequestHaltReason.HostRejected)));
+        yield return (haltAt, () => Log(() => guard.RequestsHalted(plan.HaltedHost, haltAt + HostRequestGuard.HaltCooldown, RequestHaltReason.HostRejected, _clock)));
         yield return (haltAt + HaltReleasedAfter, () => Log(() => guard.HaltReleased(plan.HaltedHost)));
         yield return (now - StressAgo, () => Log(() => stress.StressStarted(plan.StressTarget, 5, 20)));
         yield return (now - StressAgo + TimeSpan.FromSeconds(21), () => Log(() => stress.StressFinished(plan.StressTarget, 512, false)));

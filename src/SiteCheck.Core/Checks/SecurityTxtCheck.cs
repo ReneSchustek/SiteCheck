@@ -15,6 +15,9 @@ public sealed class SecurityTxtCheck(IHttpProbe http) : ICheck
     public string Id => "web.securitytxt";
 
     /// <inheritdoc/>
+    public string Name => DomainText.Get("Meldeweg für Sicherheitslücken (security.txt)");
+
+    /// <inheritdoc/>
     public CheckCategory Category => CheckCategory.Web;
 
     /// <inheritdoc/>

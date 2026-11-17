@@ -17,6 +17,9 @@ internal sealed class StubCheck(string id, CheckCategory category, IReadOnlyList
     public string Id { get; } = id;
 
     /// <inheritdoc/>
+    public string Name => "Stub " + Id;
+
+    /// <inheritdoc/>
     public CheckCategory Category { get; } = category;
 
     /// <inheritdoc/>

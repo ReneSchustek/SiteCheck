@@ -62,6 +62,10 @@ public sealed partial class CheckViewModel(
     [ObservableProperty]
     public partial string StatusText { get; private set; } = string.Empty;
 
+    /// <summary>Die Meldung im Hinweisband nach einem Halt. Getrennt von <see cref="StatusText"/>, damit sie dort nicht ein zweites Mal steht und Kopieren oder Speichern sie nicht überschreibt.</summary>
+    [ObservableProperty]
+    public partial string HaltMessage { get; private set; } = string.Empty;
+
     /// <summary>Die Web-Befunde des letzten Laufs.</summary>
     public ObservableCollection<FindingViewModel> WebFindings { get; } = [];
 
@@ -117,6 +121,7 @@ public sealed partial class CheckViewModel(
         WebFindings.Clear();
         MailFindings.Clear();
         Progress = 0;
+        HaltMessage = string.Empty;
         StatusText = _strings.GetString("Status_Check_Running");
         State = CheckRunState.Running;
 
@@ -138,9 +143,8 @@ public sealed partial class CheckViewModel(
                 ? [.. report.Findings.Select(finding => new ComparedFinding(finding, FindingChange.Unchanged))]
                 : ReportComparison.Compare(report.Findings, previous);
             FillFindings(compared);
-            StatusText = report.WasHalted
-                ? _strings.GetString("Status_Check_Halted")
-                : SummaryText(report.Summary);
+            HaltMessage = report.WasHalted ? _strings.GetString("Status_Check_Halted") : string.Empty;
+            StatusText = SummaryText(report.Summary);
             State = CheckRunState.Completed;
             if (!report.WasHalted)
             {
