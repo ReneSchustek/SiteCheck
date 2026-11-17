@@ -17,6 +17,9 @@ public sealed class VersionLeakCheck(IHttpProbe http) : ICheck
     public string Id => "web.version";
 
     /// <inheritdoc/>
+    public string Name => DomainText.Get("Versionsangabe des Servers");
+
+    /// <inheritdoc/>
     public CheckCategory Category => CheckCategory.Web;
 
     /// <inheritdoc/>

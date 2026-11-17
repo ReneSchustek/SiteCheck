@@ -35,6 +35,8 @@ internal sealed class StubCheck(CheckCategory category, IReadOnlyList<Finding> f
 
     public string Id => "stub." + Category;
 
+    public string Name => "Stub " + Category;
+
     public Task<IReadOnlyList<Finding>> RunAsync(CheckTarget target, CancellationToken cancellationToken) =>
         Task.FromResult(_findings);
 }
@@ -176,6 +178,8 @@ internal sealed class HaltingCheck : ICheck
     public int Calls { get; private set; }
 
     public string Id => "stub.halting";
+
+    public string Name => "Stub, hält an";
 
     public CheckCategory Category => CheckCategory.Web;
 

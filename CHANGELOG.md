@@ -21,6 +21,12 @@ verwendet [Semantic Versioning](https://semver.org/lang/de/).
 - Hauptschaltflächen, Schalter, Schieberegler, Haken und der Fokus-Unterstrich im Eingabefeld trugen die
   Akzentfarbe aus den Windows-Einstellungen. Sie erscheinen jetzt auf jedem Rechner in Petrol, im dunklen
   Erscheinungsbild in Stahlgrau.
+- Nach einem Halt nannte der Bericht übersprungene Prüfungen mit ihrer internen Kennung, etwa
+  `mail.mtasts.policy`. Dort steht jetzt ihr Name, etwa „MTA-STS-Richtlinie“, auf Deutsch und Englisch.
+- Die Halt-Meldung stand im Hinweisband und darunter noch einmal. Darunter steht jetzt die Zusammenzählung
+  der geprüften Punkte.
+- Das Protokoll nannte das Ende einer Sperrzeit in UTC, die Zeile selbst aber in Ortszeit. Beides steht
+  jetzt in Ortszeit.
 
 ## [0.2.0] – 2026-11-15
 

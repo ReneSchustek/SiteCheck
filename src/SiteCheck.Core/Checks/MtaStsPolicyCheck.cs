@@ -18,6 +18,9 @@ public sealed class MtaStsPolicyCheck(IHttpProbe http) : ICheck
     public string Id => "mail.mtasts.policy";
 
     /// <inheritdoc/>
+    public string Name => DomainText.Get("MTA-STS-Richtlinie");
+
+    /// <inheritdoc/>
     public CheckCategory Category => CheckCategory.Mail;
 
     /// <inheritdoc/>

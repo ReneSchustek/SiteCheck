@@ -31,6 +31,9 @@ public sealed class SensitiveFilesCheck(IHttpProbe http) : ICheck
     public string Id => "web.files";
 
     /// <inheritdoc/>
+    public string Name => DomainText.Get("Heikle Dateien (.git, .env und andere)");
+
+    /// <inheritdoc/>
     public CheckCategory Category => CheckCategory.Web;
 
     /// <inheritdoc/>

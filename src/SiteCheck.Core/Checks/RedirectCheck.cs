@@ -15,6 +15,9 @@ public sealed class RedirectCheck(IHttpProbe http) : ICheck
     public string Id => "web.redirect";
 
     /// <inheritdoc/>
+    public string Name => DomainText.Get("Umleitung auf https");
+
+    /// <inheritdoc/>
     public CheckCategory Category => CheckCategory.Web;
 
     /// <inheritdoc/>

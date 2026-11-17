@@ -12,6 +12,8 @@ internal sealed class OptInCheck(ICheck check, string title) : ICheck
 {
     public string Id => check.Id;
 
+    public string Name => check.Name;
+
     public CheckCategory Category => check.Category;
 
     public Task<IReadOnlyList<Finding>> RunAsync(CheckTarget target, CancellationToken cancellationToken) =>

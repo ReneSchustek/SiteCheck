@@ -22,6 +22,9 @@ public sealed class TlsCheck(ITlsProbe tls, TimeProvider clock) : ICheck
     public string Id => "web.tls";
 
     /// <inheritdoc/>
+    public string Name => DomainText.Get("Verschlüsselung und Zertifikat");
+
+    /// <inheritdoc/>
     public CheckCategory Category => CheckCategory.Web;
 
     /// <inheritdoc/>
