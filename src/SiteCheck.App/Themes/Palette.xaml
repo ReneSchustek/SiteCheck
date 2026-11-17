@@ -54,7 +54,22 @@
             <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#4A9CC5" />
             <SolidColorBrush x:Key="NavigationViewButtonForegroundPointerOver" Color="#FFFFFF" />
             <SolidColorBrush x:Key="NavigationViewButtonForegroundPressed" Color="#DCE9F1" />
+
+            <!-- Akzent: Die Standardsteuerelemente lesen nicht SystemAccentColor selbst, sondern
+                 seine Abstufungen. Im Hellen trägt Dark1 die Flächen (Primärschaltfläche, Haken,
+                 Schalter, Fortschritt, Fokus-Unterstrich), Dark2/Dark3 den Linktext. Fehlt eine
+                 Abstufung, setzt Windows dort die Akzentfarbe des Nutzers ein. Deshalb steht der
+                 ganze Satz hier, Dark1 gleich primary. Die Textfarbe auf dem Akzent wird als
+                 Color gesetzt, nicht als TextOnAccentFillColorPrimaryBrush: Ein eigener Pinsel
+                 unter diesem Schlüssel ließ das Fenster schwarz, der Inhalt wurde nie gezeichnet. -->
             <Color x:Key="SystemAccentColor">#26708F</Color>
+            <Color x:Key="SystemAccentColorLight1">#26708F</Color>
+            <Color x:Key="SystemAccentColorLight2">#4A8BA8</Color>
+            <Color x:Key="SystemAccentColorLight3">#DDE5E9</Color>
+            <Color x:Key="SystemAccentColorDark1">#2F4858</Color>
+            <Color x:Key="SystemAccentColorDark2">#26708F</Color>
+            <Color x:Key="SystemAccentColorDark3">#0D2B38</Color>
+            <Color x:Key="TextOnAccentFillColorPrimary">#FFFFFF</Color>
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Dark">
@@ -95,7 +110,18 @@
             <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#4A9CC5" />
             <SolidColorBrush x:Key="NavigationViewButtonForegroundPointerOver" Color="#FFFFFF" />
             <SolidColorBrush x:Key="NavigationViewButtonForegroundPressed" Color="#DCE9F1" />
+
+            <!-- Im Dunklen trägt Light2 die Flächen, Light3/Light1 den Linktext. Light2 gleich
+                 primary (Stahlgrau); der Text darauf ist on-primary, nicht das Schwarz des
+                 Rahmenwerks. -->
             <Color x:Key="SystemAccentColor">#94A3AB</Color>
+            <Color x:Key="SystemAccentColorLight1">#94A3AB</Color>
+            <Color x:Key="SystemAccentColorLight2">#C5D0D6</Color>
+            <Color x:Key="SystemAccentColorLight3">#DDE5E9</Color>
+            <Color x:Key="SystemAccentColorDark1">#94A3AB</Color>
+            <Color x:Key="SystemAccentColorDark2">#5F7685</Color>
+            <Color x:Key="SystemAccentColorDark3">#2F4858</Color>
+            <Color x:Key="TextOnAccentFillColorPrimary">#0F1923</Color>
         </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>
