@@ -110,9 +110,15 @@
     <SolidColorBrush x:Key="StatusWarningBrush" Color="#C77A00" />
     <SolidColorBrush x:Key="StatusCriticalBrush" Color="#D13A30" />
 
-    <!-- Schrift gehört zur Marke und wechselt nicht mit dem Erscheinungsbild. Roboto Flex mit
-         Rückfallkette; auf Windows ohne installierte Schrift greift Segoe UI Variable. -->
-    <FontFamily x:Key="ThemeFontFamily">Roboto Flex, Segoe UI Variable, Segoe UI</FontFamily>
-    <FontFamily x:Key="ThemeMonoFontFamily">Roboto Mono, Cascadia Mono, Consolas</FontFamily>
+    <!-- Schrift gehört zur Marke und wechselt nicht mit dem Erscheinungsbild. Windows bringt
+         Roboto Flex und Roboto Mono nicht mit, deshalb liegen die variablen Dateien unter
+         Assets/Fonts; der Teil hinter # ist der Familienname in der Datei, nicht der Dateiname.
+         Die Rückfallkette greift nur, wenn die Datei fehlt. -->
+    <FontFamily x:Key="ThemeFontFamily">ms-appx:///Assets/Fonts/roboto-flex-variable.ttf#Roboto Flex, Segoe UI Variable, Segoe UI</FontFamily>
+    <FontFamily x:Key="ThemeMonoFontFamily">ms-appx:///Assets/Fonts/roboto-mono-variable.ttf#Roboto Mono, Cascadia Mono, Consolas</FontFamily>
+    <!-- Eingebaute Steuerelemente (Schaltfläche, Eingabefeld, Auswahlliste, Dialog) lesen ihre
+         Schrift aus diesem Schlüssel und nicht aus der Schrift des Fensters. Ohne ihn stünden sie
+         in Segoe UI neben Text in Roboto Flex. -->
+    <FontFamily x:Key="ContentControlThemeFontFamily">ms-appx:///Assets/Fonts/roboto-flex-variable.ttf#Roboto Flex, Segoe UI Variable, Segoe UI</FontFamily>
 
 </ResourceDictionary>

@@ -192,3 +192,12 @@ werten Prüfungen als Angriff und sperren die Adresse vorübergehend, siehe
 ## Lizenz
 
 MIT — siehe [LICENSE](LICENSE).
+
+### Schriften
+
+SiteCheck bringt seine Schriften mit und lädt keine aus dem Netz. Das Programm nutzt
+[Roboto Flex](https://github.com/googlefonts/roboto-flex) und
+[Roboto Mono](https://github.com/googlefonts/RobotoMono), beide unter der
+[SIL Open Font License 1.1](https://openfontlicense.org). Die Lizenztexte liegen neben den
+Schriftdateien unter `Assets/Fonts`. Der gespeicherte HTML-Bericht enthält verkleinerte Fassungen
+beider Schriften, damit er auch beim Empfänger so aussieht wie im Programm.
