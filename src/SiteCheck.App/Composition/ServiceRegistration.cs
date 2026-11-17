@@ -4,6 +4,7 @@ using SiteCheck.App.Services;
 using SiteCheck.App.ViewModels;
 using SiteCheck.Application;
 using SiteCheck.Core.Abstractions;
+using SiteCheck.Data.Demo;
 using SiteCheck.Data.Logging;
 using SiteCheck.Data.Probes;
 using SiteCheck.Data.Storage;
@@ -18,21 +19,19 @@ namespace SiteCheck.App.Composition;
 public static class ServiceRegistration
 {
     /// <summary>Baut den Dienst-Container der Anwendung.</summary>
+    /// <param name="mode">Echter Betrieb oder Vorführung.</param>
+    /// <param name="paths">Wo die Daten liegen; in der Vorführung ein eigener Ordner.</param>
     /// <returns>Der fertige <see cref="IServiceProvider"/>.</returns>
-    public static IServiceProvider Build()
+    public static IServiceProvider Build(AppRunMode mode, AppPaths paths)
     {
+        ArgumentNullException.ThrowIfNull(mode);
+        ArgumentNullException.ThrowIfNull(paths);
         ServiceCollection services = new();
 
         _ = services.AddSingleton(TimeProvider.System);
-
-        // Sonden: die HTTP-Sonde hält zwei Clients (mit und ohne Folgen der Umleitung),
-        // die Lastsonde einen eigenen mit knapperem Timeout.
-        _ = services.AddSingleton<IHttpProbe>(_ => new HttpProbe(
-            ProbeHttpClients.CreateFollowing(),
-            ProbeHttpClients.CreateNonFollowing()));
-        _ = services.AddSingleton<ITlsProbe, TlsProbe>();
-        _ = services.AddSingleton<IDnsProbe>(_ => new DnsProbe());
-        _ = services.AddSingleton<ILoadProbe>(_ => new LoadProbe(ProbeHttpClients.CreateForLoad()));
+        _ = services.AddSingleton(mode);
+        _ = services.AddSingleton(paths);
+        AddProbes(services, mode);
 
         // Prüflauf: eine Factory baut je Lauf einen Runner über einen frischen HTTP-Cache, damit
         // die Prüfungen eines Laufs Seiten-Anfragen teilen, ein neuer Lauf aber frisch abfragt.
@@ -57,20 +56,14 @@ public static class ServiceRegistration
             provider.GetRequiredService<ILogger<HostRequestGuard>>()));
 
         // Speicher im Anwendungsdatenordner.
-        _ = services.AddSingleton<AppPaths>();
         _ = services.AddSingleton<ISettingsStore, SettingsStore>();
         _ = services.AddSingleton<ISiteStore, SiteStore>();
         _ = services.AddSingleton<IHistoryStore, HistoryStore>();
 
         // Das Protokoll liegt neben den übrigen Daten und bleibt lesbar, wenn das Programm nicht startet.
-        _ = services.AddLogging(logging => logging.AddProvider(new FileLoggerProvider(new AppPaths().LogDirectory, TimeProvider.System)));
+        _ = services.AddLogging(logging => logging.AddProvider(new FileLoggerProvider(paths.LogDirectory, TimeProvider.System)));
 
-        // Selbst-Update. Die Version kommt aus der Assembly, damit Anzeige und Vergleich nie auseinanderlaufen.
-        _ = services.AddSingleton<IHttpGetClient, HttpGetClient>();
-        _ = services.AddSingleton<IUpdateChecker>(provider => new GitHubUpdateChecker(
-            provider.GetRequiredService<IHttpGetClient>(),
-            CurrentVersion(),
-            provider.GetRequiredService<ILogger<GitHubUpdateChecker>>()));
+        AddUpdateSources(services, mode);
         _ = services.AddSingleton(provider => new UpdateInstallerService(
             provider.GetRequiredService<IHttpGetClient>(),
             provider.GetRequiredService<ILogger<UpdateInstallerService>>()));
@@ -98,6 +91,46 @@ public static class ServiceRegistration
         _ = services.AddSingleton<StressTestViewModel>();
 
         return services.BuildServiceProvider();
+    }
+
+    // Sonden: die HTTP-Sonde hält zwei Clients (mit und ohne Folgen der Umleitung), die Lastsonde
+    // einen eigenen mit knapperem Timeout. Die Vorführung tauscht alle vier gegen feste Antworten;
+    // die Prüfungen darüber bleiben dieselben.
+    private static void AddProbes(ServiceCollection services, AppRunMode mode)
+    {
+        if (mode.IsDemo)
+        {
+            _ = services.AddSingleton<IHttpProbe>(_ => new DemoHttpProbe(DemoEra.Current));
+            _ = services.AddSingleton<ITlsProbe>(provider => new DemoTlsProbe(provider.GetRequiredService<TimeProvider>()));
+            _ = services.AddSingleton<IDnsProbe>(_ => new DemoDnsProbe(DemoEra.Current));
+            _ = services.AddSingleton<ILoadProbe>(_ => new DemoLoadProbe());
+            return;
+        }
+
+        _ = services.AddSingleton<IHttpProbe>(_ => new HttpProbe(
+            ProbeHttpClients.CreateFollowing(),
+            ProbeHttpClients.CreateNonFollowing()));
+        _ = services.AddSingleton<ITlsProbe, TlsProbe>();
+        _ = services.AddSingleton<IDnsProbe>(_ => new DnsProbe());
+        _ = services.AddSingleton<ILoadProbe>(_ => new LoadProbe(ProbeHttpClients.CreateForLoad()));
+    }
+
+    // Selbst-Update. Die Version kommt aus der Assembly, damit Anzeige und Vergleich nie
+    // auseinanderlaufen. In der Vorführung fragt niemand bei GitHub nach.
+    private static void AddUpdateSources(ServiceCollection services, AppRunMode mode)
+    {
+        if (mode.IsDemo)
+        {
+            _ = services.AddSingleton<IHttpGetClient, OfflineHttpGetClient>();
+            _ = services.AddSingleton<IUpdateChecker>(_ => new DemoUpdateChecker(CurrentVersion()));
+            return;
+        }
+
+        _ = services.AddSingleton<IHttpGetClient, HttpGetClient>();
+        _ = services.AddSingleton<IUpdateChecker>(provider => new GitHubUpdateChecker(
+            provider.GetRequiredService<IHttpGetClient>(),
+            CurrentVersion(),
+            provider.GetRequiredService<ILogger<GitHubUpdateChecker>>()));
     }
 
     private static Version CurrentVersion() => typeof(ServiceRegistration).Assembly.GetName().Version ?? new Version(0, 0, 0);
