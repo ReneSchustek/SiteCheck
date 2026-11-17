@@ -169,6 +169,12 @@ Ruhezeit auf. Beides erhöht das Risiko einer Sperre.
 Rückgabewert der Konsole ist `1`, sobald ein kritischer Punkt dabei ist, `3`, wenn der Lauf
 angehalten wurde und der Bericht unvollständig ist, sonst `0` — praktisch für einen geplanten Lauf.
 
+**Vorführung:** `SiteCheck.exe --demo` startet mit Beispieldaten, etwa für Bildschirmfotos oder eine
+Vorstellung. Die Seiten heißen `meine-seite.example`, `shop.example` und `blog.example`; geprüft wird
+gegen feste Antworten, es geht keine einzige Anfrage ins Netz. Die Vorführung arbeitet in einem eigenen
+Ordner, der bei jedem Start neu angelegt wird. Eigene Seiten, Verlauf und Sperrzeiten bleiben unberührt.
+Der Fenstertitel trägt „Vorführung“.
+
 ## Was er bewusst NICHT macht
 
 Keine Angriffe, nur der ausdrücklich bestätigte Stresstest belastet die eigene Seite aktiv:

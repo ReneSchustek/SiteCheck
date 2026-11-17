@@ -180,6 +180,10 @@
   <data name="Log_Empty_None" xml:space="preserve">
     <value>Noch keine Einträge. Sie entstehen, sobald etwas geprüft wird.</value>
   </data>
+  <data name="MainWindow_DemoTitle" xml:space="preserve">
+    <value>SiteCheck – Vorführung</value>
+    <comment>Fenstertitel im Vorführmodus (Startschalter --demo).</comment>
+  </data>
   <data name="MainWindow_NavAbout.Content" xml:space="preserve">
     <value>Über</value>
   </data>

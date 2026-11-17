@@ -167,6 +167,11 @@ increase the risk of a block.
 The console returns `1` as soon as there is a critical finding, `3` if the run was stopped and the report is
 incomplete, and `0` otherwise, which is handy for scheduled runs.
 
+**Demo:** `SiteCheck.exe --demo` starts with sample data, for screenshots or a presentation. The sites are
+called `meine-seite.example`, `shop.example` and `blog.example`; checks run against fixed answers and not a
+single request goes to the network. The demo works in a folder of its own that is recreated on every start.
+Your own sites, history and rest periods stay untouched. The window title says "Demo".
+
 ## What it deliberately does NOT do
 
 No attacks; only the explicitly confirmed stress test puts active load on your own site: no SQL injection, no

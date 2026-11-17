@@ -5,6 +5,11 @@ verwendet [Semantic Versioning](https://semver.org/lang/de/).
 
 ## [Unreleased]
 
+### Hinzugefügt
+
+- Vorführung mit Beispieldaten: `--demo` zeigt alle Bereiche mit erfundenen Seiten, ohne eine einzige
+  Anfrage ins Netz und ohne die eigenen Daten anzufassen.
+
 ### Geändert
 
 - Oberfläche und gespeicherter Bericht erscheinen auf jedem Rechner in Roboto Flex, Codebeispiele in

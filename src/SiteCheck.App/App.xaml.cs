@@ -6,6 +6,7 @@ using SiteCheck.App.Composition;
 using SiteCheck.App.Services;
 using SiteCheck.Core.Abstractions;
 using SiteCheck.Core.Models.Update;
+using SiteCheck.Data.Storage;
 
 namespace SiteCheck.App;
 
@@ -25,7 +26,17 @@ public partial class App : Microsoft.UI.Xaml.Application
     public App()
     {
         InitializeComponent();
-        Services = ServiceRegistration.Build();
+        AppPaths paths = new();
+        if (DemoMode.IsRequested(Environment.GetCommandLineArgs()))
+        {
+            // Vor dem Container leeren: Der Protokollschreiber legt seinen Ordner beim ersten Eintrag an.
+            paths = DemoMode.PathsBeside(paths);
+            DemoMode.ResetDirectory(paths);
+            Services = ServiceRegistration.Build(new AppRunMode(IsDemo: true), paths);
+            return;
+        }
+
+        Services = ServiceRegistration.Build(AppRunMode.Normal, paths);
     }
 
     /// <summary>Der Dienst-Container der Anwendung.</summary>
@@ -55,6 +66,11 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     private async Task StartAsync()
     {
+        if (Services.GetRequiredService<AppRunMode>().IsDemo)
+        {
+            await DemoMode.SeedAsync(Services, CancellationToken.None);
+        }
+
         UpdateOrchestrator updates = Services.GetRequiredService<UpdateOrchestrator>();
 
         // Aus dem Staging-Ordner gestartet: nur die Dateien tauschen, kein Fenster öffnen.
